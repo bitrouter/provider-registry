@@ -1,14 +1,10 @@
 # bitrouter provider registry
 
-Public source-of-truth for the anonymous providers routable by
+Public source-of-truth for the providers routable by
 [`bitrouter-cloud`](https://github.com/bitrouter/bitrouter-cloud). Each
 provider opens a PR against this repo declaring which canonical models
 they serve and at what price. **No credentials live here** — those are
 held server-side in `bitrouter-cloud`.
-
-See
-[`engineering/anonymous-router/001-mvp-implementation-spec.md §3`](https://bitrouter.ai/docs/anonymous-router)
-for the routing architecture.
 
 ## Layout
 
