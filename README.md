@@ -1,0 +1,95 @@
+# bitrouter provider registry
+
+Public source-of-truth for the anonymous providers routable by
+[`bitrouter-cloud`](https://github.com/bitrouter/bitrouter-cloud). Each
+provider opens a PR against this repo declaring which canonical models
+they serve and at what price. **No credentials live here** — those are
+held server-side in `bitrouter-cloud`.
+
+See
+[`engineering/anonymous-router/001-mvp-implementation-spec.md §3`](https://bitrouter.ai/docs/anonymous-router)
+for the routing architecture.
+
+## Layout
+
+```
+canonical.yaml              # the shared model vocabulary
+providers/
+  <name>.yaml               # one file per provider (filename == name)
+scripts/
+  schema.ts                 # shared Zod schemas + IO helpers
+  validate.ts               # `bun run validate`
+  manage.ts                 # `bun run manage <subcommand>`
+.github/workflows/validate.yml
+```
+
+## Validation
+
+`bun run validate` checks:
+
+- every YAML file parses against the Zod schema in `scripts/schema.ts`;
+- every provider model references a canonical id from `canonical.yaml`;
+- filename matches the declared `name` field;
+- provider names are unique;
+- any `status: active` provider declares at least one model.
+
+The same script runs in CI on every push and pull request. To run
+locally:
+
+```bash
+bun install
+bun run validate
+```
+
+## Management
+
+`bun run manage` mutates the registry while preserving the schema.
+Every command re-validates the new YAML before writing.
+
+```bash
+bun run manage list                       # one-line summary per provider
+bun run manage show redpill               # dump one provider's YAML
+
+# Create or update a provider's top-level metadata
+bun run manage add redpill \
+    --status active \
+    --protocol openai \
+    --weight 1.0 \
+    --rpm 60 \
+    --contact ops@example.com
+
+# Attach a canonical model to an existing provider
+bun run manage add-model redpill deepseek/deepseek-v3.2 deepseek/deepseek-v3.2 \
+    --no-cache 0.27 --cache-read 0.054 --output 0.41
+
+bun run manage remove-model redpill anthropic/claude-sonnet-4-6
+bun run manage delete some-provider
+
+# Canonical model list
+bun run manage canonical list
+bun run manage canonical add openai/gpt-4o \
+    --name "OpenAI: GPT-4o" \
+    --input-modalities text,image \
+    --output-modalities text \
+    --max-input-tokens 128000 --max-output-tokens 16384
+bun run manage canonical remove openai/gpt-4o   # blocked while any provider references it
+```
+
+`add` without all flags will prompt for missing fields when stdin is a
+TTY. In CI / scripted contexts pass everything via flags; missing
+required values cause the script to exit non-zero rather than hang.
+
+## How `bitrouter-cloud` consumes this
+
+`bitrouter-cloud` reads the registry from a filesystem path
+(`ROUTER_REGISTRY_PATH`, default `/opt/provider-registry`). The
+intended deployment workflow is:
+
+1. Provider opens a PR here → CI runs `bun run validate`.
+2. A maintainer reviews and merges.
+3. `bitrouter-cloud`'s deployment pipeline updates its submodule
+   reference (or re-syncs the directory) and rolls out a new image.
+
+Credentials for each provider live in `bitrouter-cloud`'s database
+(`provider_registry_keys` table) and are rotated through its admin API,
+independent of this repo.

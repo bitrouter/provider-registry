@@ -1,0 +1,29 @@
+# Chutes — community-hosted open-weights inference network.
+# Credentials supplied at startup via CHUTES_API_KEY / CHUTES_API_BASE
+# (e.g. CHUTES_API_BASE=https://llm.chutes.ai/v1).
+name: chutes
+
+api_protocol:
+  - "*": openai
+
+rate_limits:
+  - "*":
+      requests_per_minute: 30
+
+models:
+  - id: deepseek/deepseek-v3.2
+    # Chutes typically uses the upstream Hugging Face style ID:
+    provider_model_id: deepseek-ai/DeepSeek-V3.2
+    pricing:
+      input_tokens:
+        no_cache: 0.2
+        cache_read: 0.05
+
+  - id: meta-llama/llama-3.3-70b-instruct
+    provider_model_id: meta-llama/Llama-3.3-70B-Instruct
+    pricing:
+      input_tokens:
+        no_cache: 0.3
+
+status: active
+weight: 1.0

@@ -1,0 +1,27 @@
+# Opencode — OpenAI-compatible inference endpoint at opencode.ai.
+# Credentials supplied at startup via OPENCODE_API_KEY / OPENCODE_API_BASE
+# (e.g. OPENCODE_API_BASE=https://opencode.ai/v1).
+name: opencode
+
+api_protocol:
+  - "*": openai
+
+rate_limits:
+  - "*":
+      requests_per_minute: 30
+
+models:
+  - id: deepseek/deepseek-v3.2
+    provider_model_id: deepseek/deepseek-v3.2
+    pricing:
+      input_tokens:
+        no_cache: 0.25
+
+  - id: anthropic/claude-sonnet-4-6
+    provider_model_id: anthropic/claude-sonnet-4-6
+    pricing:
+      input_tokens:
+        no_cache: 3.0
+
+status: active
+weight: 1.0

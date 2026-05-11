@@ -1,0 +1,21 @@
+# Canonical model list — see engineering/anonymous-router/001-mvp-implementation-spec.md §3.1.
+#
+# Provider-side model_id mappings live in each `providers/*.yaml` entry below.
+models:
+  - id: deepseek/deepseek-v3.2
+    name: "DeepSeek: DeepSeek V3.2"
+    description: "DeepSeek-V3.2 — high-efficiency reasoning model."
+    input_modalities: [text]
+    output_modalities: [text]
+
+  - id: meta-llama/llama-3.3-70b-instruct
+    name: "Meta: Llama 3.3 70B Instruct"
+    description: "Open-weights instruction-tuned 70B parameter model."
+    input_modalities: [text]
+    output_modalities: [text]
+
+  - id: anthropic/claude-sonnet-4-6
+    name: "Anthropic: Claude Sonnet 4.6"
+    description: "Anthropic's Claude Sonnet 4.6."
+    input_modalities: [text, image]
+    output_modalities: [text]

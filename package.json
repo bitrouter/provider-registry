@@ -1,0 +1,20 @@
+{
+  "name": "bitrouter-provider-registry",
+  "module": "scripts/validate.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "validate": "bun run scripts/validate.ts",
+    "manage": "bun run scripts/manage.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "yaml": "^2.9.0",
+    "zod": "^4.4.3"
+  }
+}
