@@ -97,8 +97,8 @@ models:
       - text
     max_input_tokens: 262144
     max_output_tokens: 65536
-  - id: xiaomimimo-v2-flash
-    name: "XiaomiMiMo: V2 Flash"
+  - id: mimo-v2-flash
+    name: "Xiaomi: MiMo V2 Flash"
     input_modalities:
       - text
     output_modalities:
@@ -243,9 +243,9 @@ models:
       - text
     max_input_tokens: 131072
     max_output_tokens: 8192
-  - id: mimo-v2.5-flash
-    name: "Xiaomi: MiMo V2.5 Flash"
-    description: Xiaomi MiMo V2.5 Flash — fast inference tier of the MiMo V2.5 family.
+  - id: mimo-v2.5
+    name: "Xiaomi: MiMo V2.5"
+    description: Xiaomi MiMo V2.5 — standard tier of the MiMo V2.5 family.
     input_modalities:
       - text
     output_modalities:

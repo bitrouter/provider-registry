@@ -72,7 +72,7 @@ models:
         cache_read: 0.195
       output_tokens:
         text: 2.34
-  - id: xiaomimimo-v2-flash
+  - id: mimo-v2-flash
     provider_model_id: XiaomiMiMo/MiMo-V2-Flash-TEE
     pricing:
       input_tokens:
