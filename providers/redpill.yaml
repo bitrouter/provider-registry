@@ -1,35 +1,26 @@
-# Red Pill AI — OpenAI-compatible aggregator.
-# Credentials supplied at startup via REDPILL_API_KEY / REDPILL_API_BASE
-# (e.g. REDPILL_API_BASE=https://api.redpill.ai/v1).
 name: redpill
-
 api_protocol:
   - "*": openai
-
 rate_limits:
   - "*":
       requests_per_minute: 60
-
 models:
-  - id: deepseek/deepseek-v3.2
+  - id: deepseek-v3.2
     provider_model_id: deepseek/deepseek-v3.2
     pricing:
       input_tokens:
         no_cache: 0.27
         cache_read: 0.054
-
-  - id: meta-llama/llama-3.3-70b-instruct
+  - id: llama-3.3-70b-instruct
     provider_model_id: meta-llama/llama-3.3-70b-instruct
     pricing:
       input_tokens:
         no_cache: 0.4
-
-  - id: anthropic/claude-sonnet-4-6
+  - id: claude-sonnet-4-6
     provider_model_id: anthropic/claude-sonnet-4-6
     pricing:
       input_tokens:
-        no_cache: 3.0
+        no_cache: 3
         cache_read: 0.3
-
 status: active
-weight: 1.0
+weight: 1

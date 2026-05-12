@@ -5,20 +5,20 @@ rate_limits:
   - "*":
       requests_per_minute: 50
 models:
-  - id: deepseek/deepseek-v3.2
+  - id: deepseek-v3.2
     provider_model_id: deepseek/deepseek-v3.2
     pricing:
       input_tokens:
         no_cache: 0.22
         cache_read: 0.045
       output_tokens: {}
-  - id: meta-llama/llama-3.3-70b-instruct
+  - id: llama-3.3-70b-instruct
     provider_model_id: meta-llama/llama-3.3-70b-instruct
     pricing:
       input_tokens:
         no_cache: 0.32
       output_tokens: {}
-  - id: deepseek/deepseek-v4-pro
+  - id: deepseek-v4-pro
     provider_model_id: deepseek-ai/DeepSeek-V4-Pro
     pricing:
       input_tokens:
@@ -26,7 +26,7 @@ models:
         cache_read: 0.35
       output_tokens:
         text: 5.5
-  - id: deepseek/deepseek-v4-flash
+  - id: deepseek-v4-flash
     provider_model_id: deepseek-ai/DeepSeek-V4-Flash
     pricing:
       input_tokens:
@@ -34,7 +34,7 @@ models:
         cache_read: 0.38
       output_tokens:
         text: 2.28
-  - id: kimi/kimi-k2-6
+  - id: kimi-k2.6
     provider_model_id: moonshotai/Kimi-K2.6
     pricing:
       input_tokens:
@@ -42,7 +42,7 @@ models:
         cache_read: 0.25
       output_tokens:
         text: 3.5
-  - id: zhipu/glm-5-1
+  - id: glm-5.1
     provider_model_id: zai-org/GLM-5.1
     pricing:
       input_tokens:
@@ -50,7 +50,7 @@ models:
         cache_read: 0.26
       output_tokens:
         text: 4.4
-  - id: minimax/minimax-m2-5
+  - id: minimax-m2.5
     provider_model_id: MiniMaxAI/MiniMax-M2.5
     pricing:
       input_tokens:

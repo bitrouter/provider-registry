@@ -79,14 +79,19 @@ export type ModelPricing = z.infer<typeof ModelPricing>;
 
 // ── Canonical model file ────────────────────────────────────────────────
 
+// Canonical ids drop the vendor prefix and follow each vendor's own
+// separator convention (e.g. `claude-sonnet-4-6`, `kimi-k2.6`,
+// `gemini-3.1-pro-preview`). The schema just enforces a conservative
+// charset: lowercase alphanumerics plus `.`, `_`, `-`, must start and
+// end with an alphanumeric.
 export const CanonicalModel = z
   .object({
     id: z
       .string()
       .min(1)
       .regex(
-        /^[a-z0-9_.-]+\/[a-zA-Z0-9._-]+$/,
-        "canonical id must be 'org/model-name'",
+        /^[a-z0-9]([a-z0-9._-]*[a-z0-9])?$/,
+        "canonical id must be lowercase, no vendor prefix, no slashes",
       ),
     name: z.string().min(1).optional(),
     description: z.string().optional(),
