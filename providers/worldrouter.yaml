@@ -89,6 +89,26 @@ models:
         no_cache: 5
       output_tokens:
         text: 15
+  - id: qwen3.5-plus
+    provider_model_id: qwen3.5-plus
+    pricing:
+      input_tokens: {}
+      output_tokens: {}
+  - id: qwen3.6-plus
+    provider_model_id: qwen3.6-plus
+    pricing:
+      input_tokens: {}
+      output_tokens: {}
+  - id: mimo-v2.5-flash
+    provider_model_id: mimo-v2.5
+    pricing:
+      input_tokens: {}
+      output_tokens: {}
+  - id: mimo-v2.5-pro
+    provider_model_id: mimo-v2.5-pro
+    pricing:
+      input_tokens: {}
+      output_tokens: {}
 status: active
 weight: 1
 submitted_at: 2026-05-12
