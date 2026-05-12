@@ -1,29 +1,110 @@
-# Chutes — community-hosted open-weights inference network.
-# Credentials supplied at startup via CHUTES_API_KEY / CHUTES_API_BASE
-# (e.g. CHUTES_API_BASE=https://llm.chutes.ai/v1).
 name: chutes
-
 api_protocol:
   - "*": openai
-
 rate_limits:
   - "*":
       requests_per_minute: 30
-
 models:
-  - id: deepseek/deepseek-v3.2
-    # Chutes typically uses the upstream Hugging Face style ID:
-    provider_model_id: deepseek-ai/DeepSeek-V3.2
-    pricing:
-      input_tokens:
-        no_cache: 0.2
-        cache_read: 0.05
-
   - id: meta-llama/llama-3.3-70b-instruct
     provider_model_id: meta-llama/Llama-3.3-70B-Instruct
     pricing:
       input_tokens:
         no_cache: 0.3
-
+  - id: kimi/kimi-k2-5
+    provider_model_id: moonshotai/Kimi-K2.5-TEE
+    pricing:
+      input_tokens:
+        no_cache: 0.44
+        cache_read: 0.22
+      output_tokens:
+        text: 2
+  - id: kimi/kimi-k2-6
+    provider_model_id: moonshotai/Kimi-K2.6-TEE
+    pricing:
+      input_tokens:
+        no_cache: 0.95
+        cache_read: 0.475
+      output_tokens:
+        text: 4
+  - id: zhipu/glm-5-1
+    provider_model_id: zai-org/GLM-5.1-TEE
+    pricing:
+      input_tokens:
+        no_cache: 1.05
+        cache_read: 0.525
+      output_tokens:
+        text: 3.5
+  - id: zhipu/glm-5
+    provider_model_id: zai-org/GLM-5-TEE
+    pricing:
+      input_tokens:
+        no_cache: 0.95
+        cache_read: 0.475
+      output_tokens:
+        text: 2.55
+  - id: zhipu/glm-4-7
+    provider_model_id: zai-org/GLM-4.7-TEE
+    pricing:
+      input_tokens:
+        no_cache: 0.39
+        cache_read: 0.195
+      output_tokens:
+        text: 1.75
+  - id: deepseek/deepseek-v3.2
+    provider_model_id: deepseek-ai/DeepSeek-V3.2-TEE
+    pricing:
+      input_tokens:
+        no_cache: 0.28
+        cache_read: 0.14
+      output_tokens:
+        text: 0.42
+  - id: deepseek/deepseek-v3-1
+    provider_model_id: deepseek-ai/DeepSeek-V3.1-TEE
+    pricing:
+      input_tokens:
+        no_cache: 0.27
+        cache_read: 0.135
+      output_tokens:
+        text: 1
+  - id: minimax/minimax-m2-5
+    provider_model_id: MiniMaxAI/MiniMax-M2.5-TEE
+    pricing:
+      input_tokens:
+        no_cache: 0.15
+        cache_read: 0.075
+      output_tokens:
+        text: 1.2
+  - id: qwen/qwen3-6-27b
+    provider_model_id: Qwen/Qwen3.6-27B-TEE
+    pricing:
+      input_tokens:
+        no_cache: 0.5
+        cache_read: 0.25
+      output_tokens:
+        text: 2
+  - id: qwen/qwen3-5-397b-a17b
+    provider_model_id: Qwen/Qwen3.5-397B-A17B-TEE
+    pricing:
+      input_tokens:
+        no_cache: 0.39
+        cache_read: 0.195
+      output_tokens:
+        text: 2.34
+  - id: qwen/qwen3-6-35b-a3b
+    provider_model_id: Qwen/Qwen3.6-35B-TEE
+    pricing:
+      input_tokens:
+        no_cache: 0.2
+        cache_read: 0.1
+      output_tokens:
+        text: 1
+  - id: xiaomi/xiaomimimo-v2-flash
+    provider_model_id: XiaomiMiMo/MiMo-V2-Flash-TEE
+    pricing:
+      input_tokens:
+        no_cache: 0.09
+        cache_read: 0.045
+      output_tokens:
+        text: 0.29
 status: active
-weight: 1.0
+weight: 1
