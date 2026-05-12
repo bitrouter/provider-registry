@@ -227,3 +227,24 @@ models:
       - text
     max_input_tokens: 131072
     max_output_tokens: 4096
+  - id: gemma4-31b
+    name: "Google: Gemma 4 31B"
+    description: Gemma 4 31B with built-in thinking mode, image understanding, native function calling,
+      multilingual support.
+    input_modalities:
+      - text
+      - image
+    output_modalities:
+      - text
+    max_input_tokens: 262144
+    max_output_tokens: 8192
+  - id: gpt-oss-120b
+    name: "OpenAI: GPT-OSS 120B"
+    description: OpenAI open-weight 117B MoE (5.1B active) with configurable reasoning effort,
+      chain-of-thought access, and built-in function calling / browsing / code execution.
+    input_modalities:
+      - text
+    output_modalities:
+      - text
+    max_input_tokens: 131072
+    max_output_tokens: 16384
