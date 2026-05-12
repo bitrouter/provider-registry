@@ -4,12 +4,10 @@ api_protocol:
 rate_limits:
   - "*":
       requests_per_minute: 30
+# Catalog source: GET https://llm.chutes.ai/v1/models (public, no auth needed).
+# All pmids end in -TEE because that's how chutes labels their trusted-
+# execution variants in the live catalog.
 models:
-  - id: llama-3.3-70b-instruct
-    provider_model_id: meta-llama/Llama-3.3-70B-Instruct
-    pricing:
-      input_tokens:
-        no_cache: 0.3
   - id: kimi-k2.5
     provider_model_id: moonshotai/Kimi-K2.5-TEE
     pricing:
@@ -42,14 +40,6 @@ models:
         cache_read: 0.475
       output_tokens:
         text: 2.55
-  - id: glm-4.7
-    provider_model_id: zai-org/GLM-4.7-TEE
-    pricing:
-      input_tokens:
-        no_cache: 0.39
-        cache_read: 0.195
-      output_tokens:
-        text: 1.75
   - id: deepseek-v3.2
     provider_model_id: deepseek-ai/DeepSeek-V3.2-TEE
     pricing:
@@ -58,14 +48,6 @@ models:
         cache_read: 0.14
       output_tokens:
         text: 0.42
-  - id: deepseek-v3.1
-    provider_model_id: deepseek-ai/DeepSeek-V3.1-TEE
-    pricing:
-      input_tokens:
-        no_cache: 0.27
-        cache_read: 0.135
-      output_tokens:
-        text: 1
   - id: minimax-m2.5
     provider_model_id: MiniMaxAI/MiniMax-M2.5-TEE
     pricing:
@@ -90,14 +72,6 @@ models:
         cache_read: 0.195
       output_tokens:
         text: 2.34
-  - id: qwen3.6-35b-a3b
-    provider_model_id: Qwen/Qwen3.6-35B-TEE
-    pricing:
-      input_tokens:
-        no_cache: 0.2
-        cache_read: 0.1
-      output_tokens:
-        text: 1
   - id: xiaomimimo-v2-flash
     provider_model_id: XiaomiMiMo/MiMo-V2-Flash-TEE
     pricing:

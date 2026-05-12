@@ -41,12 +41,6 @@ models:
       input_tokens:
         no_cache: 0.1
       output_tokens: {}
-  - id: llama-3.3-70b-instruct
-    provider_model_id: llama3-3-70b
-    pricing:
-      input_tokens:
-        no_cache: 0.35
-      output_tokens: {}
 status: active
 weight: 1
 submitted_at: 2026-05-12

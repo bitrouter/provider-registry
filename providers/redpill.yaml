@@ -11,11 +11,6 @@ models:
       input_tokens:
         no_cache: 0.27
         cache_read: 0.054
-  - id: llama-3.3-70b-instruct
-    provider_model_id: meta-llama/llama-3.3-70b-instruct
-    pricing:
-      input_tokens:
-        no_cache: 0.4
   - id: claude-sonnet-4-6
     provider_model_id: anthropic/claude-sonnet-4-6
     pricing:

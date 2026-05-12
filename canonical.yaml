@@ -6,13 +6,6 @@ models:
       - text
     output_modalities:
       - text
-  - id: llama-3.3-70b-instruct
-    name: "Meta: Llama 3.3 70B Instruct"
-    description: Open-weights instruction-tuned 70B parameter model.
-    input_modalities:
-      - text
-    output_modalities:
-      - text
   - id: claude-sonnet-4-6
     name: "Anthropic: Claude Sonnet 4.6"
     description: Anthropic's Claude Sonnet 4.6.
@@ -87,22 +80,6 @@ models:
       - text
     max_input_tokens: 202752
     max_output_tokens: 65535
-  - id: glm-4.7
-    name: "Zhipu: GLM-4.7"
-    input_modalities:
-      - text
-    output_modalities:
-      - text
-    max_input_tokens: 202752
-    max_output_tokens: 65535
-  - id: deepseek-v3.1
-    name: "DeepSeek: DeepSeek V3.1"
-    input_modalities:
-      - text
-    output_modalities:
-      - text
-    max_input_tokens: 163840
-    max_output_tokens: 65536
   - id: qwen3.6-27b
     name: "Qwen: Qwen3.6 27B"
     input_modalities:

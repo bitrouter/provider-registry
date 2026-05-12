@@ -4,19 +4,17 @@ api_protocol:
 rate_limits:
   - "*":
       requests_per_minute: 50
+# Catalog source: GET https://api.intelligence.io.solutions/api/v1/models
+# (public, no auth needed). Pricing values for newly-added entries below
+# are placeholders mirroring sibling entries on the same canonical and
+# should be replaced with io.net's published rates when available.
 models:
   - id: deepseek-v3.2
-    provider_model_id: deepseek/deepseek-v3.2
+    provider_model_id: deepseek-ai/DeepSeek-V3.2
     pricing:
       input_tokens:
         no_cache: 0.22
         cache_read: 0.045
-      output_tokens: {}
-  - id: llama-3.3-70b-instruct
-    provider_model_id: meta-llama/llama-3.3-70b-instruct
-    pricing:
-      input_tokens:
-        no_cache: 0.32
       output_tokens: {}
   - id: deepseek-v4-pro
     provider_model_id: deepseek-ai/DeepSeek-V4-Pro
@@ -34,6 +32,12 @@ models:
         cache_read: 0.38
       output_tokens:
         text: 2.28
+  - id: kimi-k2.5
+    provider_model_id: moonshotai/Kimi-K2.5
+    pricing:
+      input_tokens:
+        no_cache: 0.44
+      output_tokens: {}
   - id: kimi-k2.6
     provider_model_id: moonshotai/Kimi-K2.6
     pricing:
@@ -42,6 +46,12 @@ models:
         cache_read: 0.25
       output_tokens:
         text: 3.5
+  - id: glm-5
+    provider_model_id: zai-org/GLM-5
+    pricing:
+      input_tokens:
+        no_cache: 0.95
+      output_tokens: {}
   - id: glm-5.1
     provider_model_id: zai-org/GLM-5.1
     pricing:
@@ -58,6 +68,12 @@ models:
         cache_read: 0.1
       output_tokens:
         text: 1.2
+  - id: gpt-oss-120b
+    provider_model_id: openai/gpt-oss-120b
+    pricing:
+      input_tokens:
+        no_cache: 0.1
+      output_tokens: {}
 status: active
 weight: 1
 submitted_at: 2026-05-12

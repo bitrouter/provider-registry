@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "validate": "bun run scripts/validate.ts",
-    "manage": "bun run scripts/manage.ts"
+    "manage": "bun run scripts/manage.ts",
+    "fetch-models": "bun run scripts/fetch-provider-models.ts"
   },
   "devDependencies": {
     "@types/bun": "latest"
