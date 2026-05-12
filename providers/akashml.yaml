@@ -1,0 +1,38 @@
+name: akashml
+api_protocol:
+  - "*": openai
+rate_limits:
+  - "*":
+      requests_per_minute: 40
+models:
+  - id: qwen/qwen3-6-35b-a3b
+    provider_model_id: Qwen/Qwen3.6-35B-A3B
+    pricing:
+      input_tokens:
+        no_cache: 0.17
+      output_tokens:
+        text: 1.2
+  - id: deepseek/deepseek-v4-flash
+    provider_model_id: deepseek-ai/DeepSeek-V4-Flash
+    pricing:
+      input_tokens:
+        no_cache: 0.14
+      output_tokens:
+        text: 0.28
+  - id: minimax/minimax-m2-5
+    provider_model_id: MiniMaxAI/MiniMax-M2.5
+    pricing:
+      input_tokens:
+        no_cache: 0.15
+      output_tokens:
+        text: 1.15
+  - id: kimi/kimi-k2-6
+    provider_model_id: moonshotai/Kimi-K2.6
+    pricing:
+      input_tokens:
+        no_cache: 0.95
+      output_tokens:
+        text: 4
+status: active
+weight: 1
+submitted_at: 2026-05-12
