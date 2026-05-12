@@ -4,9 +4,6 @@ api_protocol:
 rate_limits:
   - "*":
       requests_per_minute: 60
-# Pricing source: worldrouter's published price table, originally in
-# Credits / 1M tokens. Converted to USD / 1M at the operator-confirmed
-# rate of 100 credits = 1 USD (i.e. divide every credit number by 100).
 models:
   - id: claude-sonnet-4-6
     provider_model_id: claude-sonnet-4-6
@@ -48,9 +45,9 @@ models:
     provider_model_id: gpt-5.5
     pricing:
       input_tokens:
-        no_cache: 7.0
+        no_cache: 7
         cache_read: 0.7
-        cache_write: 7.0
+        cache_write: 7
       output_tokens:
         text: 31.5
   - id: gpt-5.4
@@ -111,11 +108,11 @@ models:
     provider_model_id: grok-4.20
     pricing:
       input_tokens:
-        no_cache: 4.0
+        no_cache: 4
         cache_read: 0.4
-        cache_write: 4.0
+        cache_write: 4
       output_tokens:
-        text: 12.0
+        text: 12
   - id: qwen3.5-plus
     provider_model_id: qwen3.5-plus
     pricing:
@@ -142,16 +139,24 @@ models:
         cache_read: 0.16
         cache_write: 0.8
       output_tokens:
-        text: 4.0
+        text: 4
   - id: mimo-v2.5-pro
     provider_model_id: mimo-v2.5-pro
     pricing:
       input_tokens:
-        no_cache: 2.0
+        no_cache: 2
         cache_read: 0.4
-        cache_write: 2.0
+        cache_write: 2
       output_tokens:
-        text: 6.0
+        text: 6
+  - id: mimo-v2-flash
+    provider_model_id: mimo-v2-flash
+    pricing:
+      input_tokens:
+        no_cache: 0.09
+        cache_read: 0.045
+      output_tokens:
+        text: 0.29
 status: active
 weight: 1
 submitted_at: 2026-05-12
