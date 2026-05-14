@@ -6,6 +6,8 @@ models:
       - text
     output_modalities:
       - text
+    max_input_tokens: 131072
+    max_output_tokens: 65536
   - id: claude-sonnet-4-6
     name: "Anthropic: Claude Sonnet 4.6"
     description: Anthropic's Claude Sonnet 4.6.
@@ -14,6 +16,8 @@ models:
       - image
     output_modalities:
       - text
+    max_input_tokens: 1000000
+    max_output_tokens: 128000
   - id: kimi-k2.6
     name: "Kimi: K2.6"
     input_modalities:
