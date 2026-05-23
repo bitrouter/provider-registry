@@ -67,6 +67,14 @@ models:
       - text
     max_input_tokens: 196608
     max_output_tokens: 196608
+  - id: minimax/minimax-m2.7
+    name: "MiniMax: M2.7"
+    input_modalities:
+      - text
+    output_modalities:
+      - text
+    max_input_tokens: 196608
+    max_output_tokens: 196608
   - id: moonshotai/kimi-k2.5
     name: "Kimi: K2.5"
     input_modalities:
