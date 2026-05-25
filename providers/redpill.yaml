@@ -5,13 +5,13 @@ rate_limits:
   - "*":
       requests_per_minute: 60
 models:
-  - id: deepseek-v3.2
+  - id: deepseek/deepseek-v3.2
     provider_model_id: deepseek/deepseek-v3.2
     pricing:
       input_tokens:
         no_cache: 0.27
         cache_read: 0.054
-  - id: claude-sonnet-4-6
+  - id: anthropic/claude-sonnet-4.6
     provider_model_id: anthropic/claude-sonnet-4-6
     pricing:
       input_tokens:
