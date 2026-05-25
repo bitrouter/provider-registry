@@ -1,0 +1,37 @@
+name: minimax
+api_protocol:
+  - "*": anthropic
+rate_limits:
+  - "*":
+      requests_per_minute: 60
+# Catalog source: https://models.dev/api.json (provider key `minimax`, api=https://api.minimax.io/anthropic/v1 — Anthropic-protocol endpoint).
+# Pricing is per 1M tokens.
+models:
+  - id: minimax-m2.7
+    provider_model_id: MiniMax-M2.7
+    pricing:
+      input_tokens:
+        no_cache: 0.3
+        cache_read: 0.06
+        cache_write: 0.375
+      output_tokens:
+        text: 1.2
+  - id: minimax-m2.5
+    provider_model_id: MiniMax-M2.5
+    pricing:
+      input_tokens:
+        no_cache: 0.3
+        cache_read: 0.03
+        cache_write: 0.375
+      output_tokens:
+        text: 1.2
+  - id: minimax-m2.1
+    provider_model_id: MiniMax-M2.1
+    pricing:
+      input_tokens:
+        no_cache: 0.3
+      output_tokens:
+        text: 1.2
+status: active
+weight: 1
+submitted_at: 2026-05-25

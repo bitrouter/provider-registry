@@ -1,0 +1,28 @@
+name: xai
+api_protocol:
+  - "*": openai
+rate_limits:
+  - "*":
+      requests_per_minute: 60
+# Catalog source: https://models.dev/api.json (provider key `xai`); >200k tier on Grok 4 family doubles the base price listed here.
+# Pricing is per 1M tokens.
+models:
+  - id: grok-4.3
+    provider_model_id: grok-4.3
+    pricing:
+      input_tokens:
+        no_cache: 1.25
+        cache_read: 0.2
+      output_tokens:
+        text: 2.5
+  - id: grok-4.20
+    provider_model_id: grok-4.20-0309-non-reasoning
+    pricing:
+      input_tokens:
+        no_cache: 1.25
+        cache_read: 0.2
+      output_tokens:
+        text: 2.5
+status: active
+weight: 1
+submitted_at: 2026-05-25

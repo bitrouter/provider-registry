@@ -1,0 +1,28 @@
+name: deepseek
+api_protocol:
+  - "*": openai
+rate_limits:
+  - "*":
+      requests_per_minute: 60
+# Catalog source: https://models.dev/api.json (provider key `deepseek`, api=https://api.deepseek.com); v3.2 is no longer served first-party.
+# Pricing is per 1M tokens.
+models:
+  - id: deepseek-v4-pro
+    provider_model_id: deepseek-v4-pro
+    pricing:
+      input_tokens:
+        no_cache: 1.74
+        cache_read: 0.145
+      output_tokens:
+        text: 3.48
+  - id: deepseek-v4-flash
+    provider_model_id: deepseek-v4-flash
+    pricing:
+      input_tokens:
+        no_cache: 0.14
+        cache_read: 0.028
+      output_tokens:
+        text: 0.28
+status: active
+weight: 1
+submitted_at: 2026-05-25
