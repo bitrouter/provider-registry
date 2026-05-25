@@ -1,0 +1,36 @@
+name: moonshotai
+api_protocol:
+  - "*": openai
+rate_limits:
+  - "*":
+      requests_per_minute: 60
+# Catalog source: https://models.dev/api.json (provider key `moonshotai`, api=https://api.moonshot.ai/v1).
+# Pricing is per 1M tokens.
+models:
+  - id: kimi-k2.6
+    provider_model_id: kimi-k2.6
+    pricing:
+      input_tokens:
+        no_cache: 0.95
+        cache_read: 0.16
+      output_tokens:
+        text: 4
+  - id: kimi-k2.5
+    provider_model_id: kimi-k2.5
+    pricing:
+      input_tokens:
+        no_cache: 0.6
+        cache_read: 0.1
+      output_tokens:
+        text: 3
+  - id: kimi-k2-thinking
+    provider_model_id: kimi-k2-thinking
+    pricing:
+      input_tokens:
+        no_cache: 0.6
+        cache_read: 0.15
+      output_tokens:
+        text: 2.5
+status: active
+weight: 1
+submitted_at: 2026-05-25

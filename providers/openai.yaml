@@ -1,0 +1,124 @@
+name: openai
+api_protocol:
+  - "*": openai
+rate_limits:
+  - "*":
+      requests_per_minute: 60
+# Catalog source: https://models.dev/api.json (provider key `openai`).
+# Pricing is per 1M tokens.
+models:
+  - id: gpt-5.5
+    provider_model_id: gpt-5.5
+    pricing:
+      input_tokens:
+        no_cache: 5
+        cache_read: 0.5
+      output_tokens:
+        text: 30
+  - id: gpt-5.4
+    provider_model_id: gpt-5.4
+    pricing:
+      input_tokens:
+        no_cache: 2.5
+        cache_read: 0.25
+      output_tokens:
+        text: 15
+  - id: gpt-5.4-mini
+    provider_model_id: gpt-5.4-mini
+    pricing:
+      input_tokens:
+        no_cache: 0.75
+        cache_read: 0.075
+      output_tokens:
+        text: 4.5
+  - id: gpt-5.4-nano
+    provider_model_id: gpt-5.4-nano
+    pricing:
+      input_tokens:
+        no_cache: 0.2
+        cache_read: 0.02
+      output_tokens:
+        text: 1.25
+  - id: gpt-5.3-codex
+    provider_model_id: gpt-5.3-codex
+    pricing:
+      input_tokens:
+        no_cache: 1.75
+        cache_read: 0.175
+      output_tokens:
+        text: 14
+  - id: gpt-5.2
+    provider_model_id: gpt-5.2
+    pricing:
+      input_tokens:
+        no_cache: 1.75
+        cache_read: 0.175
+      output_tokens:
+        text: 14
+  - id: gpt-5.2-codex
+    provider_model_id: gpt-5.2-codex
+    pricing:
+      input_tokens:
+        no_cache: 1.75
+        cache_read: 0.175
+      output_tokens:
+        text: 14
+  - id: gpt-5.1
+    provider_model_id: gpt-5.1
+    pricing:
+      input_tokens:
+        no_cache: 1.25
+        cache_read: 0.13
+      output_tokens:
+        text: 10
+  - id: gpt-5.1-codex
+    provider_model_id: gpt-5.1-codex
+    pricing:
+      input_tokens:
+        no_cache: 1.25
+        cache_read: 0.125
+      output_tokens:
+        text: 10
+  - id: gpt-5.1-codex-mini
+    provider_model_id: gpt-5.1-codex-mini
+    pricing:
+      input_tokens:
+        no_cache: 0.25
+        cache_read: 0.025
+      output_tokens:
+        text: 2
+  - id: gpt-5
+    provider_model_id: gpt-5
+    pricing:
+      input_tokens:
+        no_cache: 1.25
+        cache_read: 0.125
+      output_tokens:
+        text: 10
+  - id: gpt-5-mini
+    provider_model_id: gpt-5-mini
+    pricing:
+      input_tokens:
+        no_cache: 0.25
+        cache_read: 0.025
+      output_tokens:
+        text: 2
+  - id: gpt-5-codex
+    provider_model_id: gpt-5-codex
+    pricing:
+      input_tokens:
+        no_cache: 1.25
+        cache_read: 0.125
+      output_tokens:
+        text: 10
+  - id: o3
+    provider_model_id: o3
+    pricing:
+      input_tokens:
+        no_cache: 2
+        cache_read: 0.5
+      output_tokens:
+        text: 8
+status: active
+weight: 1
+submitted_at: 2026-05-25
