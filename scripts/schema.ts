@@ -79,19 +79,19 @@ export type ModelPricing = z.infer<typeof ModelPricing>;
 
 // ── Canonical model file ────────────────────────────────────────────────
 
-// Canonical ids drop the vendor prefix and follow each vendor's own
-// separator convention (e.g. `claude-sonnet-4-6`, `kimi-k2.6`,
-// `gemini-3.1-pro-preview`). The schema just enforces a conservative
-// charset: lowercase alphanumerics plus `.`, `_`, `-`, must start and
-// end with an alphanumeric.
+// Canonical ids are huggingface-style `<org>/<model>` slugs aligned with
+// the OpenRouter catalog (e.g. `anthropic/claude-sonnet-4.6`,
+// `moonshotai/kimi-k2.6`, `google/gemini-3.1-pro-preview`). Both halves
+// are lowercase alphanumerics plus `.`, `_`, `-`, must start and end with
+// an alphanumeric, and are separated by exactly one `/`.
 export const CanonicalModel = z
   .object({
     id: z
       .string()
       .min(1)
       .regex(
-        /^[a-z0-9]([a-z0-9._-]*[a-z0-9])?$/,
-        "canonical id must be lowercase, no vendor prefix, no slashes",
+        /^[a-z0-9]([a-z0-9._-]*[a-z0-9])?\/[a-z0-9]([a-z0-9._-]*[a-z0-9])?$/,
+        "canonical id must be a lowercase '<org>/<model>' slug",
       ),
     name: z.string().min(1).optional(),
     description: z.string().optional(),
