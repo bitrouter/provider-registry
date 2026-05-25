@@ -1,0 +1,19 @@
+name: anon-a
+api_protocol:
+  - "*": anthropic
+rate_limits:
+  - "*":
+      requests_per_minute: 60
+# Pricing intentionally omitted — fill in when published rates are available.
+models:
+  - id: anthropic/claude-haiku-4.5
+    provider_model_id: claude-haiku-4-5-20251001
+  - id: anthropic/claude-opus-4.6
+    provider_model_id: claude-opus-4-6
+  - id: anthropic/claude-opus-4.7
+    provider_model_id: claude-opus-4-7
+  - id: anthropic/claude-sonnet-4.6
+    provider_model_id: claude-sonnet-4-6
+status: active
+weight: 1
+submitted_at: 2026-05-25
