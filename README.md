@@ -58,7 +58,7 @@ bun run manage add redpill \
 bun run manage add-model redpill deepseek/deepseek-v3.2 deepseek/deepseek-v3.2 \
     --no-cache 0.27 --cache-read 0.054 --output 0.41
 
-bun run manage remove-model redpill anthropic/claude-sonnet-4-6
+bun run manage remove-model redpill anthropic/claude-sonnet-4.6
 bun run manage delete some-provider
 
 # Canonical model list

@@ -9,7 +9,7 @@ rate_limits:
 # Pricing taken from tinfoil's published rates; tinfoil does not advertise
 # a separate cache-read rate, so `cache_read` is omitted here.
 models:
-  - id: deepseek-v4-pro
+  - id: deepseek/deepseek-v4-pro
     # Tinfoil deployment is configured for 800K context vs. the upstream 1M.
     provider_model_id: deepseek-v4-pro
     pricing:
@@ -17,28 +17,28 @@ models:
         no_cache: 1.50
       output_tokens:
         text: 5.25
-  - id: glm-5.1
+  - id: z-ai/glm-5.1
     provider_model_id: glm-5-1
     pricing:
       input_tokens:
         no_cache: 1.50
       output_tokens:
         text: 5.25
-  - id: kimi-k2.6
+  - id: moonshotai/kimi-k2.6
     provider_model_id: kimi-k2-6
     pricing:
       input_tokens:
         no_cache: 1.50
       output_tokens:
         text: 5.25
-  - id: gemma4-31b
+  - id: google/gemma-4-31b-it
     provider_model_id: gemma4-31b
     pricing:
       input_tokens:
         no_cache: 0.45
       output_tokens:
         text: 1.00
-  - id: gpt-oss-120b
+  - id: openai/gpt-oss-120b
     provider_model_id: gpt-oss-120b
     pricing:
       input_tokens:
