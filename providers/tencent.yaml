@@ -1,0 +1,61 @@
+name: tencent
+api_protocol:
+  - "*": openai
+rate_limits:
+  - "*":
+      requests_per_minute: 60
+# Anonymous provider — upstream endpoint, region, auth scheme, and any
+# other identifying technical details are intentionally not declared
+# here. They are held server-side by bitrouter-cloud and resolved at
+# routing time. Only the canonical model set and prices are public.
+models:
+  - id: deepseek/deepseek-v3.2
+    provider_model_id: deepseek-v3.2
+    pricing:
+      input_tokens:
+        no_cache: 0.57
+      output_tokens:
+        text: 1.71
+  - id: z-ai/glm-5
+    provider_model_id: glm-5
+    pricing:
+      input_tokens:
+        no_cache: 1.0
+        cache_read: 0.2
+      output_tokens:
+        text: 3.2
+  - id: z-ai/glm-5.1
+    provider_model_id: glm-5.1
+    pricing:
+      input_tokens:
+        no_cache: 1.4
+        cache_read: 0.26
+      output_tokens:
+        text: 4.4
+  - id: moonshotai/kimi-k2.5
+    provider_model_id: kimi-k2.5
+    pricing:
+      input_tokens:
+        no_cache: 0.6
+        cache_read: 0.1
+      output_tokens:
+        text: 3.0
+  - id: minimax/minimax-m2.5
+    provider_model_id: minimax-m2.5
+    pricing:
+      input_tokens:
+        no_cache: 0.3
+        cache_read: 0.03
+      output_tokens:
+        text: 1.2
+  - id: minimax/minimax-m2.7
+    provider_model_id: minimax-m2.7
+    pricing:
+      input_tokens:
+        no_cache: 0.3
+        cache_read: 0.06
+      output_tokens:
+        text: 1.2
+status: active
+weight: 1
+submitted_at: 2026-05-23
