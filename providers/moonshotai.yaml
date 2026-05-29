@@ -13,7 +13,7 @@ rate_limits:
 # Catalog source: https://models.dev/api.json (provider key `moonshotai`, api=https://api.moonshot.ai/v1).
 # Pricing is per 1M tokens.
 models:
-  - id: kimi-k2.6
+  - id: moonshotai/kimi-k2.6
     provider_model_id: kimi-k2.6
     pricing:
       input_tokens:
@@ -21,7 +21,7 @@ models:
         cache_read: 0.16
       output_tokens:
         text: 4
-  - id: kimi-k2.5
+  - id: moonshotai/kimi-k2.5
     provider_model_id: kimi-k2.5
     pricing:
       input_tokens:
@@ -29,7 +29,7 @@ models:
         cache_read: 0.1
       output_tokens:
         text: 3
-  - id: kimi-k2-thinking
+  - id: moonshotai/kimi-k2-thinking
     provider_model_id: kimi-k2-thinking
     pricing:
       input_tokens:
