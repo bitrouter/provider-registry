@@ -13,7 +13,7 @@ rate_limits:
 # Catalog source: https://models.dev/api.json (provider key `google`); >200k tier on the Gemini 3 family is higher than the base price listed here.
 # Pricing is per 1M tokens.
 models:
-  - id: gemini-3.1-pro-preview
+  - id: google/gemini-3.1-pro-preview
     provider_model_id: gemini-3.1-pro-preview
     pricing:
       input_tokens:
@@ -21,7 +21,7 @@ models:
         cache_read: 0.2
       output_tokens:
         text: 12
-  - id: gemini-3.5-flash
+  - id: google/gemini-3.5-flash
     provider_model_id: gemini-3.5-flash
     pricing:
       input_tokens:
@@ -29,7 +29,7 @@ models:
         cache_read: 0.15
       output_tokens:
         text: 9
-  - id: gemini-3-pro-preview
+  - id: google/gemini-3-pro-preview
     provider_model_id: gemini-3-pro-preview
     pricing:
       input_tokens:
@@ -37,7 +37,7 @@ models:
         cache_read: 0.2
       output_tokens:
         text: 12
-  - id: gemini-3-flash-preview
+  - id: google/gemini-3-flash-preview
     provider_model_id: gemini-3-flash-preview
     pricing:
       input_tokens:
@@ -45,7 +45,7 @@ models:
         cache_read: 0.05
       output_tokens:
         text: 3
-  - id: gemini-2.5-pro-preview
+  - id: google/gemini-2.5-pro-preview
     provider_model_id: gemini-2.5-pro
     pricing:
       input_tokens:
@@ -53,7 +53,7 @@ models:
         cache_read: 0.125
       output_tokens:
         text: 10
-  - id: gemma4-31b
+  - id: google/gemma-4-31b-it
     provider_model_id: gemma-4-31b-it
 status: active
 weight: 1

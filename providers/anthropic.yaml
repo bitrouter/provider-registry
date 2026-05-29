@@ -13,7 +13,7 @@ rate_limits:
 # Catalog source: https://models.dev/api.json (provider key `anthropic`); cache_write reflects Anthropic prompt-cache write tier.
 # Pricing is per 1M tokens.
 models:
-  - id: claude-opus-4-7
+  - id: anthropic/claude-opus-4.7
     provider_model_id: claude-opus-4-7
     pricing:
       input_tokens:
@@ -22,7 +22,7 @@ models:
         cache_write: 6.25
       output_tokens:
         text: 25
-  - id: claude-opus-4-6
+  - id: anthropic/claude-opus-4.6
     provider_model_id: claude-opus-4-6
     pricing:
       input_tokens:
@@ -31,7 +31,7 @@ models:
         cache_write: 6.25
       output_tokens:
         text: 25
-  - id: claude-sonnet-4-6
+  - id: anthropic/claude-sonnet-4.6
     provider_model_id: claude-sonnet-4-6
     pricing:
       input_tokens:
@@ -40,7 +40,7 @@ models:
         cache_write: 3.75
       output_tokens:
         text: 15
-  - id: claude-opus-4-5
+  - id: anthropic/claude-opus-4.5
     provider_model_id: claude-opus-4-5
     pricing:
       input_tokens:
@@ -49,7 +49,7 @@ models:
         cache_write: 6.25
       output_tokens:
         text: 25
-  - id: claude-sonnet-4-5
+  - id: anthropic/claude-sonnet-4.5
     provider_model_id: claude-sonnet-4-5
     pricing:
       input_tokens:
@@ -58,7 +58,7 @@ models:
         cache_write: 3.75
       output_tokens:
         text: 15
-  - id: claude-opus-4-1
+  - id: anthropic/claude-opus-4.1
     provider_model_id: claude-opus-4-1
     pricing:
       input_tokens:
@@ -67,7 +67,7 @@ models:
         cache_write: 18.75
       output_tokens:
         text: 75
-  - id: claude-opus-4
+  - id: anthropic/claude-opus-4
     provider_model_id: claude-opus-4-0
     pricing:
       input_tokens:
@@ -76,7 +76,7 @@ models:
         cache_write: 18.75
       output_tokens:
         text: 75
-  - id: claude-sonnet-4
+  - id: anthropic/claude-sonnet-4
     provider_model_id: claude-sonnet-4-0
     pricing:
       input_tokens:

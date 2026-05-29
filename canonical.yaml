@@ -273,7 +273,7 @@ models:
       - text
     max_input_tokens: 262144
     max_output_tokens: 32768
-  - id: gpt-5.4-nano
+  - id: openai/gpt-5.4-nano
     name: "OpenAI: GPT-5.4 Nano"
     input_modalities:
       - text
@@ -282,7 +282,7 @@ models:
       - text
     max_input_tokens: 400000
     max_output_tokens: 128000
-  - id: gpt-5.3-codex
+  - id: openai/gpt-5.3-codex
     name: "OpenAI: GPT-5.3 Codex"
     description: OpenAI GPT-5.3 Codex — coding-specialised tier in the GPT-5.3 family.
     input_modalities:
@@ -292,7 +292,7 @@ models:
       - text
     max_input_tokens: 400000
     max_output_tokens: 128000
-  - id: gpt-5.2
+  - id: openai/gpt-5.2
     name: "OpenAI: GPT-5.2"
     input_modalities:
       - text
@@ -301,7 +301,7 @@ models:
       - text
     max_input_tokens: 400000
     max_output_tokens: 128000
-  - id: gpt-5.2-codex
+  - id: openai/gpt-5.2-codex
     name: "OpenAI: GPT-5.2 Codex"
     input_modalities:
       - text
@@ -310,7 +310,7 @@ models:
       - text
     max_input_tokens: 400000
     max_output_tokens: 128000
-  - id: gpt-5.1
+  - id: openai/gpt-5.1
     name: "OpenAI: GPT-5.1"
     input_modalities:
       - text
@@ -319,7 +319,7 @@ models:
       - text
     max_input_tokens: 400000
     max_output_tokens: 128000
-  - id: gpt-5.1-codex
+  - id: openai/gpt-5.1-codex
     name: "OpenAI: GPT-5.1 Codex"
     input_modalities:
       - text
@@ -328,7 +328,7 @@ models:
       - text
     max_input_tokens: 400000
     max_output_tokens: 128000
-  - id: gpt-5.1-codex-mini
+  - id: openai/gpt-5.1-codex-mini
     name: "OpenAI: GPT-5.1 Codex Mini"
     input_modalities:
       - text
@@ -337,7 +337,7 @@ models:
       - text
     max_input_tokens: 400000
     max_output_tokens: 128000
-  - id: gpt-5
+  - id: openai/gpt-5
     name: "OpenAI: GPT-5"
     input_modalities:
       - text
@@ -346,7 +346,7 @@ models:
       - text
     max_input_tokens: 400000
     max_output_tokens: 128000
-  - id: gpt-5-mini
+  - id: openai/gpt-5-mini
     name: "OpenAI: GPT-5 Mini"
     input_modalities:
       - text
@@ -355,7 +355,7 @@ models:
       - text
     max_input_tokens: 400000
     max_output_tokens: 128000
-  - id: gpt-5-codex
+  - id: openai/gpt-5-codex
     name: "OpenAI: GPT-5 Codex"
     input_modalities:
       - text
@@ -364,7 +364,7 @@ models:
       - text
     max_input_tokens: 400000
     max_output_tokens: 128000
-  - id: o3
+  - id: openai/o3
     name: "OpenAI: o3"
     description: OpenAI o3 — reasoning-tuned model in the o-series.
     input_modalities:
@@ -374,7 +374,7 @@ models:
       - text
     max_input_tokens: 200000
     max_output_tokens: 100000
-  - id: claude-opus-4-5
+  - id: anthropic/claude-opus-4.5
     name: "Anthropic: Claude Opus 4.5"
     input_modalities:
       - text
@@ -383,7 +383,7 @@ models:
       - text
     max_input_tokens: 200000
     max_output_tokens: 64000
-  - id: claude-sonnet-4-5
+  - id: anthropic/claude-sonnet-4.5
     name: "Anthropic: Claude Sonnet 4.5"
     input_modalities:
       - text
@@ -392,7 +392,7 @@ models:
       - text
     max_input_tokens: 200000
     max_output_tokens: 64000
-  - id: claude-opus-4-1
+  - id: anthropic/claude-opus-4.1
     name: "Anthropic: Claude Opus 4.1"
     input_modalities:
       - text
@@ -401,7 +401,7 @@ models:
       - text
     max_input_tokens: 200000
     max_output_tokens: 32000
-  - id: claude-opus-4
+  - id: anthropic/claude-opus-4
     name: "Anthropic: Claude Opus 4"
     input_modalities:
       - text
@@ -410,7 +410,7 @@ models:
       - text
     max_input_tokens: 200000
     max_output_tokens: 32000
-  - id: claude-sonnet-4
+  - id: anthropic/claude-sonnet-4
     name: "Anthropic: Claude Sonnet 4"
     input_modalities:
       - text
@@ -419,7 +419,7 @@ models:
       - text
     max_input_tokens: 200000
     max_output_tokens: 64000
-  - id: gemini-3.5-flash
+  - id: google/gemini-3.5-flash
     name: "Google: Gemini 3.5 Flash"
     input_modalities:
       - text
@@ -429,7 +429,7 @@ models:
       - text
     max_input_tokens: 1048576
     max_output_tokens: 65536
-  - id: gemini-3-pro-preview
+  - id: google/gemini-3-pro-preview
     name: "Google: Gemini 3 Pro Preview"
     input_modalities:
       - text
@@ -439,7 +439,7 @@ models:
       - text
     max_input_tokens: 1048576
     max_output_tokens: 65536
-  - id: gemini-3-flash-preview
+  - id: google/gemini-3-flash-preview
     name: "Google: Gemini 3 Flash Preview"
     input_modalities:
       - text
@@ -449,7 +449,7 @@ models:
       - text
     max_input_tokens: 1048576
     max_output_tokens: 65536
-  - id: gemini-2.5-pro-preview
+  - id: google/gemini-2.5-pro-preview
     name: "Google: Gemini 2.5 Pro Preview"
     input_modalities:
       - text
@@ -459,7 +459,7 @@ models:
       - text
     max_input_tokens: 1048576
     max_output_tokens: 65536
-  - id: grok-4.3
+  - id: x-ai/grok-4.3
     name: "xAI: Grok 4.3"
     input_modalities:
       - text
@@ -468,7 +468,7 @@ models:
       - text
     max_input_tokens: 1000000
     max_output_tokens: 30000
-  - id: kimi-k2-thinking
+  - id: moonshotai/kimi-k2-thinking
     name: "Kimi: K2 Thinking"
     description: Moonshot AI Kimi K2 Thinking — reasoning-tuned K2 tier.
     input_modalities:
@@ -477,7 +477,7 @@ models:
       - text
     max_input_tokens: 262144
     max_output_tokens: 262144
-  - id: glm-5-turbo
+  - id: z-ai/glm-5-turbo
     name: "Zhipu: GLM-5 Turbo"
     input_modalities:
       - text
@@ -485,7 +485,7 @@ models:
       - text
     max_input_tokens: 200000
     max_output_tokens: 131072
-  - id: glm-5v-turbo
+  - id: z-ai/glm-5v-turbo
     name: "Zhipu: GLM-5V Turbo"
     description: Zhipu GLM-5V Turbo — multimodal GLM-5 tier.
     input_modalities:
@@ -495,7 +495,7 @@ models:
       - text
     max_input_tokens: 200000
     max_output_tokens: 131072
-  - id: glm-4.7
+  - id: z-ai/glm-4.7
     name: "Zhipu: GLM-4.7"
     input_modalities:
       - text
@@ -503,7 +503,7 @@ models:
       - text
     max_input_tokens: 204800
     max_output_tokens: 131072
-  - id: mimo-v2-pro
+  - id: xiaomi/mimo-v2-pro
     name: "Xiaomi: MiMo V2 Pro"
     input_modalities:
       - text
@@ -511,7 +511,7 @@ models:
       - text
     max_input_tokens: 1048576
     max_output_tokens: 131072
-  - id: mimo-v2-omni
+  - id: xiaomi/mimo-v2-omni
     name: "Xiaomi: MiMo V2 Omni"
     description: Xiaomi MiMo V2 Omni — multimodal MiMo V2 tier.
     input_modalities:
@@ -522,7 +522,7 @@ models:
       - text
     max_input_tokens: 262144
     max_output_tokens: 131072
-  - id: qwen3.7-max
+  - id: qwen/qwen3.7-max
     name: "Qwen: Qwen3.7 Max"
     input_modalities:
       - text
@@ -530,7 +530,7 @@ models:
       - text
     max_input_tokens: 1000000
     max_output_tokens: 65536
-  - id: qwen3.6-max-preview
+  - id: qwen/qwen3.6-max-preview
     name: "Qwen: Qwen3.6 Max Preview"
     input_modalities:
       - text
@@ -538,7 +538,7 @@ models:
       - text
     max_input_tokens: 262144
     max_output_tokens: 65536
-  - id: qwen3.5-122b-a10b
+  - id: qwen/qwen3.5-122b-a10b
     name: "Qwen: Qwen3.5 122B A10B"
     input_modalities:
       - text
@@ -548,7 +548,7 @@ models:
       - text
     max_input_tokens: 262144
     max_output_tokens: 65536
-  - id: qwen3.5-27b
+  - id: qwen/qwen3.5-27b
     name: "Qwen: Qwen3.5 27B"
     input_modalities:
       - text
@@ -558,7 +558,7 @@ models:
       - text
     max_input_tokens: 262144
     max_output_tokens: 65536
-  - id: qwen3-max
+  - id: qwen/qwen3-max
     name: "Qwen: Qwen3 Max"
     input_modalities:
       - text
@@ -566,15 +566,7 @@ models:
       - text
     max_input_tokens: 262144
     max_output_tokens: 65536
-  - id: minimax-m2.7
-    name: "MiniMax: M2.7"
-    input_modalities:
-      - text
-    output_modalities:
-      - text
-    max_input_tokens: 204800
-    max_output_tokens: 131072
-  - id: minimax-m2.1
+  - id: minimax/minimax-m2.1
     name: "MiniMax: M2.1"
     input_modalities:
       - text

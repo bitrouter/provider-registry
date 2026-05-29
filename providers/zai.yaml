@@ -13,7 +13,7 @@ rate_limits:
 # Catalog source: https://models.dev/api.json (provider key `zai`, api=https://api.z.ai/api/paas/v4).
 # Pricing is per 1M tokens.
 models:
-  - id: glm-5.1
+  - id: z-ai/glm-5.1
     provider_model_id: glm-5.1
     pricing:
       input_tokens:
@@ -21,7 +21,7 @@ models:
         cache_read: 0.26
       output_tokens:
         text: 4.4
-  - id: glm-5
+  - id: z-ai/glm-5
     provider_model_id: glm-5
     pricing:
       input_tokens:
@@ -29,7 +29,7 @@ models:
         cache_read: 0.2
       output_tokens:
         text: 3.2
-  - id: glm-5-turbo
+  - id: z-ai/glm-5-turbo
     provider_model_id: glm-5-turbo
     pricing:
       input_tokens:
@@ -37,7 +37,7 @@ models:
         cache_read: 0.24
       output_tokens:
         text: 4
-  - id: glm-5v-turbo
+  - id: z-ai/glm-5v-turbo
     provider_model_id: glm-5v-turbo
     pricing:
       input_tokens:
@@ -45,7 +45,7 @@ models:
         cache_read: 0.24
       output_tokens:
         text: 4
-  - id: glm-4.7
+  - id: z-ai/glm-4.7
     provider_model_id: glm-4.7
     pricing:
       input_tokens:

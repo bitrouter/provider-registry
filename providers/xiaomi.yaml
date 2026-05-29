@@ -13,7 +13,7 @@ rate_limits:
 # Catalog source: https://models.dev/api.json (provider key `xiaomi`, api=https://api.xiaomimimo.com/v1); mimo-v2.5 family has a higher >256k context tier not represented here.
 # Pricing is per 1M tokens.
 models:
-  - id: mimo-v2.5-pro
+  - id: xiaomi/mimo-v2.5-pro
     provider_model_id: mimo-v2.5-pro
     pricing:
       input_tokens:
@@ -21,7 +21,7 @@ models:
         cache_read: 0.2
       output_tokens:
         text: 3
-  - id: mimo-v2.5
+  - id: xiaomi/mimo-v2.5
     provider_model_id: mimo-v2.5
     pricing:
       input_tokens:
@@ -29,7 +29,7 @@ models:
         cache_read: 0.08
       output_tokens:
         text: 2
-  - id: mimo-v2-pro
+  - id: xiaomi/mimo-v2-pro
     provider_model_id: mimo-v2-pro
     pricing:
       input_tokens:
@@ -37,7 +37,7 @@ models:
         cache_read: 0.2
       output_tokens:
         text: 3
-  - id: mimo-v2-omni
+  - id: xiaomi/mimo-v2-omni
     provider_model_id: mimo-v2-omni
     pricing:
       input_tokens:
@@ -45,7 +45,7 @@ models:
         cache_read: 0.08
       output_tokens:
         text: 2
-  - id: mimo-v2-flash
+  - id: xiaomi/mimo-v2-flash
     provider_model_id: mimo-v2-flash
     pricing:
       input_tokens:
