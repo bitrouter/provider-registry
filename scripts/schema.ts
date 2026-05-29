@@ -164,6 +164,30 @@ export const ProviderFile = z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/, "submitted_at must be ISO YYYY-MM-DD")
       .optional(),
+    // When `true`, the cloud's public `/v1/providers` response surfaces
+    // the provider `name` instead of the anonymized `p_xxxx` id. Default
+    // false so providers are anonymous to discovery clients unless
+    // explicitly opted in.
+    verified: z.boolean().optional().default(false),
+    // When `true`, this provider is only routable via the caller's BYOK
+    // key — there is no platform-side credential. The cloud's routing
+    // table pushes a placeholder target so the BYOK overlay has somewhere
+    // to inject the caller's key; targets that never receive an override
+    // are dropped before dispatch. Requires `default_api_base` so the
+    // placeholder target knows where to send the request when the user
+    // did not override the base URL.
+    byok_only: z.boolean().optional().default(false),
+    // Upstream base URL used for `byok_only` providers when the caller's
+    // BYOK row does not carry an `api_base` override. HTTPS only —
+    // matches the cloud's `validate_upstream_base` guard so a yaml that
+    // passes the validator can never be rejected at routing time.
+    default_api_base: z
+      .string()
+      .url()
+      .refine((u) => u.startsWith("https://"), {
+        message: "default_api_base must be an HTTPS URL",
+      })
+      .optional(),
   })
   .strict()
   .superRefine((data, ctx) => {
@@ -177,6 +201,17 @@ export const ProviderFile = z
         });
       }
       seen.add(m.id);
+    }
+    // Mirror the cloud loader's invariant: a `byok_only` provider with
+    // no `default_api_base` is unroutable (the placeholder target needs
+    // a base URL to dispatch against when the caller's BYOK row omits
+    // `api_base`).
+    if (data.byok_only && !data.default_api_base) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["default_api_base"],
+        message: `provider '${data.name}' declares byok_only=true but no default_api_base`,
+      });
     }
   });
 export type ProviderFile = z.infer<typeof ProviderFile>;
