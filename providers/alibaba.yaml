@@ -1,4 +1,14 @@
 name: alibaba
+# First-party provider — bitrouter-cloud holds no platform key for
+# this entry. Routable only via the caller's own DashScope (Qwen)
+# key (`POST /v1/byok/keys` on the cloud). See
+# bitrouter/bitrouter-cloud#318. Default base targets the
+# international DashScope OpenAI-compatible endpoint; callers in
+# mainland China can override `api_base` to
+# https://dashscope.aliyuncs.com/compatible-mode/v1 via the BYOK
+# upsert.
+byok_only: true
+default_api_base: https://dashscope-intl.aliyuncs.com/compatible-mode/v1
 api_protocol:
   - "*": openai
 rate_limits:

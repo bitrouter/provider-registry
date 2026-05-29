@@ -1,4 +1,10 @@
 name: anthropic
+# First-party provider — bitrouter-cloud holds no platform key for
+# this entry. Routable only via the caller's own Anthropic key
+# (`POST /v1/byok/keys` on the cloud). See
+# bitrouter/bitrouter-cloud#318.
+byok_only: true
+default_api_base: https://api.anthropic.com/v1
 api_protocol:
   - "*": anthropic
 rate_limits:

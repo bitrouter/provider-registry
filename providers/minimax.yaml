@@ -1,4 +1,13 @@
 name: minimax
+# First-party provider — bitrouter-cloud holds no platform key for
+# this entry. Routable only via the caller's own MiniMax key
+# (`POST /v1/byok/keys` on the cloud). See
+# bitrouter/bitrouter-cloud#318. Default base targets the
+# Anthropic-protocol endpoint on api.minimax.io; the api_protocol
+# below pins the chain to the anthropic wire protocol so the cloud
+# dispatches correctly.
+byok_only: true
+default_api_base: https://api.minimax.io/anthropic/v1
 api_protocol:
   - "*": anthropic
 rate_limits:
