@@ -13,6 +13,15 @@ rate_limits:
 # Catalog source: https://models.dev/api.json (provider key `anthropic`); cache_write reflects Anthropic prompt-cache write tier.
 # Pricing is per 1M tokens.
 models:
+  - id: anthropic/claude-opus-4.8
+    provider_model_id: claude-opus-4-8
+    pricing:
+      input_tokens:
+        no_cache: 5
+        cache_read: 0.5
+        cache_write: 6.25
+      output_tokens:
+        text: 25
   - id: anthropic/claude-opus-4.7
     provider_model_id: claude-opus-4-7
     pricing:
