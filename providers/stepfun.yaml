@@ -1,0 +1,28 @@
+name: stepfun
+# First-party provider — bitrouter-cloud holds no platform key for
+# this entry. Routable only via the caller's own StepFun key
+# (`POST /v1/byok/keys` on the cloud). See
+# bitrouter/bitrouter-cloud#318.
+byok_only: true
+default_api_base: https://api.stepfun.ai/v1
+api_protocol:
+  - "*": openai
+rate_limits:
+  - "*":
+      requests_per_minute: 60
+# Catalog source: GET https://api.stepfun.ai/v1/models (authenticated) — confirms
+# step-3.7-flash is served first-party. models.dev does not list 3.7 yet, so the
+# price mirrors OpenRouter's published rates.
+# Pricing is per 1M tokens.
+models:
+  - id: stepfun/step-3.7-flash
+    provider_model_id: step-3.7-flash
+    pricing:
+      input_tokens:
+        no_cache: 0.2
+        cache_read: 0.04
+      output_tokens:
+        text: 1.15
+status: active
+weight: 1
+submitted_at: 2026-06-01

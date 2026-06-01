@@ -7,6 +7,7 @@
     "validate": "bun run scripts/validate.ts",
     "manage": "bun run scripts/manage.ts",
     "fetch-models": "bun run scripts/fetch-provider-models.ts",
+    "check-new-models": "bun run scripts/check-new-models.ts",
     "test-provider": "bun run scripts/test-provider.ts"
   },
   "devDependencies": {

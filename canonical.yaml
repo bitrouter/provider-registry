@@ -574,3 +574,30 @@ models:
       - text
     max_input_tokens: 204800
     max_output_tokens: 131072
+  - id: anthropic/claude-opus-4.8
+    name: "Anthropic: Claude Opus 4.8"
+    input_modalities:
+      - text
+      - image
+    output_modalities:
+      - text
+    max_input_tokens: 1000000
+    max_output_tokens: 128000
+  - id: minimax/minimax-m3
+    name: "MiniMax: M3"
+    input_modalities:
+      - text
+      - image
+    output_modalities:
+      - text
+    max_input_tokens: 1048576
+    max_output_tokens: 512000
+  - id: stepfun/step-3.7-flash
+    name: "StepFun: Step 3.7 Flash"
+    input_modalities:
+      - text
+      - image
+    output_modalities:
+      - text
+    max_input_tokens: 256000
+    max_output_tokens: 256000

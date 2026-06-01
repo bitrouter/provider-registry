@@ -203,6 +203,7 @@ interface ModelFlags {
   protocol?: string;
   "no-cache"?: string;
   "cache-read"?: string;
+  "cache-write"?: string;
   output?: string;
   rpm?: string;
   tpm?: string;
@@ -211,7 +212,7 @@ interface ModelFlags {
 async function cmdAddModel(rest: string[], flags: ModelFlags): Promise<void> {
   const [providerName, canonicalId, providerModelId] = rest;
   if (!providerName || !canonicalId || !providerModelId) {
-    fail("usage: manage add-model <provider> <canonical-id> <provider-model-id> [--protocol …] [--no-cache 0.27] [--cache-read 0.05] [--output 0.41] [--rpm 60] [--tpm 100000]");
+    fail("usage: manage add-model <provider> <canonical-id> <provider-model-id> [--protocol …] [--no-cache 0.27] [--cache-read 0.05] [--cache-write 0.34] [--output 0.41] [--rpm 60] [--tpm 100000]");
   }
 
   const reg = await loadRegistry();
@@ -237,6 +238,9 @@ async function cmdAddModel(rest: string[], flags: ModelFlags): Promise<void> {
         no_cache: flags["no-cache"] ? Number(flags["no-cache"]) : undefined,
         cache_read: flags["cache-read"]
           ? Number(flags["cache-read"])
+          : undefined,
+        cache_write: flags["cache-write"]
+          ? Number(flags["cache-write"])
           : undefined,
       },
       output_tokens: flags.output
@@ -409,6 +413,7 @@ async function main(): Promise<void> {
       // add-model
       "no-cache": { type: "string" },
       "cache-read": { type: "string" },
+      "cache-write": { type: "string" },
       output: { type: "string" },
       // canonical add
       description: { type: "string" },
