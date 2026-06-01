@@ -36,18 +36,15 @@ protected:
   - "google/gemini-*-flash*"
 
 # AA model_creator.slug -> our canonical org. AA groups some families under the
-# lab rather than the model org.
+# lab rather than the model org. Used by the deterministic mechanical fallback
+# (a pure slug normalization) and by `curate suggest`.
 org_aliases:
   alibaba: qwen
   xai: x-ai
   zai: z-ai
   kimi: moonshotai
 
-# Exact AA-slug -> canonical-id overrides for cases the heuristic can't resolve
-# (word-order flips, renames, collapsed variants). In the agent-assisted phase,
-# the agent PROPOSES additions here and a human confirms them in the PR.
-# Example: AA calls it `claude-4-5-haiku`; we call it `claude-haiku-4.5`.
-aliases:
-  claude-4-5-haiku: anthropic/claude-haiku-4.5
-  # AA drops the instruction-tuned `-it` suffix we keep on the canonical id.
-  gemma-4-31b: google/gemma-4-31b-it
+# Per-AA-model judgments (word-order flips, suffix drift, variant collapse,
+# deliberate ignores) live in curation/crosswalk/aa.yaml, keyed on AA's stable
+# UUID — NOT here. That file is the cache the pure resolver reads; this file is
+# only knobs + the org map. `curate suggest` proposes crosswalk additions.

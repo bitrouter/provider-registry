@@ -1,36 +1,42 @@
-// `bun run curate` — DRY-RUN curation reporter (v0 of the automated pipeline).
+// `bun run curate` — AA-driven curation as a (near-)pure function.
 //
-// Read-only. Fetches Artificial Analysis rankings + the OpenRouter catalog,
-// applies curation/policy.yaml, and prints what WOULD be:
-//   - onboarded   (AA top-N models we don't currently serve)
-//   - deprecated  (served models that fell out of AA top-N, minus protected)
-//   - saved       (served models a protected rule keeps despite low AA rank)
-//   - unmapped    (high-AA models whose slug we couldn't map → alias candidates)
+//   resolve (default)  state = f(AA scores, crosswalk cache, canonical,
+//                                providers, policy, as-of)
+//                      Deterministic: crosswalk lookup first, then a pure
+//                      mechanical slug normalization. NO fuzzy logic, no
+//                      OpenRouter, no clock except the passed --as-of date.
+//                      Prints onboard / deprecate / saved / unresolved.
 //
-// It mutates nothing and opens no PR — this is the report a human (or, later,
-// a bot PR) is built from. Ranking/protection math is deterministic here; the
-// fuzzy AA-slug → canonical-id mapping is the part a future agent step assists.
+//   suggest            For AA models the resolver left UNRESOLVED, propose
+//                      crosswalk entries (mechanical guess, cross-checked
+//                      against OpenRouter) as ready-to-paste YAML for review.
+//                      This is the ONLY place intelligence/heuristics live;
+//                      its output is committed to curation/crosswalk/aa.yaml
+//                      and thereafter the resolver is a pure lookup.
 //
-// Ranking happens in AA space (all scored models, effort/reasoning variants
-// collapsed to a base), so "top_n" is a true cut of AA's catalog. Each base is
-// then mapped to a canonical id, preferring OUR canonical id over OpenRouter's
-// so `-preview`-style drift doesn't show a served model as both deprecate+onboard.
+// The design goal: every decision is reproducible from (data sources + cache).
+// Judgment happens once (here, or by an agent), is frozen as data, and is never
+// recomputed. Flags:
+//   --as-of=YYYY-MM-DD   date used for deprecation_date (default: today)
+//   --check              exit non-zero if a served/top-N model is unresolved
+//   --all                (suggest) propose for every unmapped model, not just
+//                        rank-relevant ones from orgs we serve
 //
 // Requires AA_API_KEY (header x-api-key); Bun auto-loads .env.
-//   bun run curate                 # full report
-//   AA_API_KEY=... bun run curate  # one-off without persisting the key
 
 import { readFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { z } from "zod";
 import { loadCanonical, loadProviders, REGISTRY_ROOT } from "./schema";
 
 const POLICY_PATH = join(REGISTRY_ROOT, "curation", "policy.yaml");
+const AA_CROSSWALK = join(REGISTRY_ROOT, "curation", "crosswalk", "aa.yaml");
 const AA_URL = "https://artificialanalysis.ai/api/v2/data/llms/models";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/models";
 
-// ── policy ──────────────────────────────────────────────────────────────
+// ── policy & crosswalk schemas ──────────────────────────────────────────
 const Policy = z.object({
   ranking: z
     .object({
@@ -44,21 +50,36 @@ const Policy = z.object({
     .default({ grace_days: 60 }),
   protected: z.array(z.string()).default([]),
   org_aliases: z.record(z.string(), z.string()).default({}),
-  aliases: z.record(z.string(), z.string()).default({}),
 });
 type Policy = z.infer<typeof Policy>;
 
+const Verdict = z
+  .object({
+    slug: z.string().optional(),
+    canonical: z.string().optional(),
+    collapse_of: z.string().optional(),
+    ignore: z.string().optional(),
+    by: z.string().optional(),
+    date: z.string().optional(),
+  })
+  .refine(
+    (v) => [v.canonical, v.collapse_of, v.ignore].filter((x) => x !== undefined).length === 1,
+    { message: "each crosswalk entry needs exactly one of canonical|collapse_of|ignore" },
+  );
+type Verdict = z.infer<typeof Verdict>;
+const Crosswalk = z.object({ entries: z.record(z.string(), Verdict).default({}) });
+
 async function loadPolicy(): Promise<Policy> {
-  const raw = await readFile(POLICY_PATH, "utf8");
-  return Policy.parse(parseYaml(raw) ?? {});
+  return Policy.parse(parseYaml(await readFile(POLICY_PATH, "utf8")) ?? {});
+}
+async function loadCrosswalk(): Promise<Map<string, Verdict>> {
+  if (!existsSync(AA_CROSSWALK)) return new Map();
+  const parsed = Crosswalk.parse(parseYaml(await readFile(AA_CROSSWALK, "utf8")) ?? {});
+  return new Map(Object.entries(parsed.entries));
 }
 
 // ── http ────────────────────────────────────────────────────────────────
-async function fetchWithRetry(
-  url: string,
-  init: RequestInit,
-  attempts = 3,
-): Promise<Response> {
+async function fetchWithRetry(url: string, init: RequestInit, attempts = 3): Promise<Response> {
   let lastErr: unknown;
   for (let i = 0; i < attempts; i++) {
     try {
@@ -72,6 +93,7 @@ async function fetchWithRetry(
 }
 
 interface AAModel {
+  id: string;
   slug: string;
   name: string;
   release_date?: string;
@@ -82,45 +104,37 @@ interface AAModel {
 async function fetchAA(): Promise<AAModel[]> {
   const key = process.env.AA_API_KEY;
   if (!key) {
-    console.error(
-      "✗ AA_API_KEY not set. Put it in .env (or pass inline) — get one at https://artificialanalysis.ai/",
-    );
+    console.error("✗ AA_API_KEY not set (put it in .env) — get one at https://artificialanalysis.ai/");
     process.exit(2);
   }
-  const r = await fetchWithRetry(AA_URL, {
-    headers: { "x-api-key": key, Accept: "application/json" },
-  });
+  const r = await fetchWithRetry(AA_URL, { headers: { "x-api-key": key, Accept: "application/json" } });
   if (!r.ok) {
     console.error(`✗ AA API HTTP ${r.status} ${r.statusText}`);
     process.exit(2);
   }
-  const body = (await r.json()) as { data?: AAModel[] };
-  return body.data ?? [];
+  return ((await r.json()) as { data?: AAModel[] }).data ?? [];
 }
 
 async function fetchOpenRouterIds(): Promise<Set<string>> {
   try {
-    const r = await fetchWithRetry(OPENROUTER_URL, {
-      headers: { Accept: "application/json" },
-    });
+    const r = await fetchWithRetry(OPENROUTER_URL, { headers: { Accept: "application/json" } });
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const body = (await r.json()) as { data?: Array<{ id?: string }> };
     return new Set((body.data ?? []).map((m) => m.id).filter(Boolean) as string[]);
   } catch (err) {
-    console.error(
-      `! OpenRouter catalog unavailable (${(err as Error).message}) — id confirmation falls back to our canonical only`,
-    );
+    console.error(`! OpenRouter unavailable (${(err as Error).message})`);
     return new Set();
   }
 }
 
-// ── AA slug → base identity → canonical id ──────────────────────────────
-// Effort/reasoning/adaptive variants collapse onto the base model; `thinking`
-// is NOT stripped (it names distinct models, e.g. moonshotai/kimi-k2-thinking,
-// so those stay separate and surface as alias candidates if ambiguous).
+// ── pure mechanical normalization (deterministic; no network, no fuzz) ───
+// Strips effort/reasoning variants (NOT `thinking`, which names real models)
+// and trailing dates, then version-hyphen → dot. This is a total pure function
+// of the slug string; it is the fallback for AA models without a crosswalk
+// entry. Where it is WRONG (word-order, `-it`, semantic collapse), a crosswalk
+// entry overrides it.
 const VARIANT = /-(non-reasoning|reasoning|adaptive|high|medium|low|minimal)$/;
 const DATE_SUFFIX = /-\d{4,8}$/;
-
 function baseSlug(slug: string): string {
   let s = slug;
   for (let i = 0; i < 4; i++) {
@@ -130,185 +144,258 @@ function baseSlug(slug: string): string {
   }
   return s;
 }
-
-interface Resolved {
-  id: string;
-  source: "alias" | "canonical" | "canonical+preview" | "openrouter" | "openrouter+preview";
-}
-
-// Map a base slug+creator to a canonical id. Prefer OUR canonical id (incl. a
-// soft `-preview` suffix) so a served model maps to itself before OpenRouter's
-// possibly-renamed twin; fall back to OpenRouter for genuinely new models.
-function mapBase(
-  base: string,
-  creator: string,
-  policy: Policy,
-  orIds: Set<string>,
-  canonIds: Set<string>,
-): Resolved | null {
-  const alias = policy.aliases[base];
-  if (alias) return { id: alias, source: "alias" };
-
-  const model = base.replace(/(\d)-(\d)/g, "$1.$2"); // version hyphen → dot
+function mechanical(slug: string, creator: string, policy: Policy, canonIds: Set<string>): string | null {
+  const model = baseSlug(slug).replace(/(\d)-(\d)/g, "$1.$2");
   const org = policy.org_aliases[creator] ?? creator;
   if (!org || !model) return null;
   const cand = `${org}/${model}`;
-
-  if (canonIds.has(cand)) return { id: cand, source: "canonical" };
-  if (canonIds.has(`${cand}-preview`)) return { id: `${cand}-preview`, source: "canonical+preview" };
-  if (orIds.has(cand)) return { id: cand, source: "openrouter" };
-  if (orIds.has(`${cand}-preview`)) return { id: `${cand}-preview`, source: "openrouter+preview" };
+  if (canonIds.has(cand)) return cand;
+  if (canonIds.has(`${cand}-preview`)) return `${cand}-preview`; // soft preview drift
   return null;
 }
 
-function globToRe(glob: string): RegExp {
-  const escaped = glob.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*");
-  return new RegExp(`^${escaped}$`);
+// ── resolution (pure) ───────────────────────────────────────────────────
+type Resolution =
+  | { kind: "canonical" | "collapse"; id: string; via: "crosswalk" }
+  | { kind: "mechanical"; id: string; via: "mechanical" }
+  | { kind: "ignore" }
+  | { kind: "unresolved" };
+
+function resolveModel(m: AAModel, crosswalk: Map<string, Verdict>, policy: Policy, canonIds: Set<string>): Resolution {
+  const cw = crosswalk.get(m.id);
+  if (cw) {
+    if (cw.ignore !== undefined) return { kind: "ignore" };
+    if (cw.canonical) return { kind: "canonical", id: cw.canonical, via: "crosswalk" };
+    if (cw.collapse_of) return { kind: "collapse", id: cw.collapse_of, via: "crosswalk" };
+  }
+  const mech = mechanical(m.slug, m.model_creator?.slug ?? "", policy, canonIds);
+  return mech ? { kind: "mechanical", id: mech, via: "mechanical" } : { kind: "unresolved" };
 }
 
+function globToRe(glob: string): RegExp {
+  return new RegExp(`^${glob.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*")}$`);
+}
 function pad(s: string, n: number): string {
   return s.length >= n ? s : s + " ".repeat(n - s.length);
 }
 
-// ── main ────────────────────────────────────────────────────────────────
-async function main(): Promise<void> {
-  const policy = await loadPolicy();
-  const [aa, orIds, canon, providers] = await Promise.all([
-    fetchAA(),
-    fetchOpenRouterIds(),
-    loadCanonical(),
-    loadProviders(),
-  ]);
-
-  const canonIds = new Set(canon.map((m) => m.id));
-  const ourOrgs = new Set([...canonIds].map((id) => id.split("/")[0]));
-
-  const served = new Map<string, string[]>();
-  for (const { data } of providers) {
-    for (const m of data.models) {
-      served.set(m.id, [...(served.get(m.id) ?? []), data.name]);
-    }
-  }
-
-  const { intelligence_weight: wi, coding_weight: wc, top_n } = policy.ranking;
-  const scoreOf = (m: AAModel): number | null => {
+function scorer(policy: Policy) {
+  const { intelligence_weight: wi, coding_weight: wc } = policy.ranking;
+  return (m: AAModel): number | null => {
     const e = m.evaluations ?? {};
     const i = e.artificial_analysis_intelligence_index;
     const c = e.artificial_analysis_coding_index;
     return typeof i === "number" && typeof c === "number" ? wi * i + wc * c : null;
   };
+}
 
-  // Rank in AA space: collapse variants to a base identity, keep best score.
-  interface Base {
-    base: string;
-    creator: string;
-    score: number;
-    release?: string;
-  }
-  const bases = new Map<string, Base>();
+// Shared ranking: every scored AA model collapses to a group — its canonical id
+// (resolved) or a deterministic `aa:<creator>/<base>` slot (unresolved) so the
+// denominator is honest. Returned sorted by score desc; rank = array index.
+interface GroupInfo {
+  key: string;
+  isCanonical: boolean;
+  score: number;
+  creator: string;
+  release?: string;
+  bestModel: AAModel;
+  onlyMechanical: boolean;
+}
+function buildGroups(
+  aa: AAModel[],
+  crosswalk: Map<string, Verdict>,
+  policy: Policy,
+  canonIds: Set<string>,
+  score: (m: AAModel) => number | null,
+): GroupInfo[] {
+  const groups = new Map<string, GroupInfo>();
   for (const m of aa) {
-    const score = scoreOf(m);
-    if (score == null) continue;
-    const creator = m.model_creator?.slug ?? "?";
-    const base = baseSlug(m.slug);
-    const key = `${creator}/${base}`;
-    const cur = bases.get(key);
-    if (!cur || score > cur.score) bases.set(key, { base, creator, score, release: m.release_date });
+    const sc = score(m);
+    if (sc == null) continue;
+    const res = resolveModel(m, crosswalk, policy, canonIds);
+    if (res.kind === "ignore") continue;
+    const isCanonical = res.kind !== "unresolved";
+    const key = isCanonical
+      ? (res as { id: string }).id
+      : `aa:${m.model_creator?.slug ?? "?"}/${baseSlug(m.slug)}`;
+    const cur = groups.get(key);
+    if (!cur) {
+      groups.set(key, {
+        key,
+        isCanonical,
+        score: sc,
+        creator: m.model_creator?.slug ?? "?",
+        release: m.release_date,
+        bestModel: m,
+        onlyMechanical: res.kind === "mechanical",
+      });
+    } else {
+      if (sc > cur.score) {
+        cur.score = sc;
+        cur.bestModel = m;
+        cur.release = m.release_date;
+      }
+      cur.onlyMechanical = cur.onlyMechanical && res.kind === "mechanical";
+    }
   }
-  const aaRanked = [...bases.values()].sort((a, b) => b.score - a.score);
-  const cutoffScore = aaRanked[Math.min(top_n, aaRanked.length) - 1]?.score ?? 0;
+  return [...groups.values()].sort((a, b) => b.score - a.score);
+}
 
-  // Map each ranked base → canonical id; keep the best (lowest) rank per id.
-  interface CanonRank {
-    rank: number;
-    score: number;
-    base: string;
-    creator: string;
-    source: Resolved["source"];
-    release?: string;
-  }
-  const canonRank = new Map<string, CanonRank>();
-  const unmappedRanked: Array<Base & { rank: number }> = [];
-  aaRanked.forEach((b, i) => {
-    const rank = i + 1;
-    const res = mapBase(b.base, b.creator, policy, orIds, canonIds);
-    if (!res) {
-      unmappedRanked.push({ ...b, rank });
-      return;
-    }
-    const cur = canonRank.get(res.id);
-    if (!cur || rank < cur.rank) {
-      canonRank.set(res.id, { rank, score: b.score, base: b.base, creator: b.creator, source: res.source, release: b.release });
-    }
-  });
-  const keptIds = new Set([...canonRank].filter(([, v]) => v.rank <= top_n).map(([id]) => id));
+// ── resolve command ─────────────────────────────────────────────────────
+async function cmdResolve(opts: { asOf: string; check: boolean }): Promise<void> {
+  const [policy, crosswalk, aa, canon, providers] = await Promise.all([
+    loadPolicy(),
+    loadCrosswalk(),
+    fetchAA(),
+    loadCanonical(),
+    loadProviders(),
+  ]);
+  const canonIds = new Set(canon.map((m) => m.id));
+  const ourOrgs = new Set([...canonIds].map((id) => id.split("/")[0]));
+  const served = new Map<string, string[]>();
+  for (const { data } of providers)
+    for (const m of data.models) served.set(m.id, [...(served.get(m.id) ?? []), data.name]);
+
+  const score = scorer(policy);
+  const { top_n } = policy.ranking;
+
+  const ranked = buildGroups(aa, crosswalk, policy, canonIds, score);
+  const byKey = new Map(ranked.map((g) => [g.key, g]));
+  const rankOf = new Map(ranked.map((g, i) => [g.key, i + 1]));
+  const cutoff = ranked[Math.min(top_n, ranked.length) - 1]?.score ?? 0;
+  const keptCanonical = new Set(ranked.slice(0, top_n).filter((g) => g.isCanonical).map((g) => g.key));
 
   const protectedRes = policy.protected.map(globToRe);
-  const isProtected = (id: string): boolean => protectedRes.some((re) => re.test(id));
-
-  const depDate = new Date(Date.now() + policy.deprecation.grace_days * 86400000)
-    .toISOString()
-    .slice(0, 10);
+  const isProtected = (id: string) => protectedRes.some((re) => re.test(id));
+  const depDate = new Date(`${opts.asOf}T00:00:00Z`);
+  depDate.setUTCDate(depDate.getUTCDate() + policy.deprecation.grace_days);
+  const depIso = depDate.toISOString().slice(0, 10);
 
   const bar = "─".repeat(80);
-  console.log(`curation dry-run — AA top ${top_n} by ${wi}·intelligence + ${wc}·coding`);
-  console.log(
-    `AA models: ${aa.length} | ${aaRanked.length} base identities, ${canonRank.size} mapped to canonical | cutoff score: ${cutoffScore.toFixed(1)} | grace: ${policy.deprecation.grace_days}d`,
-  );
+  console.log(`curate resolve — as-of ${opts.asOf} — AA top ${top_n} by ${policy.ranking.intelligence_weight}·int + ${policy.ranking.coding_weight}·cod`);
+  console.log(`AA ${aa.length} models | ${ranked.length} groups | crosswalk ${crosswalk.size} entries | cutoff ${cutoff.toFixed(1)} | grace ${policy.deprecation.grace_days}d`);
   console.log(bar);
 
-  // ── A. onboarding candidates (kept by AA, not served) ──
-  const onboardOurs: CanonRank[] = [];
-  const onboardNewOrg: CanonRank[] = [];
-  for (const [id, v] of [...canonRank].filter(([, v]) => v.rank <= top_n).sort((a, b) => a[1].rank - b[1].rank)) {
-    if (served.has(id)) continue;
-    const entry = { ...v };
-    (ourOrgs.has(id.split("/")[0]) ? onboardOurs : onboardNewOrg).push(Object.assign(entry, { id } as never));
-  }
-  console.log(`\n## ONBOARD — AA top ${top_n}, not served, org already in registry: ${onboardOurs.length}`);
-  for (const r of onboardOurs as Array<CanonRank & { id: string }>) {
-    const where = canonIds.has(r.id) ? "in canonical, unattached" : "NEW canonical";
-    console.log(`  #${pad(String(r.rank), 3)} ${pad(r.id, 38)} ${pad(where, 24)} (AA:${r.base}, ${r.release ?? "?"})`);
-  }
-  const newOrgIds = (onboardNewOrg as Array<CanonRank & { id: string }>).map((r) => r.id);
-  console.log(`\n   (+${newOrgIds.length} in AA top ${top_n} from orgs with no provider here: ${newOrgIds.slice(0, 10).join(", ")}${newOrgIds.length > 10 ? ", …" : ""})`);
+  // A. onboard — kept canonical id, in our canonical.yaml, not served
+  const onboard = ranked
+    .slice(0, top_n)
+    .filter((g) => g.isCanonical && !served.has(g.key))
+    .filter((g) => ourOrgs.has(g.key.split("/")[0]));
+  console.log(`\n## ONBOARD — top ${top_n}, in canonical, not served: ${onboard.length}`);
+  for (const g of onboard)
+    console.log(`  #${pad(String(rankOf.get(g.key)), 3)} ${pad(g.key, 38)} (AA:${g.bestModel.slug}, ${g.release ?? "?"}${g.onlyMechanical ? ", mech" : ""})`);
 
-  // ── B. deprecation candidates (served, fell out, not protected) ──
+  // B. deprecate — served, not kept, not protected
   const deprecate: Array<{ id: string; provs: string[]; rank?: number }> = [];
   const saved: Array<{ id: string; provs: string[]; rank?: number }> = [];
   for (const [id, provs] of served) {
-    if (keptIds.has(id)) continue;
-    const rank = canonRank.get(id)?.rank;
-    (isProtected(id) ? saved : deprecate).push({ id, provs, rank });
+    if (keptCanonical.has(id)) continue;
+    (isProtected(id) ? saved : deprecate).push({ id, provs, rank: rankOf.get(id) });
   }
   deprecate.sort((a, b) => (a.rank ?? 1e9) - (b.rank ?? 1e9));
-  console.log(`\n## DEPRECATE — served but outside AA top ${top_n}, not protected: ${deprecate.length}`);
-  console.log(`   (would set deprecation_date=${depDate} on these provider attachments)`);
-  for (const d of deprecate) {
-    const rk = d.rank ? `rank #${d.rank}` : "unranked/unmapped";
-    console.log(`  ${pad(rk, 18)} ${pad(d.id, 38)} served by: ${d.provs.join(", ")}`);
-  }
+  console.log(`\n## DEPRECATE — served, outside top ${top_n}, not protected: ${deprecate.length}`);
+  console.log(`   (would set deprecation_date=${depIso})`);
+  for (const d of deprecate)
+    console.log(`  ${pad(d.rank ? `rank #${d.rank}` : "unresolved", 16)} ${pad(d.id, 38)} served by: ${d.provs.join(", ")}`);
 
-  // ── C. protected saves ──
-  console.log(`\n## SAVED BY PROTECTED RULE — would deprecate, but kept: ${saved.length}`);
-  for (const s of saved.sort((a, b) => (a.rank ?? 1e9) - (b.rank ?? 1e9))) {
-    const rk = s.rank ? `AA rank #${s.rank}` : "not in AA mapped set";
-    console.log(`  ${pad(rk, 22)} ${pad(s.id, 38)} (${s.provs.join(", ")})`);
-  }
+  // C. protected saves
+  console.log(`\n## SAVED BY PROTECTED RULE: ${saved.length}`);
+  for (const s of saved.sort((a, b) => (a.rank ?? 1e9) - (b.rank ?? 1e9)))
+    console.log(`  ${pad(s.rank ? `rank #${s.rank}` : "unresolved", 16)} ${pad(s.id, 38)} (${s.provs.join(", ")})`);
 
-  // ── D. high-scoring unmapped (alias-table candidates) ──
-  const aliasCandidates = unmappedRanked
-    .filter((u) => u.rank <= top_n && ourOrgs.has(policy.org_aliases[u.creator] ?? u.creator))
-    .sort((a, b) => a.rank - b.rank);
-  console.log(`\n## UNMAPPED but in AA top ${top_n}, from orgs we serve — add to policy aliases: ${aliasCandidates.length}`);
-  for (const u of aliasCandidates.slice(0, 15)) {
-    console.log(`  #${pad(String(u.rank), 3)} ${pad(u.creator + "/" + u.base, 42)} score ${u.score.toFixed(1)} (${u.release ?? "?"})`);
-  }
+  // D. unresolved & rank-relevant from our orgs → crosswalk gaps
+  const gaps = ranked
+    .slice(0, top_n)
+    .filter((g) => !g.isCanonical && ourOrgs.has(policy.org_aliases[g.creator] ?? g.creator));
+  console.log(`\n## UNRESOLVED, top ${top_n}, our orgs → run \`curate suggest\`: ${gaps.length}`);
+  for (const g of gaps.slice(0, 15))
+    console.log(`  #${pad(String(rankOf.get(g.key)), 3)} ${pad(`${g.creator}/${baseSlug(g.bestModel.slug)}`, 42)} score ${g.score.toFixed(1)}`);
+
+  // determinism note: served ids resolved only by the mechanical fallback
+  const mechServed = [...served.keys()].filter((id) => byKey.get(id)?.onlyMechanical);
+  if (mechServed.length)
+    console.log(`\n   note: ${mechServed.length} served id(s) resolved by mechanical fallback (pin to crosswalk to freeze): ${mechServed.slice(0, 8).join(", ")}${mechServed.length > 8 ? ", …" : ""}`);
 
   console.log(`\n${bar}`);
-  console.log(
-    `summary: onboard ${onboardOurs.length} | deprecate ${deprecate.length} | protected-saves ${saved.length} | alias-gaps ${aliasCandidates.length}  — DRY RUN, nothing written`,
-  );
+  console.log(`summary: onboard ${onboard.length} | deprecate ${deprecate.length} | saved ${saved.length} | gaps ${gaps.length}  — DRY RUN, nothing written`);
+
+  if (opts.check) {
+    const servedUnresolved = [...served.keys()].filter((id) => !byKey.has(id));
+    const fail = gaps.length > 0 || servedUnresolved.length > 0;
+    if (fail) {
+      console.error(`\n✗ --check: ${gaps.length} top-${top_n} gap(s), ${servedUnresolved.length} served id(s) with no AA mapping — resolve the crosswalk first`);
+      process.exit(1);
+    }
+    console.error(`\n✓ --check: every served + top-${top_n} model from our orgs is resolved`);
+  }
+}
+
+// ── suggest command (the only place heuristics run) ─────────────────────
+async function cmdSuggest(opts: { all: boolean; pin: boolean }): Promise<void> {
+  const [policy, crosswalk, aa, canon, orIds] = await Promise.all([
+    loadPolicy(),
+    loadCrosswalk(),
+    fetchAA(),
+    loadCanonical(),
+    fetchOpenRouterIds(),
+  ]);
+  const canonIds = new Set(canon.map((m) => m.id));
+  const ourOrgs = new Set([...canonIds].map((id) => id.split("/")[0]));
+  const score = scorer(policy);
+  const ourOrg = (creator: string) => ourOrgs.has(policy.org_aliases[creator] ?? creator);
+
+  const emit = (m: AAModel, verdict: string) => {
+    console.log(`  ${m.id}:`);
+    console.log(`    slug: ${m.slug}`);
+    console.log(`    ${verdict}`);
+    console.log(`    by: heuristic`);
+  };
+
+  console.log("# proposed additions to curation/crosswalk/aa.yaml — review, then paste under `entries:`");
+  console.log("# (by: heuristic; confirm the canonical id before committing)\n");
+  let n = 0;
+
+  if (opts.pin) {
+    // Freeze the deterministic mechanical resolutions as explicit cache entries.
+    for (const m of aa) {
+      if (score(m) == null || crosswalk.has(m.id)) continue;
+      if (!opts.all && !ourOrg(m.model_creator?.slug ?? "")) continue;
+      const mech = mechanical(m.slug, m.model_creator?.slug ?? "", policy, canonIds);
+      if (!mech) continue;
+      emit(m, baseSlug(m.slug) === m.slug ? `canonical: ${mech}` : `collapse_of: ${mech}`);
+      n++;
+    }
+  } else {
+    // Default: the SAME gaps `resolve` reports — unresolved groups in the top_n
+    // from orgs we serve (or all, with --all). One proposal per group.
+    const ranked = buildGroups(aa, crosswalk, policy, canonIds, score);
+    const top = opts.all ? ranked : ranked.slice(0, policy.ranking.top_n);
+    for (const g of top.filter((g) => !g.isCanonical && (opts.all || ourOrg(g.creator)))) {
+      const m = g.bestModel;
+      const guess = `${policy.org_aliases[g.creator] ?? g.creator}/${baseSlug(m.slug).replace(/(\d)-(\d)/g, "$1.$2")}`;
+      emit(
+        m,
+        orIds.has(guess)
+          ? `canonical: ${guess}   # NEW — add to canonical.yaml first`
+          : `ignore: TODO   # heuristic could not map; human/agent decide (maybe collapse_of an existing id)`,
+      );
+      n++;
+    }
+  }
+  console.log(`\n# ${n} proposal(s).${opts.all ? "" : " --all = every org / below cutoff; --pin = freeze mechanically-resolved models."}`);
+}
+
+// ── dispatch ────────────────────────────────────────────────────────────
+async function main(): Promise<void> {
+  const argv = process.argv.slice(2);
+  const cmd = argv.find((a) => !a.startsWith("-")) ?? "resolve";
+  const asOfArg = argv.find((a) => a.startsWith("--as-of="))?.split("=")[1];
+  const asOf = asOfArg ?? new Date().toISOString().slice(0, 10);
+  if (cmd === "suggest") {
+    await cmdSuggest({ all: argv.includes("--all"), pin: argv.includes("--pin") });
+  } else {
+    await cmdResolve({ asOf, check: argv.includes("--check") });
+  }
 }
 
 await main();
