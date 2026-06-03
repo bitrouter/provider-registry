@@ -260,7 +260,7 @@ function buildGroups(
 }
 
 // ── resolve command ─────────────────────────────────────────────────────
-async function cmdResolve(opts: { asOf: string; check: boolean }): Promise<void> {
+async function cmdResolve(opts: { asOf: string; check: boolean; topN?: number }): Promise<void> {
   const [policy, crosswalk, aa, canon, providers] = await Promise.all([
     loadPolicy(),
     loadCrosswalk(),
@@ -268,6 +268,7 @@ async function cmdResolve(opts: { asOf: string; check: boolean }): Promise<void>
     loadCanonical(),
     loadProviders(),
   ]);
+  if (opts.topN && Number.isFinite(opts.topN)) policy.ranking.top_n = opts.topN;
   const canonIds = new Set(canon.map((m) => m.id));
   const ourOrgs = new Set([...canonIds].map((id) => id.split("/")[0]));
   const served = new Map<string, string[]>();
@@ -466,7 +467,7 @@ function pricingFromCost(cost?: CatalogModel["cost"]): ProviderModel["pricing"] 
   return Object.keys(pricing).length ? (pricing as ProviderModel["pricing"]) : undefined;
 }
 
-async function cmdApply(opts: { asOf: string; write: boolean }): Promise<void> {
+async function cmdApply(opts: { asOf: string; write: boolean; topN?: number }): Promise<void> {
   const [policy, crosswalk, aa, canon, providers] = await Promise.all([
     loadPolicy(),
     loadCrosswalk(),
@@ -474,6 +475,7 @@ async function cmdApply(opts: { asOf: string; write: boolean }): Promise<void> {
     loadCanonical(),
     loadProviders(),
   ]);
+  if (opts.topN && Number.isFinite(opts.topN)) policy.ranking.top_n = opts.topN;
   let orCatalog: Map<string, ORModel>;
   let catalog: Catalog;
   try {
@@ -604,12 +606,14 @@ async function main(): Promise<void> {
   const cmd = argv.find((a) => !a.startsWith("-")) ?? "resolve";
   const asOfArg = argv.find((a) => a.startsWith("--as-of="))?.split("=")[1];
   const asOf = asOfArg ?? new Date().toISOString().slice(0, 10);
+  const topNArg = argv.find((a) => a.startsWith("--top-n="))?.split("=")[1];
+  const topN = topNArg ? Number(topNArg) : undefined;
   if (cmd === "suggest") {
     await cmdSuggest({ all: argv.includes("--all"), pin: argv.includes("--pin") });
   } else if (cmd === "apply") {
-    await cmdApply({ asOf, write: argv.includes("--write") });
+    await cmdApply({ asOf, write: argv.includes("--write"), topN });
   } else {
-    await cmdResolve({ asOf, check: argv.includes("--check") });
+    await cmdResolve({ asOf, check: argv.includes("--check"), topN });
   }
 }
 
