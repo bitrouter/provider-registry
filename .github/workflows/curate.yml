@@ -1,19 +1,16 @@
 # Automated, scheduled curation for VERIFIED providers (public-repo safe).
 #
-# Daily (and on-demand) it probes each verified provider's live /models with
-# that provider's key from the Actions env, onboards AA-top-N models they serve
-# (canonical entry + crosswalk cache + attachment with OpenRouter pricing),
-# stages deprecations for verified-provider models that fell out of AA top-N,
-# and opens/updates a single bot PR for a maintainer to review. Anonymous
-# providers are never touched here.
+# Daily (and on-demand) it reads each verified provider's catalog from
+# models.dev (keyless) + the OpenRouter catalog (keyless, canonical-id
+# authority), onboards AA-top-N models they serve (canonical entry + crosswalk
+# cache + attachment with models.dev pricing), stages deprecations for
+# verified-provider models that fell out of AA top-N, and opens/updates a single
+# bot PR for a maintainer to review. Anonymous providers are never touched here.
 #
-# Required secrets:
+# Required secrets (just two — no per-provider keys):
 #   AA_API_KEY                         Artificial Analysis ranking API
 #   RELEASE_BOT_APP_ID / _PRIVATE_KEY  the GitHub App that opens the PR (so CI
 #                                      runs on the bot PR, same as release-plz)
-#   <PROVIDER>_API_KEY                 per verified provider that needs a key to
-#                                      list its catalog (e.g. OPENAI_API_KEY).
-#                                      Missing ones are skipped gracefully.
 name: curate
 
 on:
@@ -61,17 +58,6 @@ jobs:
         id: report
         env:
           AA_API_KEY: ${{ secrets.AA_API_KEY }}
-          ALIBABA_API_KEY: ${{ secrets.ALIBABA_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
-          MOONSHOTAI_API_KEY: ${{ secrets.MOONSHOTAI_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          STEPFUN_API_KEY: ${{ secrets.STEPFUN_API_KEY }}
-          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
-          XIAOMI_API_KEY: ${{ secrets.XIAOMI_API_KEY }}
-          ZAI_API_KEY: ${{ secrets.ZAI_API_KEY }}
         run: |
           set -euo pipefail
           DATE=$(date -u +%F)
@@ -82,7 +68,7 @@ jobs:
           {
             echo "body<<__CURATE_EOF__"
             echo "Automated curation — as-of **$DATE** — verified providers only."
-            echo "Probes each verified provider's live \`/models\`, onboards AA-top-N models it serves, and stages deprecations. Review the diff and merge."
+            echo "Reads each verified provider's catalog from models.dev (keyless), onboards AA-top-N models it serves, and stages deprecations. Review the diff and merge."
             echo
             echo "### Applied this run"
             echo '```'

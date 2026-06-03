@@ -39,6 +39,7 @@ import {
   ProviderModel,
   REGISTRY_ROOT,
 } from "./schema";
+import { loadCatalog, type Catalog, type CatalogModel } from "./catalog";
 
 const POLICY_PATH = join(REGISTRY_ROOT, "curation", "policy.yaml");
 const AA_CROSSWALK = join(REGISTRY_ROOT, "curation", "crosswalk", "aa.yaml");
@@ -59,6 +60,8 @@ const Policy = z.object({
     .default({ grace_days: 60 }),
   protected: z.array(z.string()).default([]),
   org_aliases: z.record(z.string(), z.string()).default({}),
+  // provider name → models.dev provider key, when they differ (e.g. stepfun)
+  modelsdev_keys: z.record(z.string(), z.string()).default({}),
   // safety cap: never onboard more than this many canonical models per run
   max_onboard_per_run: z.number().int().positive().default(8),
 });
@@ -90,17 +93,21 @@ async function loadCrosswalk(): Promise<Map<string, Verdict>> {
 }
 
 // ── http ────────────────────────────────────────────────────────────────
-async function fetchWithRetry(url: string, init: RequestInit, attempts = 3): Promise<Response> {
+async function fetchWithRetry(url: string, init: RequestInit, attempts = 4): Promise<Response> {
   let lastErr: unknown;
+  let lastRes: Response | undefined;
   for (let i = 0; i < attempts; i++) {
     try {
-      return await fetch(url, init);
+      const res = await fetch(url, init);
+      if (res.status < 500) return res; // 2xx/4xx final; 5xx worth retrying
+      lastRes = res;
     } catch (err) {
       lastErr = err;
-      await new Promise((r) => setTimeout(r, 300 * (i + 1)));
     }
+    if (i < attempts - 1) await new Promise((r) => setTimeout(r, 400 * (i + 1)));
   }
-  throw lastErr;
+  if (lastRes) return lastRes;
+  throw lastErr ?? new Error("fetch failed");
 }
 
 interface AAModel {
@@ -137,8 +144,6 @@ async function fetchOpenRouterIds(): Promise<Set<string>> {
     return new Set();
   }
 }
-
-type Protocol = "openai" | "anthropic" | "google";
 
 // ── pure mechanical normalization (deterministic; no network, no fuzz) ───
 // Strips effort/reasoning variants (NOT `thinking`, which names real models)
@@ -399,14 +404,14 @@ async function cmdSuggest(opts: { all: boolean; pin: boolean }): Promise<void> {
 }
 
 // ── apply command (verified-provider catalog sync) ──────────────────────
-// The mutating path, scoped to `verified` providers (public-repo safe). For
-// AA-top-N models a verified provider actually serves (live /models, probed
-// with that provider's key from the env), it: adds the canonical entry from
-// OpenRouter metadata, caches the AA→canonical judgment in the crosswalk, and
-// attaches the model with OpenRouter pricing. Verified-provider models that
+// The mutating path, scoped to `verified` providers (public-repo safe). It uses
+// KEYLESS sources only: models.dev for each provider's catalog + pricing, and
+// OpenRouter (also keyless) for canonical-id authority + metadata. For an
+// AA-top-N model a verified provider actually serves (per models.dev), it adds
+// the canonical entry, caches the AA→canonical judgment in the crosswalk, and
+// attaches the model with models.dev pricing. Verified-provider models that
 // fell out of AA top-N (and aren't protected) get a staged deprecation_date.
 // Anonymous providers are never touched here.
-const PUBLIC_BASES_APPLY: Record<string, string> = {};
 
 interface ORModel {
   id: string;
@@ -414,7 +419,6 @@ interface ORModel {
   context_length?: number;
   architecture?: { input_modalities?: string[]; output_modalities?: string[] };
   top_provider?: { max_completion_tokens?: number };
-  pricing?: Record<string, string>;
 }
 async function fetchOpenRouterCatalog(): Promise<Map<string, ORModel>> {
   const r = await fetchWithRetry(OPENROUTER_URL, { headers: { Accept: "application/json" } });
@@ -423,46 +427,6 @@ async function fetchOpenRouterCatalog(): Promise<Map<string, ORModel>> {
   return new Map((body.data ?? []).map((m) => [m.id, m]));
 }
 
-async function probeProvider(
-  base: string,
-  apiKey: string | undefined,
-  protocol: Protocol,
-): Promise<string[] | null> {
-  let url = `${base.replace(/\/$/, "")}/models`;
-  const headers: Record<string, string> = { Accept: "application/json" };
-  if (apiKey) {
-    if (protocol === "anthropic") {
-      headers["x-api-key"] = apiKey;
-      headers["anthropic-version"] = "2023-06-01";
-    } else if (protocol === "google") url += `?key=${encodeURIComponent(apiKey)}`;
-    else headers["Authorization"] = `Bearer ${apiKey}`;
-  }
-  try {
-    const r = await fetchWithRetry(url, { headers });
-    if (!r.ok) return null;
-    const body = await r.json();
-    const list: unknown[] = Array.isArray(body)
-      ? body
-      : Array.isArray((body as { data?: unknown[] }).data)
-        ? (body as { data: unknown[] }).data
-        : Array.isArray((body as { models?: unknown[] }).models)
-          ? (body as { models: unknown[] }).models
-          : [];
-    return list
-      .map((e) => (e && typeof e === "object" ? ((e as Record<string, unknown>).id ?? (e as Record<string, unknown>).name) : e))
-      .filter((x): x is string => typeof x === "string");
-  } catch {
-    return null;
-  }
-}
-
-function defaultProtocolOf(data: ProviderFile): Protocol {
-  for (const entry of data.api_protocol ?? []) {
-    const v = (entry as Record<string, string>)["*"];
-    if (v === "openai" || v === "anthropic" || v === "google") return v;
-  }
-  return "openai";
-}
 function providerOrg(data: ProviderFile): string | null {
   const counts = new Map<string, number>();
   for (const m of data.models) {
@@ -473,11 +437,6 @@ function providerOrg(data: ProviderFile): string | null {
   let n = 0;
   for (const [org, c] of counts) if (c > n) ((best = org), (n = c));
   return best;
-}
-function perMillion(p: unknown): number | undefined {
-  const n = Number(p);
-  if (!Number.isFinite(n) || n < 0) return undefined;
-  return Math.round(n * 1e12) / 1e6;
 }
 function canonicalFromOR(or: ORModel): z.infer<typeof CanonicalModel> {
   const allow = new Set(["text", "image", "audio"]);
@@ -492,18 +451,15 @@ function canonicalFromOR(or: ORModel): z.infer<typeof CanonicalModel> {
     max_output_tokens: or.top_provider?.max_completion_tokens,
   });
 }
-function pricingFromOR(or: ORModel): ProviderModel["pricing"] {
-  const p = or.pricing ?? {};
+// models.dev `cost` is already per-1M tokens — the same convention as the yamls.
+function pricingFromCost(cost?: CatalogModel["cost"]): ProviderModel["pricing"] {
+  const clean = (x?: number) => (typeof x === "number" && Number.isFinite(x) && x >= 0 ? x : undefined);
   const input: Record<string, number> = {};
-  const noCache = perMillion(p.prompt);
-  const cacheRead = perMillion(p.input_cache_read);
-  const cacheWrite = perMillion(p.input_cache_write);
-  if (noCache !== undefined) input.no_cache = noCache;
-  if (cacheRead !== undefined) input.cache_read = cacheRead;
-  if (cacheWrite !== undefined) input.cache_write = cacheWrite;
+  if (clean(cost?.input) !== undefined) input.no_cache = cost!.input!;
+  if (clean(cost?.cache_read) !== undefined) input.cache_read = cost!.cache_read!;
+  if (clean(cost?.cache_write) !== undefined) input.cache_write = cost!.cache_write!;
   const out: Record<string, number> = {};
-  const text = perMillion(p.completion);
-  if (text !== undefined) out.text = text;
+  if (clean(cost?.output) !== undefined) out.text = cost!.output!;
   const pricing: Record<string, unknown> = {};
   if (Object.keys(input).length) pricing.input_tokens = input;
   if (Object.keys(out).length) pricing.output_tokens = out;
@@ -519,10 +475,11 @@ async function cmdApply(opts: { asOf: string; write: boolean }): Promise<void> {
     loadProviders(),
   ]);
   let orCatalog: Map<string, ORModel>;
+  let catalog: Catalog;
   try {
-    orCatalog = await fetchOpenRouterCatalog();
+    [orCatalog, catalog] = await Promise.all([fetchOpenRouterCatalog(), loadCatalog()]);
   } catch (err) {
-    console.error(`✗ ${(err as Error).message} — apply needs OpenRouter for metadata/pricing`);
+    console.error(`✗ ${(err as Error).message} — apply needs OpenRouter (id authority) + models.dev (catalogs/pricing)`);
     process.exit(2);
   }
   const canonIds = new Set(canon.map((m) => m.id));
@@ -546,25 +503,24 @@ async function cmdApply(opts: { asOf: string; write: boolean }): Promise<void> {
   }
 
   const verified = providers.filter((p) => p.data.verified);
-  // probe each verified provider once
-  const liveByProvider = new Map<string, string[]>();
+  // each verified provider's catalog from models.dev (keyless)
+  const modelsDevKey = (name: string) => policy.modelsdev_keys[name] ?? name;
+  const providerCatalog = new Map<string, CatalogModel[]>();
   for (const { data } of verified) {
-    const org = providerOrg(data);
-    const base = process.env[`${envKey(data.name)}_API_BASE`] ?? data.default_api_base ?? PUBLIC_BASES_APPLY[data.name];
-    const key = process.env[`${envKey(data.name)}_API_KEY`];
-    if (!base) continue;
-    const live = await probeProvider(base, key, defaultProtocolOf(data));
-    if (live) liveByProvider.set(data.name, live);
-    console.error(`  probe ${data.name} (${org}): ${live ? `${live.length} models` : "unreachable/no key — skipped"}`);
+    const key = modelsDevKey(data.name);
+    const models = catalog.get(key);
+    if (models) providerCatalog.set(data.name, [...models.values()]);
+    console.error(`  ${data.name} (models.dev:${key}, ${providerOrg(data)}): ${models ? `${models.size} models` : "no catalog — skipped"}`);
   }
 
   const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
-  const servesId = (data: ProviderFile, providerName: string, id: string): string | null => {
+  // the models.dev model a verified provider serves for canonical `id`, or null
+  const servesModel = (data: ProviderFile, providerName: string, id: string): CatalogModel | null => {
     if (providerOrg(data) !== id.split("/")[0]) return null;
     const needle = norm(id.split("/")[1]!);
-    const live = liveByProvider.get(providerName) ?? [];
+    const models = providerCatalog.get(providerName) ?? [];
     // prefer an exact id match (e.g. `o4-mini`) over a dated snapshot
-    return live.find((l) => norm(l) === needle) ?? live.find((l) => norm(l).includes(needle)) ?? null;
+    return models.find((m) => norm(m.id) === needle) ?? models.find((m) => norm(m.id).includes(needle)) ?? null;
   };
 
   // build the change set
@@ -574,15 +530,16 @@ async function cmdApply(opts: { asOf: string; write: boolean }): Promise<void> {
   let onboarded = 0;
   for (const t of targets) {
     if (onboarded >= policy.max_onboard_per_run) break;
-    const servers = verified.filter((p) => servesId(p.data, p.data.name, t.id));
+    const servers = verified
+      .map((p) => ({ name: p.data.name, model: servesModel(p.data, p.data.name, t.id) }))
+      .filter((s): s is { name: string; model: CatalogModel } => s.model !== null);
     if (servers.length === 0) continue; // only onboard models a verified provider actually serves
     canonicalAdds.push(canonicalFromOR(orCatalog.get(t.id)!));
     crosswalkAdds.push({ uuid: t.uuid, slug: t.slug, id: t.id });
-    for (const p of servers) {
-      const pmid = servesId(p.data, p.data.name, t.id)!;
-      attaches.set(p.data.name, [
-        ...(attaches.get(p.data.name) ?? []),
-        ProviderModel.parse({ id: t.id, provider_model_id: pmid, pricing: pricingFromOR(orCatalog.get(t.id)!) }),
+    for (const s of servers) {
+      attaches.set(s.name, [
+        ...(attaches.get(s.name) ?? []),
+        ProviderModel.parse({ id: t.id, provider_model_id: s.model.id, pricing: pricingFromCost(s.model.cost) }),
       ]);
     }
     onboarded++;
@@ -639,10 +596,6 @@ async function cmdApply(opts: { asOf: string; write: boolean }): Promise<void> {
     await writeFile(providerPath(data.name), doc.toString());
   }
   console.log("\n✓ applied. Run `bun run validate` to confirm.");
-}
-
-function envKey(name: string): string {
-  return name.toUpperCase().replace(/[^A-Z0-9]/g, "_");
 }
 
 // ── dispatch ────────────────────────────────────────────────────────────
