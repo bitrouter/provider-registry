@@ -26,3 +26,4 @@ models:
 status: active
 weight: 1
 submitted_at: 2026-06-01
+verified: true

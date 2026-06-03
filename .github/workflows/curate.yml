@@ -1,0 +1,96 @@
+# Automated, scheduled curation for VERIFIED providers (public-repo safe).
+#
+# Daily (and on-demand) it reads each verified provider's catalog from
+# models.dev (keyless) + the OpenRouter catalog (keyless, canonical-id
+# authority), onboards AA-top-N models they serve (canonical entry + crosswalk
+# cache + attachment with models.dev pricing), stages deprecations for
+# verified-provider models that fell out of AA top-N, and opens/updates a single
+# bot PR for a maintainer to review. Anonymous providers are never touched here.
+#
+# Required secrets (just two — no per-provider keys):
+#   AA_API_KEY                         Artificial Analysis ranking API
+#   RELEASE_BOT_APP_ID / _PRIVATE_KEY  the GitHub App that opens the PR (so CI
+#                                      runs on the bot PR, same as release-plz)
+name: curate
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # daily 06:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: curation
+  cancel-in-progress: true
+
+jobs:
+  curate:
+    # don't run on forks of a public repo
+    if: github.repository == 'bitrouter/provider-registry'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate GitHub App token
+        id: token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.token.outputs.token }}
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - name: Pre-flight (registry valid, scripts compile)
+        run: |
+          bun run validate
+          bunx tsc --noEmit
+
+      - name: Curate (apply + build PR body)
+        id: report
+        env:
+          AA_API_KEY: ${{ secrets.AA_API_KEY }}
+        run: |
+          set -euo pipefail
+          DATE=$(date -u +%F)
+          echo "date=$DATE" >> "$GITHUB_OUTPUT"
+          bun run curate apply --write --as-of="$DATE" 2>&1 | tee /tmp/apply.txt
+          bun run curate resolve --as-of="$DATE" 2>&1 | tee /tmp/resolve.txt
+          bun run validate # post-write gate
+          {
+            echo "body<<__CURATE_EOF__"
+            echo "Automated curation — as-of **$DATE** — verified providers only."
+            echo "Reads each verified provider's catalog from models.dev (keyless), onboards AA-top-N models it serves, and stages deprecations. Review the diff and merge."
+            echo
+            echo "### Applied this run"
+            echo '```'
+            cat /tmp/apply.txt
+            echo '```'
+            echo "<details><summary>Full resolve digest</summary>"
+            echo
+            echo '```'
+            cat /tmp/resolve.txt
+            echo '```'
+            echo "</details>"
+            echo "__CURATE_EOF__"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Open / update bot PR
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ steps.token.outputs.token }}
+          branch: bot/curation
+          base: main
+          title: "chore(curation): automated catalog sync ${{ steps.report.outputs.date }}"
+          commit-message: "chore(curation): automated catalog sync (as-of ${{ steps.report.outputs.date }})"
+          body: ${{ steps.report.outputs.body }}
+          labels: automated-curation
+          delete-branch: false
