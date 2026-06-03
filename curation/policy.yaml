@@ -23,6 +23,10 @@ deprecation:
   # rank dips, so no separate "strikes" state file is needed.
   grace_days: 60
 
+# Safety cap: `curate apply` never onboards more than this many canonical models
+# in a single run (guards against a bad AA response flooding the registry).
+max_onboard_per_run: 8
+
 # Canonical-id globs that are NEVER auto-deprecated. Matched against OUR canonical
 # ids (not AA slugs), so protection holds even when the AA -> canonical mapping is
 # imperfect. These are the high-volume / utility tiers we always want available

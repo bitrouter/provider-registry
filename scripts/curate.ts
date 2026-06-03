@@ -24,12 +24,21 @@
 //
 // Requires AA_API_KEY (header x-api-key); Bun auto-loads .env.
 
-import { readFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { parse as parseYaml } from "yaml";
+import { parse as parseYaml, parseDocument } from "yaml";
 import { z } from "zod";
-import { loadCanonical, loadProviders, REGISTRY_ROOT } from "./schema";
+import {
+  loadCanonical,
+  loadProviders,
+  providerPath,
+  writeCanonicalFile,
+  CanonicalModel,
+  ProviderFile,
+  ProviderModel,
+  REGISTRY_ROOT,
+} from "./schema";
 
 const POLICY_PATH = join(REGISTRY_ROOT, "curation", "policy.yaml");
 const AA_CROSSWALK = join(REGISTRY_ROOT, "curation", "crosswalk", "aa.yaml");
@@ -50,6 +59,8 @@ const Policy = z.object({
     .default({ grace_days: 60 }),
   protected: z.array(z.string()).default([]),
   org_aliases: z.record(z.string(), z.string()).default({}),
+  // safety cap: never onboard more than this many canonical models per run
+  max_onboard_per_run: z.number().int().positive().default(8),
 });
 type Policy = z.infer<typeof Policy>;
 
@@ -126,6 +137,8 @@ async function fetchOpenRouterIds(): Promise<Set<string>> {
     return new Set();
   }
 }
+
+type Protocol = "openai" | "anthropic" | "google";
 
 // ── pure mechanical normalization (deterministic; no network, no fuzz) ───
 // Strips effort/reasoning variants (NOT `thinking`, which names real models)
@@ -385,6 +398,253 @@ async function cmdSuggest(opts: { all: boolean; pin: boolean }): Promise<void> {
   console.log(`\n# ${n} proposal(s).${opts.all ? "" : " --all = every org / below cutoff; --pin = freeze mechanically-resolved models."}`);
 }
 
+// ── apply command (verified-provider catalog sync) ──────────────────────
+// The mutating path, scoped to `verified` providers (public-repo safe). For
+// AA-top-N models a verified provider actually serves (live /models, probed
+// with that provider's key from the env), it: adds the canonical entry from
+// OpenRouter metadata, caches the AA→canonical judgment in the crosswalk, and
+// attaches the model with OpenRouter pricing. Verified-provider models that
+// fell out of AA top-N (and aren't protected) get a staged deprecation_date.
+// Anonymous providers are never touched here.
+const PUBLIC_BASES_APPLY: Record<string, string> = {};
+
+interface ORModel {
+  id: string;
+  name?: string;
+  context_length?: number;
+  architecture?: { input_modalities?: string[]; output_modalities?: string[] };
+  top_provider?: { max_completion_tokens?: number };
+  pricing?: Record<string, string>;
+}
+async function fetchOpenRouterCatalog(): Promise<Map<string, ORModel>> {
+  const r = await fetchWithRetry(OPENROUTER_URL, { headers: { Accept: "application/json" } });
+  if (!r.ok) throw new Error(`OpenRouter HTTP ${r.status}`);
+  const body = (await r.json()) as { data?: ORModel[] };
+  return new Map((body.data ?? []).map((m) => [m.id, m]));
+}
+
+async function probeProvider(
+  base: string,
+  apiKey: string | undefined,
+  protocol: Protocol,
+): Promise<string[] | null> {
+  let url = `${base.replace(/\/$/, "")}/models`;
+  const headers: Record<string, string> = { Accept: "application/json" };
+  if (apiKey) {
+    if (protocol === "anthropic") {
+      headers["x-api-key"] = apiKey;
+      headers["anthropic-version"] = "2023-06-01";
+    } else if (protocol === "google") url += `?key=${encodeURIComponent(apiKey)}`;
+    else headers["Authorization"] = `Bearer ${apiKey}`;
+  }
+  try {
+    const r = await fetchWithRetry(url, { headers });
+    if (!r.ok) return null;
+    const body = await r.json();
+    const list: unknown[] = Array.isArray(body)
+      ? body
+      : Array.isArray((body as { data?: unknown[] }).data)
+        ? (body as { data: unknown[] }).data
+        : Array.isArray((body as { models?: unknown[] }).models)
+          ? (body as { models: unknown[] }).models
+          : [];
+    return list
+      .map((e) => (e && typeof e === "object" ? ((e as Record<string, unknown>).id ?? (e as Record<string, unknown>).name) : e))
+      .filter((x): x is string => typeof x === "string");
+  } catch {
+    return null;
+  }
+}
+
+function defaultProtocolOf(data: ProviderFile): Protocol {
+  for (const entry of data.api_protocol ?? []) {
+    const v = (entry as Record<string, string>)["*"];
+    if (v === "openai" || v === "anthropic" || v === "google") return v;
+  }
+  return "openai";
+}
+function providerOrg(data: ProviderFile): string | null {
+  const counts = new Map<string, number>();
+  for (const m of data.models) {
+    const org = m.id.split("/")[0]!;
+    counts.set(org, (counts.get(org) ?? 0) + 1);
+  }
+  let best: string | null = null;
+  let n = 0;
+  for (const [org, c] of counts) if (c > n) ((best = org), (n = c));
+  return best;
+}
+function perMillion(p: unknown): number | undefined {
+  const n = Number(p);
+  if (!Number.isFinite(n) || n < 0) return undefined;
+  return Math.round(n * 1e12) / 1e6;
+}
+function canonicalFromOR(or: ORModel): z.infer<typeof CanonicalModel> {
+  const allow = new Set(["text", "image", "audio"]);
+  const inMod = (or.architecture?.input_modalities ?? ["text"]).filter((m) => allow.has(m));
+  const outMod = (or.architecture?.output_modalities ?? ["text"]).filter((m) => m === "text" || m === "audio");
+  return CanonicalModel.parse({
+    id: or.id,
+    name: or.name,
+    input_modalities: inMod.length ? inMod : ["text"],
+    output_modalities: outMod.length ? outMod : ["text"],
+    max_input_tokens: or.context_length,
+    max_output_tokens: or.top_provider?.max_completion_tokens,
+  });
+}
+function pricingFromOR(or: ORModel): ProviderModel["pricing"] {
+  const p = or.pricing ?? {};
+  const input: Record<string, number> = {};
+  const noCache = perMillion(p.prompt);
+  const cacheRead = perMillion(p.input_cache_read);
+  const cacheWrite = perMillion(p.input_cache_write);
+  if (noCache !== undefined) input.no_cache = noCache;
+  if (cacheRead !== undefined) input.cache_read = cacheRead;
+  if (cacheWrite !== undefined) input.cache_write = cacheWrite;
+  const out: Record<string, number> = {};
+  const text = perMillion(p.completion);
+  if (text !== undefined) out.text = text;
+  const pricing: Record<string, unknown> = {};
+  if (Object.keys(input).length) pricing.input_tokens = input;
+  if (Object.keys(out).length) pricing.output_tokens = out;
+  return Object.keys(pricing).length ? (pricing as ProviderModel["pricing"]) : undefined;
+}
+
+async function cmdApply(opts: { asOf: string; write: boolean }): Promise<void> {
+  const [policy, crosswalk, aa, canon, providers] = await Promise.all([
+    loadPolicy(),
+    loadCrosswalk(),
+    fetchAA(),
+    loadCanonical(),
+    loadProviders(),
+  ]);
+  let orCatalog: Map<string, ORModel>;
+  try {
+    orCatalog = await fetchOpenRouterCatalog();
+  } catch (err) {
+    console.error(`✗ ${(err as Error).message} — apply needs OpenRouter for metadata/pricing`);
+    process.exit(2);
+  }
+  const canonIds = new Set(canon.map((m) => m.id));
+  const ourOrgs = new Set([...canonIds].map((id) => id.split("/")[0]));
+  const score = scorer(policy);
+  const ranked = buildGroups(aa, crosswalk, policy, canonIds, score);
+  const keptCanonical = new Set(ranked.slice(0, policy.ranking.top_n).filter((g) => g.isCanonical).map((g) => g.key));
+  const protectedRes = policy.protected.map(globToRe);
+  const isProtected = (id: string) => protectedRes.some((re) => re.test(id));
+
+  // onboarding candidates: AA-top-N gap groups (our orgs) whose mechanical id is
+  // a real OpenRouter id not yet in canonical — i.e. genuinely new models.
+  interface OnboardTarget { id: string; uuid: string; slug: string }
+  const targets: OnboardTarget[] = [];
+  for (const g of ranked.slice(0, policy.ranking.top_n)) {
+    if (g.isCanonical) continue;
+    const org = policy.org_aliases[g.creator] ?? g.creator;
+    if (!ourOrgs.has(org)) continue;
+    const guess = `${org}/${baseSlug(g.bestModel.slug).replace(/(\d)-(\d)/g, "$1.$2")}`;
+    if (orCatalog.has(guess) && !canonIds.has(guess)) targets.push({ id: guess, uuid: g.bestModel.id, slug: g.bestModel.slug });
+  }
+
+  const verified = providers.filter((p) => p.data.verified);
+  // probe each verified provider once
+  const liveByProvider = new Map<string, string[]>();
+  for (const { data } of verified) {
+    const org = providerOrg(data);
+    const base = process.env[`${envKey(data.name)}_API_BASE`] ?? data.default_api_base ?? PUBLIC_BASES_APPLY[data.name];
+    const key = process.env[`${envKey(data.name)}_API_KEY`];
+    if (!base) continue;
+    const live = await probeProvider(base, key, defaultProtocolOf(data));
+    if (live) liveByProvider.set(data.name, live);
+    console.error(`  probe ${data.name} (${org}): ${live ? `${live.length} models` : "unreachable/no key — skipped"}`);
+  }
+
+  const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const servesId = (data: ProviderFile, providerName: string, id: string): string | null => {
+    if (providerOrg(data) !== id.split("/")[0]) return null;
+    const needle = norm(id.split("/")[1]!);
+    const live = liveByProvider.get(providerName) ?? [];
+    // prefer an exact id match (e.g. `o4-mini`) over a dated snapshot
+    return live.find((l) => norm(l) === needle) ?? live.find((l) => norm(l).includes(needle)) ?? null;
+  };
+
+  // build the change set
+  const canonicalAdds: Array<z.infer<typeof CanonicalModel>> = [];
+  const crosswalkAdds: Array<{ uuid: string; slug: string; id: string }> = [];
+  const attaches = new Map<string, ProviderModel[]>();
+  let onboarded = 0;
+  for (const t of targets) {
+    if (onboarded >= policy.max_onboard_per_run) break;
+    const servers = verified.filter((p) => servesId(p.data, p.data.name, t.id));
+    if (servers.length === 0) continue; // only onboard models a verified provider actually serves
+    canonicalAdds.push(canonicalFromOR(orCatalog.get(t.id)!));
+    crosswalkAdds.push({ uuid: t.uuid, slug: t.slug, id: t.id });
+    for (const p of servers) {
+      const pmid = servesId(p.data, p.data.name, t.id)!;
+      attaches.set(p.data.name, [
+        ...(attaches.get(p.data.name) ?? []),
+        ProviderModel.parse({ id: t.id, provider_model_id: pmid, pricing: pricingFromOR(orCatalog.get(t.id)!) }),
+      ]);
+    }
+    onboarded++;
+  }
+
+  // deprecation staging for verified providers
+  const deprecations: Array<{ provider: string; id: string }> = [];
+  for (const { data } of verified) {
+    for (const m of data.models) {
+      if (keptCanonical.has(m.id) || isProtected(m.id) || m.deprecation_date) continue;
+      // only deprecate something the provider org owns and AA ranks out
+      deprecations.push({ provider: data.name, id: m.id });
+    }
+  }
+
+  const depDate = new Date(`${opts.asOf}T00:00:00Z`);
+  depDate.setUTCDate(depDate.getUTCDate() + policy.deprecation.grace_days);
+  const depIso = depDate.toISOString().slice(0, 10);
+
+  // report
+  console.log(`\ncurate apply — as-of ${opts.asOf} — ${opts.write ? "WRITE" : "dry-run"} — verified providers only`);
+  console.log(`onboard ${canonicalAdds.length} | attach ${[...attaches.values()].flat().length} | deprecate ${deprecations.length}`);
+  for (const c of canonicalAdds) console.log(`  + canonical ${c.id}`);
+  for (const [prov, ms] of attaches) for (const m of ms) console.log(`  + attach   ${prov} ← ${m.id} (${m.provider_model_id})`);
+  for (const d of deprecations) console.log(`  ~ deprecate ${d.provider}/${d.id} → ${depIso}`);
+  if (!canonicalAdds.length && !deprecations.length) console.log("  (nothing to do)");
+
+  if (!opts.write) {
+    console.log("\n(dry run — pass --write to apply)");
+    return;
+  }
+
+  // apply: canonical (append) + crosswalk (append, preserve comments) + providers
+  if (canonicalAdds.length) await writeCanonicalFile([...canon, ...canonicalAdds]);
+  if (crosswalkAdds.length) {
+    const doc = parseDocument(await readFile(AA_CROSSWALK, "utf8"));
+    for (const e of crosswalkAdds)
+      doc.setIn(["entries", e.uuid], { slug: e.slug, canonical: e.id, by: "automation", date: opts.asOf });
+    await writeFile(AA_CROSSWALK, doc.toString());
+  }
+  const depByProvider = new Map<string, Set<string>>();
+  for (const d of deprecations) depByProvider.set(d.provider, (depByProvider.get(d.provider) ?? new Set()).add(d.id));
+  for (const { data } of verified) {
+    const adds = attaches.get(data.name);
+    const deps = depByProvider.get(data.name);
+    if (!adds && !deps) continue;
+    const doc = parseDocument(await readFile(providerPath(data.name), "utf8"));
+    if (adds) for (const m of adds) doc.addIn(["models"], m);
+    if (deps) {
+      const seq = doc.getIn(["models"]) as { items: Array<{ get: (k: string) => unknown; set: (k: string, v: unknown) => void }> };
+      for (const item of seq.items) if (deps.has(item.get("id") as string)) item.set("deprecation_date", depIso);
+    }
+    ProviderFile.parse(doc.toJSON()); // validate before writing
+    await writeFile(providerPath(data.name), doc.toString());
+  }
+  console.log("\n✓ applied. Run `bun run validate` to confirm.");
+}
+
+function envKey(name: string): string {
+  return name.toUpperCase().replace(/[^A-Z0-9]/g, "_");
+}
+
 // ── dispatch ────────────────────────────────────────────────────────────
 async function main(): Promise<void> {
   const argv = process.argv.slice(2);
@@ -393,6 +653,8 @@ async function main(): Promise<void> {
   const asOf = asOfArg ?? new Date().toISOString().slice(0, 10);
   if (cmd === "suggest") {
     await cmdSuggest({ all: argv.includes("--all"), pin: argv.includes("--pin") });
+  } else if (cmd === "apply") {
+    await cmdApply({ asOf, write: argv.includes("--write") });
   } else {
     await cmdResolve({ asOf, check: argv.includes("--check") });
   }
