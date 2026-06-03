@@ -8,12 +8,13 @@
 
 ranking:
   source: https://artificialanalysis.ai/api/v2/data/llms/models
-  # score = intelligence_weight * intelligence_index + coding_weight * coding_index
-  # (reproduces PR #5's selection). A canonical model is "kept" if its best AA
-  # variant ranks within the top_n by this score.
+  # score = intelligence_weight * intelligence_index + coding_weight * coding_index.
+  # A canonical model is "kept" if its best AA variant ranks within top_n by this
+  # score. Tightened from 100 → 75 (cutoff ~33.4): admits only genuinely top-tier
+  # models and trims the long mid-tier tail. Override per-run with `--top-n=N`.
   intelligence_weight: 0.5
   coding_weight: 0.5
-  top_n: 100
+  top_n: 75
 
 deprecation:
   # A model that falls out of the kept set is queued, not deleted: its provider
