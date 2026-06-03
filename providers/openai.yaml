@@ -124,6 +124,14 @@ models:
         cache_read: 0.5
       output_tokens:
         text: 8
+  - id: openai/o4-mini
+    provider_model_id: o4-mini
+    pricing:
+      input_tokens:
+        no_cache: 1.1
+        cache_read: 0.275
+      output_tokens:
+        text: 4.4
 status: active
 weight: 1
 submitted_at: 2026-05-25

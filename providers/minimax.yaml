@@ -41,6 +41,13 @@ models:
         no_cache: 0.3
       output_tokens:
         text: 1.2
+  - id: minimax/minimax-m2
+    provider_model_id: MiniMax-M2
+    pricing:
+      input_tokens:
+        no_cache: 0.3
+      output_tokens:
+        text: 1.2
 status: active
 weight: 1
 submitted_at: 2026-05-25
