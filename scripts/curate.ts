@@ -27,7 +27,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { parse as parseYaml, parseDocument } from "yaml";
+import { parse as parseYaml, parseDocument, isMap, isSeq } from "yaml";
 import { z } from "zod";
 import {
   loadCanonical,
@@ -589,11 +589,17 @@ async function cmdApply(opts: { asOf: string; write: boolean; topN?: number }): 
     const deps = depByProvider.get(data.name);
     if (!adds && !deps) continue;
     const doc = parseDocument(await readFile(providerPath(data.name), "utf8"));
-    if (adds) for (const m of adds) doc.addIn(["models"], m);
+    // Stage deprecations on the EXISTING model nodes first (they're parsed
+    // YAMLMaps with .get/.set), guarding node types — then append new models as
+    // proper nodes. Doing it in this order, and via createNode, avoids calling
+    // node methods on freshly-added plain objects.
     if (deps) {
-      const seq = doc.getIn(["models"]) as { items: Array<{ get: (k: string) => unknown; set: (k: string, v: unknown) => void }> };
-      for (const item of seq.items) if (deps.has(item.get("id") as string)) item.set("deprecation_date", depIso);
+      const seq = doc.getIn(["models"]);
+      if (isSeq(seq))
+        for (const item of seq.items)
+          if (isMap(item) && deps.has(item.get("id") as string)) item.set("deprecation_date", depIso);
     }
+    if (adds) for (const m of adds) doc.addIn(["models"], doc.createNode(m));
     ProviderFile.parse(doc.toJSON()); // validate before writing
     await writeFile(providerPath(data.name), doc.toString());
   }
