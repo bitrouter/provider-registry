@@ -579,7 +579,10 @@ async function cmdApply(opts: { asOf: string; write: boolean; topN?: number }): 
   if (crosswalkAdds.length) {
     const doc = parseDocument(await readFile(AA_CROSSWALK, "utf8"));
     for (const e of crosswalkAdds)
-      doc.setIn(["entries", e.uuid], { slug: e.slug, canonical: e.id, by: "automation", date: opts.asOf });
+      // No `date` on automation entries on purpose: re-running an unchanged
+      // proposal then produces a byte-identical crosswalk, so an unmerged bot PR
+      // doesn't churn day to day (peter-evans no-ops on no diff). git records when.
+      doc.setIn(["entries", e.uuid], { slug: e.slug, canonical: e.id, by: "automation" });
     await writeFile(AA_CROSSWALK, doc.toString());
   }
   const depByProvider = new Map<string, Set<string>>();
