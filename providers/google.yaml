@@ -53,6 +53,7 @@ models:
         cache_read: 0.125
       output_tokens:
         text: 10
+    deprecation_date: 2026-08-03
   - id: google/gemma-4-31b-it
     provider_model_id: gemma-4-31b-it
 status: active
