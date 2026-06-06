@@ -1,0 +1,102 @@
+name: alibaba-coding-plan
+# First-party subscription endpoint — Alibaba Model Studio (Bailian)
+# "Coding Plan", a fixed-monthly-fee coding subscription with its own
+# `sk-sp-...` API-key format and a dedicated base URL, NOT interchangeable
+# with a pay-as-you-go DashScope key (`sk-...`). bitrouter-cloud holds no
+# platform key for this entry; it is routable only via the caller's own
+# Coding Plan key (`POST /v1/byok/keys` on the cloud). Default base
+# targets the international coding endpoint; mainland-China callers can
+# override `api_base` to https://coding.dashscope.aliyuncs.com/v1 via the
+# BYOK upsert.
+#
+# OpenAI-compatible endpoint (`Authorization: Bearer <sk-sp-key>`, no
+# extra headers required). Official docs:
+#   https://www.alibabacloud.com/help/en/model-studio/coding-plan
+#   https://help.aliyun.com/zh/model-studio/coding-plan
+# NOTE (ToS): Alibaba restricts Coding Plan keys to interactive coding
+# tools and prohibits non-interactive batch calling. Operators routing a
+# caller's coding-plan key through a gateway should keep usage within the
+# caller's own interactive workflow.
+byok_only: true
+default_api_base: https://coding-intl.dashscope.aliyuncs.com/v1
+api_protocol:
+  - "*": openai
+rate_limits:
+  - "*":
+      requests_per_minute: 60
+# Model list mirrors the standard `alibaba` catalog: the upstream
+# subscription is the source of truth for which models a given coding
+# plan can actually call (no client-side model gating). Pricing mirrors
+# the standard endpoint for reference only — the Coding Plan is a
+# flat-rate subscription and BYOK traffic is billed by Alibaba, not
+# metered per token by bitrouter-cloud.
+models:
+  - id: qwen/qwen3.7-max
+    provider_model_id: qwen3.7-max
+    pricing:
+      input_tokens:
+        no_cache: 2.5
+        cache_read: 0.5
+      output_tokens:
+        text: 7.5
+  - id: qwen/qwen3.6-max-preview
+    provider_model_id: qwen3.6-max-preview
+    pricing:
+      input_tokens:
+        no_cache: 1.3
+        cache_read: 0.13
+      output_tokens:
+        text: 7.8
+  - id: qwen/qwen3.6-plus
+    provider_model_id: qwen3.6-plus
+    pricing:
+      input_tokens:
+        no_cache: 0.5
+        cache_read: 0.05
+      output_tokens:
+        text: 3
+  - id: qwen/qwen3.6-27b
+    provider_model_id: qwen3.6-27b
+    pricing:
+      input_tokens:
+        no_cache: 0.6
+      output_tokens:
+        text: 3.6
+  - id: qwen/qwen3.6-35b-a3b
+    provider_model_id: qwen3.6-35b-a3b
+    pricing:
+      input_tokens:
+        no_cache: 0.248
+      output_tokens:
+        text: 1.485
+  - id: qwen/qwen3.5-397b-a17b
+    provider_model_id: qwen3.5-397b-a17b
+    pricing:
+      input_tokens:
+        no_cache: 0.6
+      output_tokens:
+        text: 3.6
+  - id: qwen/qwen3.5-122b-a10b
+    provider_model_id: qwen3.5-122b-a10b
+    pricing:
+      input_tokens:
+        no_cache: 0.4
+      output_tokens:
+        text: 3.2
+  - id: qwen/qwen3.5-27b
+    provider_model_id: qwen3.5-27b
+    pricing:
+      input_tokens:
+        no_cache: 0.3
+      output_tokens:
+        text: 2.4
+  - id: qwen/qwen3-max
+    provider_model_id: qwen3-max
+    pricing:
+      input_tokens:
+        no_cache: 1.2
+      output_tokens:
+        text: 6
+status: active
+weight: 1
+submitted_at: 2026-06-05
