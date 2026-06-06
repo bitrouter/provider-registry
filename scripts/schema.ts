@@ -16,6 +16,15 @@ import { z } from "zod";
 export const ApiProtocol = z.enum(["openai", "anthropic", "google"]);
 export type ApiProtocol = z.infer<typeof ApiProtocol>;
 
+// Outbound credential scheme for the Messages (`anthropic`) transport:
+// `x-api-key` (Anthropic's native scheme, the default) or `bearer`
+// (`Authorization: Bearer`). The OpenAI and Google transports use a fixed
+// scheme and ignore this. Mirrors the SDK's `AuthScheme` enum
+// (bitrouter/bitrouter#516); kept in lock-step with the Rust consumer so a
+// yaml the consumer accepts also validates here. Exactly one scheme is sent.
+export const AuthScheme = z.enum(["x-api-key", "bearer"]);
+export type AuthScheme = z.infer<typeof AuthScheme>;
+
 export const ProviderStatus = z.enum([
   "active",
   "staging",
@@ -188,6 +197,11 @@ export const ProviderFile = z
         message: "default_api_base must be an HTTPS URL",
       })
       .optional(),
+    // Outbound credential scheme for this provider's Messages (`anthropic`)
+    // requests — see `AuthScheme`. Optional; omitted means `x-api-key`
+    // (Anthropic's native default), matching the Rust consumer's serde
+    // default. Ignored for OpenAI/Google providers.
+    auth_scheme: AuthScheme.optional().default("x-api-key"),
   })
   .strict()
   .superRefine((data, ctx) => {
