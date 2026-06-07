@@ -25,6 +25,20 @@ export type ApiProtocol = z.infer<typeof ApiProtocol>;
 export const AuthScheme = z.enum(["x-api-key", "bearer"]);
 export type AuthScheme = z.infer<typeof AuthScheme>;
 
+// An API-agnostic flag for an optional inference feature a (provider, model)
+// pair supports. Capabilities are deliberately abstract: the same capability
+// maps to a different wire parameter in each inbound API (structured outputs =
+// Chat Completions `response_format`, Messages `output_config.format`, Generate
+// Content `responseSchema`, Responses `text.format`), so naming them after one
+// API's parameter would mislead. Declared per (provider, model) because the same
+// canonical model served by different channels can differ — an official API
+// honours the schema; a reseller proxy may silently ignore it. Mirrors the SDK's
+// `Capability` enum; kept in lock-step with the Rust consumer so a yaml the
+// consumer accepts also validates here. A declared capability must be confirmed
+// against the live provider by `scripts/verify-capabilities.ts`.
+export const Capability = z.enum(["structured_outputs"]);
+export type Capability = z.infer<typeof Capability>;
+
 export const ProviderStatus = z.enum([
   "active",
   "staging",
@@ -140,7 +154,12 @@ export const ProviderModel = z
     api_protocol: ApiProtocol.optional(),
     pricing: ModelPricing.optional(),
     rate_limits: RateLimits.optional(),
-    supported_features: z.array(z.string()).optional(),
+    // Inference capabilities this (provider, model) pair supports beyond plain
+    // completion — see `Capability`. Omitted/empty means none declared: the
+    // cloud router will not route a request that needs a capability to a
+    // provider that doesn't list it, and `/v1/models` surfaces the union across
+    // all providers of a canonical model.
+    capabilities: z.array(Capability).optional(),
     deprecation_date: z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/, "deprecation_date must be ISO YYYY-MM-DD")

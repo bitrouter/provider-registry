@@ -1,0 +1,335 @@
+// Verify that a provider's declared `capabilities` are actually honoured by the
+// live upstream — and discover which ones it supports but hasn't declared.
+//
+// Unlike `test-provider.ts` (which only checks the route serves traffic), this
+// probes each declared capability in the provider's NATIVE wire protocol and
+// asserts the upstream truly honours it. This matters because structured-output
+// support is a per-channel property: an official API honours the schema, but a
+// reseller/subscription proxy often accepts the parameter and silently ignores
+// it (returns HTTP 200 + prose). The registry must reflect what the channel
+// really does, not what the underlying model is capable of.
+//
+// Capability → native parameter under test (one inbound protocol each):
+//   structured_outputs:
+//     openai     → POST /chat/completions  `response_format.json_schema`
+//                  <https://platform.openai.com/docs/guides/structured-outputs>
+//     anthropic  → POST /messages          `output_config.format`
+//                  <https://platform.claude.com/docs/en/build-with-claude/structured-outputs>
+//     google     → POST /models/<m>:generateContent  `generationConfig.responseSchema`
+//                  <https://ai.google.dev/gemini-api/docs/structured-output>
+//   A capability is "honoured" iff the reply is PURE JSON conforming to the
+//   probe schema. Prose / markdown-fenced JSON ⇒ not honoured.
+//
+// Credentials come from environment variables, matching bitrouter-cloud's
+// resolution convention exactly:
+//   {PROVIDER_NAME_UPPER}_API_KEY    (e.g. OPENAI_API_KEY)
+//   {PROVIDER_NAME_UPPER}_API_BASE   (e.g. OPENAI_API_BASE, HTTPS, versioned root)
+//
+// Usage:
+//   OPENAI_API_KEY=... OPENAI_API_BASE=https://api.openai.com/v1 \
+//     bun run scripts/verify-capabilities.ts openai [capability]
+//
+// `capability` defaults to `structured_outputs` (the only one implemented today).
+// Exit code is non-zero iff a DECLARED capability is not honoured (a CI gate);
+// undeclared-but-supported rows are reported as suggestions, not failures.
+
+import {
+  Capability,
+  loadProviders,
+  type ApiProtocol,
+  type AuthScheme,
+  type ProviderFile,
+  type ProviderModel,
+} from "./schema";
+
+const PROBE_PROMPT =
+  "What is the weather like in London right now? Make a reasonable guess for the values.";
+const PROBE_MAX_TOKENS = 256;
+
+// A small strict schema; a faithful provider returns exactly these three keys
+// and nothing but JSON. Google's `responseSchema` is an OpenAPI subset that
+// rejects `additionalProperties`, so the google probe strips it.
+const WEATHER_SCHEMA = {
+  type: "object",
+  properties: {
+    location: { type: "string" },
+    temperature: { type: "number" },
+    conditions: { type: "string" },
+  },
+  required: ["location", "temperature", "conditions"],
+  additionalProperties: false,
+} as const;
+
+function envSegment(name: string): string {
+  return name.toUpperCase().replace(/[^A-Z0-9]/g, "_");
+}
+
+function maskKey(key: string): string {
+  if (key.length <= 12) return "***";
+  return `${key.slice(0, 6)}…${key.slice(-4)} (len=${key.length})`;
+}
+
+function pad(s: string, n: number): string {
+  return s.length >= n ? s : s + " ".repeat(n - s.length);
+}
+
+// Resolve the effective wire protocol for one model: an explicit per-model
+// override wins, else the provider's pattern list (exact id match, then `*`).
+function resolveProtocol(provider: ProviderFile, model: ProviderModel): ApiProtocol {
+  if (model.api_protocol) return model.api_protocol;
+  let star: ApiProtocol | undefined;
+  for (const entry of provider.api_protocol ?? []) {
+    const [pattern, proto] = Object.entries(entry)[0]!;
+    if (pattern === model.id) return proto;
+    if (pattern === "*") star = proto;
+  }
+  return star ?? "openai";
+}
+
+// True iff `content` is pure JSON (no prose / fences) matching WEATHER_SCHEMA.
+function isSchemaJson(content: string): boolean {
+  const trimmed = content.trim();
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(trimmed);
+  } catch {
+    return false;
+  }
+  if (typeof parsed !== "object" || parsed === null) return false;
+  const o = parsed as Record<string, unknown>;
+  return (
+    typeof o.location === "string" &&
+    typeof o.temperature === "number" &&
+    typeof o.conditions === "string"
+  );
+}
+
+interface CapResult {
+  honored: boolean;
+  status: number;
+  detail: string;
+}
+
+async function postJson(
+  url: string,
+  headers: Record<string, string>,
+  body: unknown,
+): Promise<{ status: number; text: string; json: Record<string, unknown> }> {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...headers },
+    body: JSON.stringify(body),
+  });
+  const text = await res.text();
+  let json: Record<string, unknown> = {};
+  try {
+    json = JSON.parse(text) as Record<string, unknown>;
+  } catch {
+    /* leave empty; raw text becomes the error detail */
+  }
+  return { status: res.status, text, json };
+}
+
+function errOf(
+  json: Record<string, unknown>,
+  text: string,
+): string {
+  const e = json.error as Record<string, unknown> | undefined;
+  return (e?.message as string) ?? (text.slice(0, 160) || "(no body)");
+}
+
+async function probeStructuredOutputs(
+  protocol: ApiProtocol,
+  base: string,
+  key: string,
+  pmid: string,
+  authScheme: AuthScheme,
+): Promise<CapResult> {
+  const root = base.replace(/\/$/, "");
+  try {
+    if (protocol === "openai") {
+      const { status, text, json } = await postJson(
+        `${root}/chat/completions`,
+        { Authorization: `Bearer ${key}` },
+        {
+          model: pmid,
+          max_tokens: PROBE_MAX_TOKENS,
+          messages: [{ role: "user", content: PROBE_PROMPT }],
+          response_format: {
+            type: "json_schema",
+            json_schema: { name: "weather", strict: true, schema: WEATHER_SCHEMA },
+          },
+        },
+      );
+      if (status < 200 || status >= 300) return { honored: false, status, detail: errOf(json, text) };
+      const choices = json.choices as Array<{ message?: { content?: unknown } }> | undefined;
+      const content = choices?.[0]?.message?.content;
+      return { honored: typeof content === "string" && isSchemaJson(content), status, detail: "" };
+    }
+
+    if (protocol === "anthropic") {
+      // The Messages transport's credential header is provider-declared via
+      // `auth_scheme` (x-api-key is Anthropic's native default; resellers on a
+      // one-api/new-api stack usually want `Authorization: Bearer`). Mirrors
+      // bitrouter-cloud's outbound auth for this protocol.
+      const authHeader: Record<string, string> =
+        authScheme === "bearer"
+          ? { Authorization: `Bearer ${key}` }
+          : { "x-api-key": key };
+      const { status, text, json } = await postJson(
+        `${root}/messages`,
+        { ...authHeader, "anthropic-version": "2023-06-01" },
+        {
+          model: pmid,
+          max_tokens: PROBE_MAX_TOKENS,
+          messages: [{ role: "user", content: PROBE_PROMPT }],
+          output_config: { format: { type: "json_schema", schema: WEATHER_SCHEMA } },
+        },
+      );
+      if (status < 200 || status >= 300) return { honored: false, status, detail: errOf(json, text) };
+      const blocks = (json.content as Array<{ type: string; text?: string }> | undefined) ?? [];
+      const content = blocks.filter((b) => b.type === "text").map((b) => b.text ?? "").join("");
+      return { honored: isSchemaJson(content), status, detail: "" };
+    }
+
+    if (protocol === "google") {
+      // Gemini's responseSchema is an OpenAPI subset — drop additionalProperties.
+      const { additionalProperties, ...googleSchema } = WEATHER_SCHEMA;
+      const { status, text, json } = await postJson(
+        `${root}/models/${pmid}:generateContent`,
+        { "x-goog-api-key": key },
+        {
+          contents: [{ role: "user", parts: [{ text: PROBE_PROMPT }] }],
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: googleSchema,
+          },
+        },
+      );
+      if (status < 200 || status >= 300) return { honored: false, status, detail: errOf(json, text) };
+      const cand = (json.candidates as Array<{ content?: { parts?: Array<{ text?: string }> } }> | undefined)?.[0];
+      const content = (cand?.content?.parts ?? []).map((p) => p.text ?? "").join("");
+      return { honored: isSchemaJson(content), status, detail: "" };
+    }
+
+    return { honored: false, status: 0, detail: `unsupported protocol '${protocol}'` };
+  } catch (err) {
+    return { honored: false, status: 0, detail: `network: ${(err as Error).message}` };
+  }
+}
+
+// Registry of capability → probe. Add new entries as capabilities land.
+const PROBES: Partial<
+  Record<
+    Capability,
+    (proto: ApiProtocol, base: string, key: string, pmid: string, authScheme: AuthScheme) => Promise<CapResult>
+  >
+> = {
+  structured_outputs: probeStructuredOutputs,
+};
+
+async function main(): Promise<void> {
+  const providerName = process.argv[2];
+  const capArg = process.argv[3] ?? "structured_outputs";
+  if (!providerName) {
+    console.error("usage: bun run scripts/verify-capabilities.ts <provider-name> [capability]");
+    console.error(`capabilities: ${Capability.options.join(", ")}`);
+    process.exit(2);
+  }
+  const capParse = Capability.safeParse(capArg);
+  if (!capParse.success) {
+    console.error(`✗ unknown capability '${capArg}' — known: ${Capability.options.join(", ")}`);
+    process.exit(2);
+  }
+  const capability = capParse.data;
+  const probe = PROBES[capability];
+  if (!probe) {
+    console.error(`✗ no probe implemented for capability '${capability}' yet`);
+    process.exit(2);
+  }
+
+  const env = envSegment(providerName);
+  const key = process.env[`${env}_API_KEY`];
+  if (!key) {
+    console.error(`✗ ${env}_API_KEY must be set`);
+    process.exit(2);
+  }
+
+  const providers = await loadProviders();
+  const found = providers.find((p) => p.data.name === providerName);
+  if (!found) {
+    console.error(`✗ provider '${providerName}' is not in this registry`);
+    process.exit(2);
+  }
+  const provider = found.data;
+  if (provider.models.length === 0) {
+    console.error(`✗ provider '${providerName}' declares no models`);
+    process.exit(2);
+  }
+
+  // Base URL: an explicit {ENV}_API_BASE wins; otherwise fall back to the
+  // provider's yaml `default_api_base` (set for BYOK providers, so they need
+  // only the API key — matching check-new-models / .env.example). Anonymous
+  // providers hold the base server-side, so they require the env override.
+  const base = process.env[`${env}_API_BASE`] ?? provider.default_api_base;
+  if (!base) {
+    console.error(`✗ ${env}_API_BASE must be set ('${providerName}' has no default_api_base in its yaml)`);
+    process.exit(2);
+  }
+  if (!base.startsWith("https://")) {
+    console.error(`✗ base must be HTTPS — bitrouter-cloud's url_validator rejects non-HTTPS upstreams`);
+    process.exit(2);
+  }
+
+  const bar = "─".repeat(92);
+  console.log(`provider:   ${providerName}`);
+  console.log(`base:       ${base}`);
+  console.log(`key:        ${maskKey(key)}`);
+  console.log(`capability: ${capability}`);
+  console.log(bar);
+
+  const canonWidth = Math.max(...provider.models.map((m) => m.id.length));
+  const pmidWidth = Math.max(...provider.models.map((m) => m.provider_model_id.length));
+
+  let declaredFailures = 0; // declared but not honoured (unsupported or unprobeable) → CI failure
+  let suggestions = 0; // honoured but not declared → could add
+  let inconclusive = 0; // probe errored (non-2xx) → support undetermined
+
+  for (const m of provider.models) {
+    const protocol = resolveProtocol(provider, m);
+    const declared = (m.capabilities ?? []).includes(capability);
+    process.stdout.write(
+      `${pad(m.id, canonWidth)} → ${pad(m.provider_model_id, pmidWidth)}  ${pad(protocol, 9)}  `,
+    );
+    const r = await probe(protocol, base, key, m.provider_model_id, provider.auth_scheme);
+
+    let verdict: string;
+    if (r.honored) {
+      verdict = declared ? "✓ verified" : "+ supported (undeclared → add it)";
+      if (!declared) suggestions++;
+    } else if (r.status >= 200 && r.status < 300) {
+      // 2xx but not schema-JSON ⇒ the channel accepted the param and ignored it.
+      verdict = declared ? "✗ DECLARED-BUT-UNSUPPORTED" : "· unsupported";
+      if (declared) declaredFailures++;
+    } else {
+      // non-2xx ⇒ couldn't probe (auth, rate-limit, route). Support undetermined.
+      verdict = "? inconclusive";
+      inconclusive++;
+      if (declared) declaredFailures++;
+    }
+
+    const tail = r.honored ? "" : `  [HTTP ${r.status}${r.detail ? ` ${r.detail.slice(0, 80)}` : ""}]`;
+    console.log(`${pad(`honored=${r.honored ? "yes" : "no"}`, 12)} ${verdict}${tail}`);
+  }
+
+  console.log(bar);
+  console.log(
+    `summary: ${declaredFailures} declared-but-unsupported, ${suggestions} undeclared-but-supported, ${inconclusive} inconclusive`,
+  );
+  if (declaredFailures > 0) {
+    console.log(`✗ ${declaredFailures} declared '${capability}' capability(ies) are NOT honoured by the upstream`);
+  }
+  process.exit(declaredFailures > 0 ? 1 : 0);
+}
+
+if (import.meta.main) await main();
