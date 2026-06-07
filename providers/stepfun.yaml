@@ -23,6 +23,8 @@ models:
         cache_read: 0.04
       output_tokens:
         text: 1.15
+    capabilities:
+      - structured_outputs
   - id: stepfun/step-3.5-flash
     provider_model_id: step-3.5-flash
     pricing:

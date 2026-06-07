@@ -17,6 +17,8 @@ models:
         no_cache: 1.50
       output_tokens:
         text: 5.25
+    capabilities:
+      - structured_outputs
   - id: z-ai/glm-5.1
     provider_model_id: glm-5-1
     pricing:
@@ -24,6 +26,8 @@ models:
         no_cache: 1.50
       output_tokens:
         text: 5.25
+    capabilities:
+      - structured_outputs
   - id: moonshotai/kimi-k2.6
     provider_model_id: kimi-k2-6
     pricing:
@@ -31,6 +35,8 @@ models:
         no_cache: 1.50
       output_tokens:
         text: 5.25
+    capabilities:
+      - structured_outputs
   - id: google/gemma-4-31b-it
     provider_model_id: gemma4-31b
     pricing:
@@ -38,6 +44,8 @@ models:
         no_cache: 0.45
       output_tokens:
         text: 1.00
+    capabilities:
+      - structured_outputs
   - id: openai/gpt-oss-120b
     provider_model_id: gpt-oss-120b
     pricing:
@@ -45,6 +53,8 @@ models:
         no_cache: 0.75
       output_tokens:
         text: 1.25
+    capabilities:
+      - structured_outputs
 status: active
 weight: 1
 submitted_at: 2026-05-12

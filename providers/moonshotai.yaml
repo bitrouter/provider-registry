@@ -21,6 +21,8 @@ models:
         cache_read: 0.16
       output_tokens:
         text: 4
+    capabilities:
+      - structured_outputs
   - id: moonshotai/kimi-k2.5
     provider_model_id: kimi-k2.5
     pricing:
@@ -29,6 +31,8 @@ models:
         cache_read: 0.1
       output_tokens:
         text: 3
+    capabilities:
+      - structured_outputs
   - id: moonshotai/kimi-k2-thinking
     provider_model_id: kimi-k2-thinking
     pricing:

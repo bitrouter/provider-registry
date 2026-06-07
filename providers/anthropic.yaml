@@ -22,6 +22,8 @@ models:
         cache_write: 6.25
       output_tokens:
         text: 25
+    capabilities:
+      - structured_outputs
   - id: anthropic/claude-opus-4.7
     provider_model_id: claude-opus-4-7
     pricing:
@@ -31,6 +33,8 @@ models:
         cache_write: 6.25
       output_tokens:
         text: 25
+    capabilities:
+      - structured_outputs
   - id: anthropic/claude-opus-4.6
     provider_model_id: claude-opus-4-6
     pricing:
@@ -40,6 +44,8 @@ models:
         cache_write: 6.25
       output_tokens:
         text: 25
+    capabilities:
+      - structured_outputs
   - id: anthropic/claude-sonnet-4.6
     provider_model_id: claude-sonnet-4-6
     pricing:
@@ -49,6 +55,8 @@ models:
         cache_write: 3.75
       output_tokens:
         text: 15
+    capabilities:
+      - structured_outputs
   - id: anthropic/claude-opus-4.5
     provider_model_id: claude-opus-4-5
     pricing:
@@ -58,6 +66,8 @@ models:
         cache_write: 6.25
       output_tokens:
         text: 25
+    capabilities:
+      - structured_outputs
   - id: anthropic/claude-sonnet-4.5
     provider_model_id: claude-sonnet-4-5
     pricing:
@@ -67,6 +77,8 @@ models:
         cache_write: 3.75
       output_tokens:
         text: 15
+    capabilities:
+      - structured_outputs
   - id: anthropic/claude-opus-4.1
     provider_model_id: claude-opus-4-1
     pricing:
@@ -76,6 +88,8 @@ models:
         cache_write: 18.75
       output_tokens:
         text: 75
+    capabilities:
+      - structured_outputs
   - id: anthropic/claude-opus-4
     provider_model_id: claude-opus-4-0
     pricing:

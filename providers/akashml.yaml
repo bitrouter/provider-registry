@@ -12,6 +12,8 @@ models:
         no_cache: 0.17
       output_tokens:
         text: 1.2
+    capabilities:
+      - structured_outputs
   - id: deepseek/deepseek-v4-flash
     provider_model_id: deepseek-ai/DeepSeek-V4-Flash
     pricing:
@@ -19,6 +21,8 @@ models:
         no_cache: 0.14
       output_tokens:
         text: 0.28
+    capabilities:
+      - structured_outputs
   - id: minimax/minimax-m2.5
     provider_model_id: MiniMaxAI/MiniMax-M2.5
     pricing:
@@ -26,6 +30,8 @@ models:
         no_cache: 0.15
       output_tokens:
         text: 1.15
+    capabilities:
+      - structured_outputs
   - id: moonshotai/kimi-k2.6
     provider_model_id: moonshotai/Kimi-K2.6
     pricing:
