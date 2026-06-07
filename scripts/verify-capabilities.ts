@@ -44,7 +44,11 @@ import {
 
 const PROBE_PROMPT =
   "What is the weather like in London right now? Make a reasonable guess for the values.";
-const PROBE_MAX_TOKENS = 256;
+// Generous cap: reasoning models (gpt-5.x, o-series) spend completion tokens on
+// hidden reasoning before emitting the JSON, so a small cap can starve the
+// visible output. Structured-output replies are short, so this ceiling only
+// really bounds the unsupported (prose) case.
+const PROBE_MAX_TOKENS = 8192;
 
 // A small strict schema; a faithful provider returns exactly these three keys
 // and nothing but JSON. Google's `responseSchema` is an OpenAPI subset that
@@ -119,6 +123,7 @@ async function postJson(
     method: "POST",
     headers: { "Content-Type": "application/json", ...headers },
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(60_000),
   });
   const text = await res.text();
   let json: Record<string, unknown> = {};
@@ -153,7 +158,9 @@ async function probeStructuredOutputs(
         { Authorization: `Bearer ${key}` },
         {
           model: pmid,
-          max_tokens: PROBE_MAX_TOKENS,
+          // Newer OpenAI models reject `max_tokens` and require this; OpenAI-
+          // compatible providers accept or ignore it.
+          max_completion_tokens: PROBE_MAX_TOKENS,
           messages: [{ role: "user", content: PROBE_PROMPT }],
           response_format: {
             type: "json_schema",
