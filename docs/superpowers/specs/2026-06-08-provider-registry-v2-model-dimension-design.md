@@ -33,8 +33,10 @@ v2 makes four changes to the model dimension:
    and keep our own additions.
 2. **Remove the anonymous-provider design entirely.** Product research found it
    unnecessary. All providers are public with real names; no anonymized id.
-3. **Add a per-provider catalog data source** so the catalog can be auto-updated
-   per provider from a declared source (`models_dev`, `v1_models`, or `none`).
+3. **Add a per-provider auto-sync feed** so a provider's catalog can be
+   auto-updated from a declared upstream feed (`models_dev` or `v1_models`). We
+   remain the source of truth; the feed only tells the sync bot where to read
+   upstream catalog data. Providers with no feed are manual-only.
 4. **Keep the storage format and our special fields.** Canonical + flat
    per-provider YAML is retained; we enrich, not rewrite.
 
@@ -120,51 +122,53 @@ accept `response_format`/`output_config` and silently return prose. The advisory
 hint says the model *can*; only the verified per-provider capability lets the
 router send capability-requiring traffic there.
 
-### 3.2 Provider file — `catalog` block (new)
+### 3.2 Provider file — `auto_sync` block (new, optional)
 
-Replaces the hardcoded "models.dev for `verified` providers" automation path and
-absorbs the curation-gating role `verified` used to play.
+We are the source of truth; this block does **not** declare an external "source",
+it only tells the sync bot which upstream catalog *feed* to pull this provider's
+attachments from. It is **optional** — omitting it means manual / source-of-truth
+only, which is the default and the role `verified` played in gating a provider
+out of the curation pipeline.
 
 ```yaml
-catalog:
-  source: models_dev      # models_dev | v1_models | none
-  key: stepfun-ai         # OPTIONAL, models_dev only: their provider id when it differs from ours
-  url: https://...        # OPTIONAL, v1_models only: catalog base when there's no default_api_base to reuse
-  sync: [models, pricing] # OPTIONAL: what auto-sync may write
+auto_sync:                  # OPTIONAL. Omit → manual only; automation never touches this provider.
+  feed: models_dev          # models_dev | v1_models — the upstream the sync bot reads from
+  key: stepfun-ai           # OPTIONAL, feed=models_dev only: their provider id when it differs from ours
+  url: https://...          # OPTIONAL, feed=v1_models only: catalog base when there's no default_api_base to reuse
+  writes: [models, pricing] # OPTIONAL: what the sync bot may write back into this file
 ```
 
 Semantics:
 
-- `source: models_dev` — pull the provider's catalog, pricing, and the canonical
+- `feed: models_dev` — pull the provider's catalog, pricing, and the canonical
   metadata fields from models.dev under `key` (default `key` = provider `name`).
-  Default `sync: [models, pricing]`.
-- `source: v1_models` — probe the live `/models` endpoint at
-  `url ?? default_api_base`. Default `sync: [models]`; `/models` rarely carries
+  Default `writes: [models, pricing]`.
+- `feed: v1_models` — probe the live `/models` endpoint at
+  `url ?? default_api_base`. Default `writes: [models]`; `/models` rarely carries
   pricing, so new attachments take pricing from the models.dev/OpenRouter default
   (today's `check-new-models` behaviour) or manual review.
-- `source: none` — never touched by automation; manual PRs only. This is what
-  gates a provider out of the curation pipeline (the role `verified` played for
-  `curate apply`).
+- **No `auto_sync` block** — never touched by automation; manual PRs only.
 
-`key` moves the `modelsdev_keys` map out of `curation/policy.yaml` and onto the
-provider it describes, so everything about one provider lives in its own file.
+Why inline rather than a separate sync-script config: the feed, `key`, and `url`
+are per-provider facts, so co-locating them keeps a provider's whole configuration
+in one file. This is the same reason we move the `modelsdev_keys` map out of
+`curation/policy.yaml` and onto each provider's `auto_sync.key`.
 
-### 3.3 Provider file — `verified` → `tier` (trust signal)
+### 3.3 Provider file — `verified` → `community` flag (trust signal)
 
-Anonymity is removed. The `verified` boolean is replaced by an explicit
-origin/trust signal that is **always surfaced publicly**:
+Anonymity is removed. The `verified` boolean is replaced by a single optional
+flag that marks unaffiliated community resellers; it is **always surfaced
+publicly**:
 
 ```yaml
-tier: first_party   # first_party | official | community
+community: true   # OPTIONAL. Marks an unaffiliated community reseller. Omit for first-party / official providers (the default).
 ```
 
-- `first_party` — the model creator's own endpoint (e.g. `anthropic`, `openai`).
-- `official` — an authorized/official reseller or managed cloud endpoint.
-- `community` — an unaffiliated reseller.
-
-This has concrete value: a prior anonymous Claude provider was withdrawn for
-serving relabeled fake Claude models. A public origin signal lets discovery
-clients distinguish an official upstream from an arbitrary reseller.
+Only the community case is flagged — first-party and official providers are the
+unmarked default. This has concrete value: a prior anonymous Claude provider was
+withdrawn for serving relabeled fake Claude models. A public `community` flag lets
+discovery clients tell a vetted upstream from an arbitrary reseller, without us
+having to adjudicate a finer first-party/official split.
 
 ### 3.4 Removed
 
@@ -175,7 +179,7 @@ clients distinguish an official upstream from an arbitrary reseller.
 ### 3.5 Unchanged
 
 `capabilities` (per-model, verified), `byok_only` + `default_api_base`
-(orthogonal to `tier`: it means "no platform key, BYOK-only" — true for
+(orthogonal to `community`: it means "no platform key, BYOK-only" — true for
 subscription/coding-plan entries), `auth_scheme`, `status`, `weight`,
 `rate_limits`, `api_protocol`, all cross-file invariants.
 
@@ -191,7 +195,7 @@ subscription/coding-plan entries), `auth_scheme`, `status`, `weight`,
   AA-ranked policy (`top_n`, `protected` globs, grace-day deprecation). models.dev
   supplies catalog + pricing + the new metadata fields for the models we admit;
   it does not flood every model in. We keep our own additions (canonical ids,
-  pricing overrides, capabilities, tiers, catalog blocks).
+  pricing overrides, capabilities, `community` flags, `auto_sync` blocks).
 - **Field mapping (models.dev → ours):**
   - `cost.{input,output,cache_read,cache_write}` → `pricing.input_tokens.*` /
     `pricing.output_tokens.text` (per-1M, same convention — `pricingFromCost` already does this).
@@ -205,18 +209,18 @@ subscription/coding-plan entries), `auth_scheme`, `status`, `weight`,
 
 ## 5. Automation
 
-- **Generalize `curate apply` to be driven by each provider's `catalog.source`**
+- **Generalize `curate apply` to be driven by each provider's `auto_sync.feed`**
   rather than the hardcoded `verified`-only + models.dev path:
-  - `models_dev` → sync from models.dev under `catalog.key`.
-  - `v1_models` → probe `/models` at `catalog.url ?? default_api_base`
+  - `models_dev` → sync from models.dev under `auto_sync.key`.
+  - `v1_models` → probe `/models` at `auto_sync.url ?? default_api_base`
     (fold in today's `check-new-models` / `fetch-provider-models` logic).
-  - `none` → skip.
+  - no `auto_sync` block → skip.
 - **AA ranking policy** (admission/deprecation) is unchanged and orthogonal:
-  it decides *which canonical ids* are admitted/deprecated; `catalog.source`
+  it decides *which canonical ids* are admitted/deprecated; `auto_sync.feed`
   decides *how each provider's attachments* are refreshed.
 - **`verify-capabilities.ts`** (proving the routing-gating layer) is unchanged.
 - The scheduled GitHub Action (`curate.yml`) keeps running the apply pass; it now
-  iterates providers by `catalog.source` instead of `verified`.
+  iterates providers by the presence of `auto_sync` instead of `verified`.
 
 ---
 
@@ -229,9 +233,9 @@ the consumer must:
 
 - **Drop anonymization.** Remove the anonymized `p_xxxx` id and the
   `verified`-based name hiding; `/v1/providers` always returns the real `name`,
-  and now also surfaces `tier`.
-- **Replace `verified` with `tier`** in the loaded struct.
-- **Accept the `catalog` block.** It is registry-tooling-only and irrelevant to
+  and now also surfaces the `community` flag.
+- **Replace `verified` with the optional `community` flag** in the loaded struct.
+- **Accept the `auto_sync` block.** It is registry-tooling-only and irrelevant to
   routing, but a strict deserializer rejects unknown fields, so the struct must
   include/skip it.
 - **Leave unchanged:** the capability routing gate, the `/v1/models` capability
@@ -251,7 +255,7 @@ defined here. Deferred.
 1. **One-shot importer (new script).** Reads models.dev source TOMLs for the
    in-scope providers, produces the enriched `canonical.yaml` + updated provider
    files in a single reviewable PR. This is the auditable v2 starting state.
-2. **Ongoing drift** is handled by the `catalog.source`-driven `curate apply` on
+2. **Ongoing drift** is handled by the `auto_sync.feed`-driven `curate apply` on
    the existing schedule.
 
 In-scope repos: `bitrouter/bitrouter` (governs the SDK enums kept in lock-step),
@@ -266,34 +270,34 @@ In-scope repos: `bitrouter/bitrouter` (governs the SDK enums kept in lock-step),
 - [ ] Add optional canonical fields: `release_date`, `knowledge_cutoff`,
       `open_weights`, `family`, and a `supports` object
       (`reasoning`/`tool_call`/`structured_output`, all optional booleans).
-- [ ] Add the provider `catalog` block schema (`source` enum + optional `key`,
-      `url`, `sync`), with refinements: `key` only meaningful for `models_dev`,
-      `url` only for `v1_models`.
-- [ ] Replace `verified: boolean` with `tier: first_party|official|community`.
+- [ ] Add the optional provider `auto_sync` block schema (`feed` enum + optional
+      `key`, `url`, `writes`), with refinements: `key` only meaningful for
+      `feed=models_dev`, `url` only for `feed=v1_models`.
+- [ ] Replace `verified: boolean` with an optional `community: boolean` flag.
 - [ ] Remove `verified` and any anonymization-related validation.
 
 **Data / migration**
 - [ ] Write the one-shot importer (models.dev source TOMLs → canonical + provider files).
-- [ ] Run it for in-scope providers; enrich `canonical.yaml`; set `tier` and
-      `catalog` on every provider file.
+- [ ] Run it for in-scope providers; enrich `canonical.yaml`; mark `community`
+      where applicable and add `auto_sync` blocks to auto-synced providers.
 - [ ] Delete `providers/anon-b.yaml`.
-- [ ] Migrate `curation/policy.yaml` `modelsdev_keys` → per-provider `catalog.key`.
+- [ ] Migrate `curation/policy.yaml` `modelsdev_keys` → per-provider `auto_sync.key`.
 
 **Automation**
-- [ ] Generalize `curate apply` to dispatch on `catalog.source`
-      (`models_dev` / `v1_models` / `none`); fold in `check-new-models` logic for `v1_models`.
-- [ ] Update `curate.yml` to gate on `catalog.source` instead of `verified`.
+- [ ] Generalize `curate apply` to dispatch on `auto_sync.feed`
+      (`models_dev` / `v1_models` / absent); fold in `check-new-models` logic for `v1_models`.
+- [ ] Update `curate.yml` to gate on the presence of `auto_sync` instead of `verified`.
 - [ ] Confirm `verify-capabilities.ts` still passes on enriched files.
 
 **Consumer (bitrouter-cloud, coordinated PR)**
 - [ ] Drop `p_xxxx` anonymization + `verified` name hiding; always return real
-      `name` + `tier` on `/v1/providers`.
-- [ ] Swap `verified` → `tier` in the loader; accept/skip the `catalog` block.
+      `name` + the `community` flag on `/v1/providers`.
+- [ ] Swap `verified` → optional `community` in the loader; accept/skip the `auto_sync` block.
 - [ ] Verify capability gating, `/v1/models` union, and BYOK overlay are unaffected.
 
 **Validation / docs**
 - [ ] `bun run validate` passes on the full migrated registry.
-- [ ] Update `README.md` (new fields, `tier`, `catalog`, anonymity removed).
+- [ ] Update `README.md` (new fields, `community`, `auto_sync`, anonymity removed).
 - [ ] Final independent sub-agent review against these requirements
       (per workspace `CLAUDE.md` rule 4).
 
@@ -301,9 +305,10 @@ In-scope repos: `bitrouter/bitrouter` (governs the SDK enums kept in lock-step),
 
 ## 9. Open items for review
 
-- Exact value set / definitions for `tier` (`first_party | official | community`)
-  — confirm the three-way split is right, or collapse to a boolean `official`.
+- Whether the `community` flag should default the *other* way (mark vetted
+  providers, treat unmarked as community). Current design marks only community
+  and treats unmarked as first-party/official.
 - Whether `supports` should also carry `temperature` (models.dev tracks it) or
   stay limited to `reasoning`/`tool_call`/`structured_output`.
-- Whether `catalog.sync` needs finer granularity than `[models, pricing]`
-  (e.g. `metadata`).
+- Whether `auto_sync.writes` needs finer granularity than `[models, pricing]`
+  (e.g. a `metadata` channel).
