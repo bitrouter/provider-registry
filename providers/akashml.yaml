@@ -13,7 +13,9 @@ models:
       output_tokens:
         text: 1.2
     capabilities:
+      - reasoning
       - structured_outputs
+      - tools
   - id: deepseek/deepseek-v4-flash
     provider_model_id: deepseek-ai/DeepSeek-V4-Flash
     pricing:
@@ -22,7 +24,9 @@ models:
       output_tokens:
         text: 0.28
     capabilities:
+      - reasoning
       - structured_outputs
+      - tools
   - id: minimax/minimax-m2.5
     provider_model_id: MiniMaxAI/MiniMax-M2.5
     pricing:
@@ -31,7 +35,9 @@ models:
       output_tokens:
         text: 1.15
     capabilities:
+      - reasoning
       - structured_outputs
+      - tools
   - id: moonshotai/kimi-k2.6
     provider_model_id: moonshotai/Kimi-K2.6
     pricing:
@@ -39,6 +45,9 @@ models:
         no_cache: 0.95
       output_tokens:
         text: 4
+    capabilities:
+      - reasoning
+      - tools
 status: active
 weight: 1
 submitted_at: 2026-05-12

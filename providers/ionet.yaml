@@ -18,6 +18,9 @@ models:
         cache_read: 0.045
       output_tokens:
         text: 0.38
+    capabilities:
+      - reasoning
+      - tools
   - id: deepseek/deepseek-v4-pro
     provider_model_id: deepseek-ai/DeepSeek-V4-Pro
     pricing:
@@ -26,6 +29,9 @@ models:
         cache_read: 0.35
       output_tokens:
         text: 5.5
+    capabilities:
+      - reasoning
+      - tools
   - id: deepseek/deepseek-v4-flash
     provider_model_id: deepseek-ai/DeepSeek-V4-Flash
     pricing:
@@ -34,6 +40,9 @@ models:
         cache_read: 0.38
       output_tokens:
         text: 2.28
+    capabilities:
+      - reasoning
+      - tools
   - id: moonshotai/kimi-k2.5
     provider_model_id: moonshotai/Kimi-K2.5
     pricing:
@@ -41,6 +50,9 @@ models:
         no_cache: 0.44
       output_tokens:
         text: 2.00
+    capabilities:
+      - reasoning
+      - tools
   - id: moonshotai/kimi-k2.6
     provider_model_id: moonshotai/Kimi-K2.6
     pricing:
@@ -49,6 +61,9 @@ models:
         cache_read: 0.25
       output_tokens:
         text: 3.5
+    capabilities:
+      - reasoning
+      - tools
   - id: z-ai/glm-5
     provider_model_id: zai-org/GLM-5
     pricing:
@@ -56,6 +71,9 @@ models:
         no_cache: 1.00
       output_tokens:
         text: 3.00
+    capabilities:
+      - reasoning
+      - tools
   - id: z-ai/glm-5.1
     provider_model_id: zai-org/GLM-5.1
     pricing:
@@ -64,6 +82,9 @@ models:
         cache_read: 0.26
       output_tokens:
         text: 4.4
+    capabilities:
+      - reasoning
+      - tools
   - id: minimax/minimax-m2.5
     provider_model_id: MiniMaxAI/MiniMax-M2.5
     pricing:
@@ -72,6 +93,9 @@ models:
         cache_read: 0.1
       output_tokens:
         text: 1.2
+    capabilities:
+      - reasoning
+      - tools
   - id: openai/gpt-oss-120b
     provider_model_id: openai/gpt-oss-120b
     pricing:
@@ -79,6 +103,9 @@ models:
         no_cache: 0.10
       output_tokens:
         text: 0.40
+    capabilities:
+      - reasoning
+      - tools
 status: active
 weight: 1
 submitted_at: 2026-05-12

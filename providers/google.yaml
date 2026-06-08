@@ -21,6 +21,9 @@ models:
         cache_read: 0.2
       output_tokens:
         text: 12
+    capabilities:
+      - reasoning
+      - tools
   - id: google/gemini-3.5-flash
     provider_model_id: gemini-3.5-flash
     pricing:
@@ -29,6 +32,9 @@ models:
         cache_read: 0.15
       output_tokens:
         text: 9
+    capabilities:
+      - reasoning
+      - tools
   - id: google/gemini-3-pro-preview
     provider_model_id: gemini-3-pro-preview
     pricing:
@@ -37,6 +43,9 @@ models:
         cache_read: 0.2
       output_tokens:
         text: 12
+    capabilities:
+      - reasoning
+      - tools
   - id: google/gemini-3-flash-preview
     provider_model_id: gemini-3-flash-preview
     pricing:
@@ -45,6 +54,9 @@ models:
         cache_read: 0.05
       output_tokens:
         text: 3
+    capabilities:
+      - reasoning
+      - tools
   - id: google/gemini-2.5-pro-preview
     provider_model_id: gemini-2.5-pro
     pricing:
@@ -54,8 +66,14 @@ models:
       output_tokens:
         text: 10
     deprecation_date: 2026-08-03
+    capabilities:
+      - reasoning
+      - tools
   - id: google/gemma-4-31b-it
     provider_model_id: gemma-4-31b-it
+    capabilities:
+      - reasoning
+      - tools
 status: active
 weight: 1
 submitted_at: 2026-05-25

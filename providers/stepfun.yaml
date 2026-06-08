@@ -33,6 +33,9 @@ models:
         cache_read: 0.019
       output_tokens:
         text: 0.288
+    capabilities:
+      - reasoning
+      - tools
 status: active
 weight: 1
 submitted_at: 2026-06-01

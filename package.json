@@ -10,7 +10,8 @@
     "check-new-models": "bun run scripts/check-new-models.ts",
     "curate": "bun run scripts/curate.ts",
     "test-provider": "bun run scripts/test-provider.ts",
-    "verify-capabilities": "bun run scripts/verify-capabilities.ts"
+    "verify-capabilities": "bun run scripts/verify-capabilities.ts",
+    "import-capabilities": "bun run scripts/import-capabilities.ts"
   },
   "devDependencies": {
     "@types/bun": "latest"

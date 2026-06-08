@@ -36,7 +36,13 @@ export type AuthScheme = z.infer<typeof AuthScheme>;
 // `Capability` enum; kept in lock-step with the Rust consumer so a yaml the
 // consumer accepts also validates here. A declared capability must be confirmed
 // against the live provider by `scripts/verify-capabilities.ts`.
-export const Capability = z.enum(["structured_outputs"]);
+export const Capability = z.enum([
+  "structured_outputs",
+  "tools",
+  "reasoning",
+  "web_search",
+  "logprobs",
+]);
 export type Capability = z.infer<typeof Capability>;
 
 export const ProviderStatus = z.enum([

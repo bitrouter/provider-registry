@@ -17,7 +17,9 @@ models:
       output_tokens:
         text: 1.71
     capabilities:
+      - reasoning
       - structured_outputs
+      - tools
   - id: z-ai/glm-5
     provider_model_id: glm-5
     pricing:
@@ -27,7 +29,9 @@ models:
       output_tokens:
         text: 3.2
     capabilities:
+      - reasoning
       - structured_outputs
+      - tools
   - id: z-ai/glm-5.1
     provider_model_id: glm-5.1
     pricing:
@@ -36,6 +40,9 @@ models:
         cache_read: 0.26
       output_tokens:
         text: 4.4
+    capabilities:
+      - reasoning
+      - tools
   - id: moonshotai/kimi-k2.5
     provider_model_id: kimi-k2.5
     pricing:
@@ -45,7 +52,9 @@ models:
       output_tokens:
         text: 3.0
     capabilities:
+      - reasoning
       - structured_outputs
+      - tools
   - id: minimax/minimax-m2.5
     provider_model_id: minimax-m2.5
     pricing:
@@ -54,6 +63,9 @@ models:
         cache_read: 0.03
       output_tokens:
         text: 1.2
+    capabilities:
+      - reasoning
+      - tools
   - id: minimax/minimax-m2.7
     provider_model_id: minimax-m2.7
     pricing:
@@ -62,6 +74,9 @@ models:
         cache_read: 0.06
       output_tokens:
         text: 1.2
+    capabilities:
+      - reasoning
+      - tools
 status: active
 weight: 1
 submitted_at: 2026-05-23

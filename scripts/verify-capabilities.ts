@@ -29,7 +29,7 @@
 //   OPENAI_API_KEY=... OPENAI_API_BASE=https://api.openai.com/v1 \
 //     bun run scripts/verify-capabilities.ts openai [capability]
 //
-// `capability` defaults to `structured_outputs` (the only one implemented today).
+// `capability` defaults to `structured_outputs`; `tools` is also probe-implemented.
 // Exit code is non-zero iff a DECLARED capability is not honoured (a CI gate);
 // undeclared-but-supported rows are reported as suggestions, not failures.
 
@@ -63,6 +63,17 @@ const WEATHER_SCHEMA = {
   required: ["location", "temperature", "conditions"],
   additionalProperties: false,
 } as const;
+
+// Tool-calling probe: force a single tool call. Parameters are a minimal object
+// schema with no `additionalProperties` (Gemini's functionDeclarations reject
+// it, same as responseSchema).
+const TOOL_PARAMS = {
+  type: "object",
+  properties: { location: { type: "string" } },
+  required: ["location"],
+} as const;
+const TOOL_PROMPT = "What is the weather in London? Use the get_weather tool.";
+const TOOL_DESC = "Get the current weather for a location.";
 
 function envSegment(name: string): string {
   return name.toUpperCase().replace(/[^A-Z0-9]/g, "_");
@@ -224,6 +235,81 @@ async function probeStructuredOutputs(
   }
 }
 
+// Probe tool/function calling by forcing a single tool call and checking the
+// reply carries one. Honoured = the model emitted a tool/function call.
+async function probeTools(
+  protocol: ApiProtocol,
+  base: string,
+  key: string,
+  pmid: string,
+  authScheme: AuthScheme,
+): Promise<CapResult> {
+  const root = base.replace(/\/$/, "");
+  try {
+    if (protocol === "openai") {
+      const { status, text, json } = await postJson(
+        `${root}/chat/completions`,
+        { Authorization: `Bearer ${key}` },
+        {
+          model: pmid,
+          max_completion_tokens: PROBE_MAX_TOKENS,
+          messages: [{ role: "user", content: TOOL_PROMPT }],
+          tools: [
+            {
+              type: "function",
+              function: { name: "get_weather", description: TOOL_DESC, parameters: TOOL_PARAMS },
+            },
+          ],
+          tool_choice: "required",
+        },
+      );
+      if (status < 200 || status >= 300) return { honored: false, status, detail: errOf(json, text) };
+      const choices = json.choices as Array<{ message?: { tool_calls?: unknown[] } }> | undefined;
+      const calls = choices?.[0]?.message?.tool_calls;
+      return { honored: Array.isArray(calls) && calls.length > 0, status, detail: "" };
+    }
+
+    if (protocol === "anthropic") {
+      const authHeader: Record<string, string> =
+        authScheme === "bearer" ? { Authorization: `Bearer ${key}` } : { "x-api-key": key };
+      const { status, text, json } = await postJson(
+        `${root}/messages`,
+        { ...authHeader, "anthropic-version": "2023-06-01" },
+        {
+          model: pmid,
+          max_tokens: PROBE_MAX_TOKENS,
+          messages: [{ role: "user", content: TOOL_PROMPT }],
+          tools: [{ name: "get_weather", description: TOOL_DESC, input_schema: TOOL_PARAMS }],
+          tool_choice: { type: "any" },
+        },
+      );
+      if (status < 200 || status >= 300) return { honored: false, status, detail: errOf(json, text) };
+      const blocks = (json.content as Array<{ type: string }> | undefined) ?? [];
+      return { honored: blocks.some((b) => b.type === "tool_use"), status, detail: "" };
+    }
+
+    if (protocol === "google") {
+      const { status, text, json } = await postJson(
+        `${root}/models/${pmid}:generateContent`,
+        { "x-goog-api-key": key },
+        {
+          contents: [{ role: "user", parts: [{ text: TOOL_PROMPT }] }],
+          tools: [{ functionDeclarations: [{ name: "get_weather", description: TOOL_DESC, parameters: TOOL_PARAMS }] }],
+          toolConfig: { functionCallingConfig: { mode: "ANY" } },
+        },
+      );
+      if (status < 200 || status >= 300) return { honored: false, status, detail: errOf(json, text) };
+      const cand = (json.candidates as Array<{ content?: { parts?: Array<{ functionCall?: unknown }> } }> | undefined)?.[0];
+      const parts = cand?.content?.parts ?? [];
+      return { honored: parts.some((p) => p.functionCall != null), status, detail: "" };
+    }
+
+    return { honored: false, status: 0, detail: `unsupported protocol '${protocol}'` };
+  } catch (err) {
+    return { honored: false, status: 0, detail: `network: ${(err as Error).message}` };
+  }
+}
+
 // Registry of capability → probe. Add new entries as capabilities land.
 const PROBES: Partial<
   Record<
@@ -232,6 +318,7 @@ const PROBES: Partial<
   >
 > = {
   structured_outputs: probeStructuredOutputs,
+  tools: probeTools,
 };
 
 async function main(): Promise<void> {

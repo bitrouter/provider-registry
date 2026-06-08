@@ -15,6 +15,9 @@ models:
         cache_read: 0.25
       output_tokens:
         text: 15.0
+    capabilities:
+      - reasoning
+      - tools
   - id: openai/gpt-5.4-mini
     provider_model_id: gpt-5.4-mini
     pricing:
@@ -23,6 +26,9 @@ models:
         cache_read: 0.075
       output_tokens:
         text: 4.5
+    capabilities:
+      - reasoning
+      - tools
   - id: openai/gpt-5.5
     provider_model_id: gpt-5.5
     pricing:
@@ -31,6 +37,9 @@ models:
         cache_read: 0.5
       output_tokens:
         text: 30.0
+    capabilities:
+      - reasoning
+      - tools
 status: active
 weight: 1
 submitted_at: 2026-05-25

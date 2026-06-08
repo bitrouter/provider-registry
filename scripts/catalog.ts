@@ -14,6 +14,13 @@ export interface CatalogModel {
   cost?: { input?: number; output?: number; cache_read?: number; cache_write?: number };
   modalities?: { input?: string[]; output?: string[] };
   limit?: { context?: number; output?: number };
+  // Model-level capability flags (models.dev). Mapped to canonical `capabilities`
+  // tokens by import-capabilities.ts. Non-multimodal subset for now; modalities
+  // (above) are reserved for a later multimodal pass.
+  reasoning?: boolean;
+  tool_call?: boolean;
+  attachment?: boolean;
+  structured_output?: boolean;
 }
 
 // providerKey (models.dev's key, e.g. "openai", "stepfun-ai") → modelId → model

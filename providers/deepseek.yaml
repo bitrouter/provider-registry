@@ -21,6 +21,9 @@ models:
         cache_read: 0.145
       output_tokens:
         text: 3.48
+    capabilities:
+      - reasoning
+      - tools
   - id: deepseek/deepseek-v4-flash
     provider_model_id: deepseek-v4-flash
     pricing:
@@ -29,6 +32,9 @@ models:
         cache_read: 0.028
       output_tokens:
         text: 0.28
+    capabilities:
+      - reasoning
+      - tools
 status: active
 weight: 1
 submitted_at: 2026-05-25

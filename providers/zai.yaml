@@ -21,6 +21,9 @@ models:
         cache_read: 0.26
       output_tokens:
         text: 4.4
+    capabilities:
+      - reasoning
+      - tools
   - id: z-ai/glm-5
     provider_model_id: glm-5
     pricing:
@@ -29,6 +32,9 @@ models:
         cache_read: 0.2
       output_tokens:
         text: 3.2
+    capabilities:
+      - reasoning
+      - tools
   - id: z-ai/glm-5-turbo
     provider_model_id: glm-5-turbo
     pricing:
@@ -37,6 +43,9 @@ models:
         cache_read: 0.24
       output_tokens:
         text: 4
+    capabilities:
+      - reasoning
+      - tools
   - id: z-ai/glm-5v-turbo
     provider_model_id: glm-5v-turbo
     pricing:
@@ -45,6 +54,9 @@ models:
         cache_read: 0.24
       output_tokens:
         text: 4
+    capabilities:
+      - reasoning
+      - tools
   - id: z-ai/glm-4.7
     provider_model_id: glm-4.7
     pricing:
@@ -53,6 +65,9 @@ models:
         cache_read: 0.11
       output_tokens:
         text: 2.2
+    capabilities:
+      - reasoning
+      - tools
 status: active
 weight: 1
 submitted_at: 2026-05-25
