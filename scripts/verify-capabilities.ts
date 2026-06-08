@@ -20,8 +20,8 @@
 //   A capability is "honoured" iff the reply is PURE JSON conforming to the
 //   probe schema. Prose / markdown-fenced JSON ⇒ not honoured.
 //
-// Credentials come from environment variables, matching bitrouter-cloud's
-// resolution convention exactly:
+// Credentials come from environment variables, using the conventional
+// per-provider scheme:
 //   {PROVIDER_NAME_UPPER}_API_KEY    (e.g. OPENAI_API_KEY)
 //   {PROVIDER_NAME_UPPER}_API_BASE   (e.g. OPENAI_API_BASE, HTTPS, versioned root)
 //
@@ -177,8 +177,7 @@ async function probeStructuredOutputs(
     if (protocol === "anthropic") {
       // The Messages transport's credential header is provider-declared via
       // `auth_scheme` (x-api-key is Anthropic's native default; resellers on a
-      // one-api/new-api stack usually want `Authorization: Bearer`). Mirrors
-      // bitrouter-cloud's outbound auth for this protocol.
+      // one-api/new-api stack usually want `Authorization: Bearer`).
       const authHeader: Record<string, string> =
         authScheme === "bearer"
           ? { Authorization: `Bearer ${key}` }
@@ -284,7 +283,7 @@ async function main(): Promise<void> {
     process.exit(2);
   }
   if (!base.startsWith("https://")) {
-    console.error(`✗ base must be HTTPS — bitrouter-cloud's url_validator rejects non-HTTPS upstreams`);
+    console.error(`✗ base must be HTTPS (non-HTTPS upstreams are rejected)`);
     process.exit(2);
   }
 
