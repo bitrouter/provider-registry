@@ -25,7 +25,7 @@
 // Usage:
 //   bun run check-new-models                 # dry run, every provider
 //   bun run check-new-models --write         # attach the matches
-//   bun run check-new-models anon-a worldrouter   # subset by name
+//   bun run check-new-models redpill worldrouter  # subset by name
 
 import {
   loadProviders,
