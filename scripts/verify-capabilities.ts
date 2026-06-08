@@ -237,6 +237,10 @@ async function probeStructuredOutputs(
 
 // Probe tool/function calling by forcing a single tool call and checking the
 // reply carries one. Honoured = the model emitted a tool/function call.
+// Official tool-calling docs per protocol:
+//   openai    <https://platform.openai.com/docs/guides/function-calling>
+//   anthropic <https://platform.claude.com/docs/en/build-with-claude/tool-use>
+//   google    <https://ai.google.dev/gemini-api/docs/function-calling>
 async function probeTools(
   protocol: ApiProtocol,
   base: string,

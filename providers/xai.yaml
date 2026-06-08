@@ -31,8 +31,10 @@ models:
         cache_read: 0.2
       output_tokens:
         text: 2.5
+    # `reasoning` dropped: the provider_model_id is the non-reasoning grok-4.20
+    # variant. The model-level models.dev baseline over-claimed it (the canonical
+    # id `grok-4.20` matches the reasoning family); corrected by hand.
     capabilities:
-      - reasoning
       - tools
 status: active
 weight: 1
