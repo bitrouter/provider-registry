@@ -48,6 +48,9 @@ models:
         no_cache: 0.6
       output_tokens:
         text: 3.6
+    capabilities:
+      - reasoning
+      - tools
   - id: qwen/qwen3.6-35b-a3b
     provider_model_id: qwen3.6-35b-a3b
     pricing:
@@ -55,6 +58,9 @@ models:
         no_cache: 0.248
       output_tokens:
         text: 1.485
+    capabilities:
+      - reasoning
+      - tools
   - id: qwen/qwen3.5-397b-a17b
     provider_model_id: qwen3.5-397b-a17b
     pricing:
@@ -62,6 +68,9 @@ models:
         no_cache: 0.6
       output_tokens:
         text: 3.6
+    capabilities:
+      - reasoning
+      - tools
   - id: qwen/qwen3.5-122b-a10b
     provider_model_id: qwen3.5-122b-a10b
     pricing:
@@ -84,6 +93,8 @@ models:
       output_tokens:
         text: 6
     deprecation_date: 2026-08-03
+    capabilities:
+      - tools
   - id: qwen/qwen3.7-plus
     provider_model_id: qwen3.7-plus
     pricing:

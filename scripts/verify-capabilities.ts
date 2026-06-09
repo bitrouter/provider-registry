@@ -29,7 +29,7 @@
 //   OPENAI_API_KEY=... OPENAI_API_BASE=https://api.openai.com/v1 \
 //     bun run scripts/verify-capabilities.ts openai [capability]
 //
-// `capability` defaults to `structured_outputs` (the only one implemented today).
+// `capability` defaults to `structured_outputs`; `tools` is also probe-implemented.
 // Exit code is non-zero iff a DECLARED capability is not honoured (a CI gate);
 // undeclared-but-supported rows are reported as suggestions, not failures.
 
@@ -63,6 +63,17 @@ const WEATHER_SCHEMA = {
   required: ["location", "temperature", "conditions"],
   additionalProperties: false,
 } as const;
+
+// Tool-calling probe: force a single tool call. Parameters are a minimal object
+// schema with no `additionalProperties` (Gemini's functionDeclarations reject
+// it, same as responseSchema).
+const TOOL_PARAMS = {
+  type: "object",
+  properties: { location: { type: "string" } },
+  required: ["location"],
+} as const;
+const TOOL_PROMPT = "What is the weather in London? Use the get_weather tool.";
+const TOOL_DESC = "Get the current weather for a location.";
 
 function envSegment(name: string): string {
   return name.toUpperCase().replace(/[^A-Z0-9]/g, "_");
@@ -224,6 +235,85 @@ async function probeStructuredOutputs(
   }
 }
 
+// Probe tool/function calling by forcing a single tool call and checking the
+// reply carries one. Honoured = the model emitted a tool/function call.
+// Official tool-calling docs per protocol:
+//   openai    <https://platform.openai.com/docs/guides/function-calling>
+//   anthropic <https://platform.claude.com/docs/en/build-with-claude/tool-use>
+//   google    <https://ai.google.dev/gemini-api/docs/function-calling>
+async function probeTools(
+  protocol: ApiProtocol,
+  base: string,
+  key: string,
+  pmid: string,
+  authScheme: AuthScheme,
+): Promise<CapResult> {
+  const root = base.replace(/\/$/, "");
+  try {
+    if (protocol === "openai") {
+      const { status, text, json } = await postJson(
+        `${root}/chat/completions`,
+        { Authorization: `Bearer ${key}` },
+        {
+          model: pmid,
+          max_completion_tokens: PROBE_MAX_TOKENS,
+          messages: [{ role: "user", content: TOOL_PROMPT }],
+          tools: [
+            {
+              type: "function",
+              function: { name: "get_weather", description: TOOL_DESC, parameters: TOOL_PARAMS },
+            },
+          ],
+          tool_choice: "required",
+        },
+      );
+      if (status < 200 || status >= 300) return { honored: false, status, detail: errOf(json, text) };
+      const choices = json.choices as Array<{ message?: { tool_calls?: unknown[] } }> | undefined;
+      const calls = choices?.[0]?.message?.tool_calls;
+      return { honored: Array.isArray(calls) && calls.length > 0, status, detail: "" };
+    }
+
+    if (protocol === "anthropic") {
+      const authHeader: Record<string, string> =
+        authScheme === "bearer" ? { Authorization: `Bearer ${key}` } : { "x-api-key": key };
+      const { status, text, json } = await postJson(
+        `${root}/messages`,
+        { ...authHeader, "anthropic-version": "2023-06-01" },
+        {
+          model: pmid,
+          max_tokens: PROBE_MAX_TOKENS,
+          messages: [{ role: "user", content: TOOL_PROMPT }],
+          tools: [{ name: "get_weather", description: TOOL_DESC, input_schema: TOOL_PARAMS }],
+          tool_choice: { type: "any" },
+        },
+      );
+      if (status < 200 || status >= 300) return { honored: false, status, detail: errOf(json, text) };
+      const blocks = (json.content as Array<{ type: string }> | undefined) ?? [];
+      return { honored: blocks.some((b) => b.type === "tool_use"), status, detail: "" };
+    }
+
+    if (protocol === "google") {
+      const { status, text, json } = await postJson(
+        `${root}/models/${pmid}:generateContent`,
+        { "x-goog-api-key": key },
+        {
+          contents: [{ role: "user", parts: [{ text: TOOL_PROMPT }] }],
+          tools: [{ functionDeclarations: [{ name: "get_weather", description: TOOL_DESC, parameters: TOOL_PARAMS }] }],
+          toolConfig: { functionCallingConfig: { mode: "ANY" } },
+        },
+      );
+      if (status < 200 || status >= 300) return { honored: false, status, detail: errOf(json, text) };
+      const cand = (json.candidates as Array<{ content?: { parts?: Array<{ functionCall?: unknown }> } }> | undefined)?.[0];
+      const parts = cand?.content?.parts ?? [];
+      return { honored: parts.some((p) => p.functionCall != null), status, detail: "" };
+    }
+
+    return { honored: false, status: 0, detail: `unsupported protocol '${protocol}'` };
+  } catch (err) {
+    return { honored: false, status: 0, detail: `network: ${(err as Error).message}` };
+  }
+}
+
 // Registry of capability → probe. Add new entries as capabilities land.
 const PROBES: Partial<
   Record<
@@ -232,13 +322,17 @@ const PROBES: Partial<
   >
 > = {
   structured_outputs: probeStructuredOutputs,
+  tools: probeTools,
 };
 
 async function main(): Promise<void> {
   const providerName = process.argv[2];
   const capArg = process.argv[3] ?? "structured_outputs";
+  // Optional 4th arg: only probe models whose canonical id contains this
+  // substring (focused re-checks, e.g. one model across several providers).
+  const modelFilter = process.argv[4];
   if (!providerName) {
-    console.error("usage: bun run scripts/verify-capabilities.ts <provider-name> [capability]");
+    console.error("usage: bun run scripts/verify-capabilities.ts <provider-name> [capability] [model-id-filter]");
     console.error(`capabilities: ${Capability.options.join(", ")}`);
     process.exit(2);
   }
@@ -272,6 +366,13 @@ async function main(): Promise<void> {
     console.error(`✗ provider '${providerName}' declares no models`);
     process.exit(2);
   }
+  const models = modelFilter
+    ? provider.models.filter((m) => m.id.includes(modelFilter))
+    : provider.models;
+  if (models.length === 0) {
+    console.error(`✗ no model in '${providerName}' matches '${modelFilter}'`);
+    process.exit(2);
+  }
 
   // Base URL: an explicit {ENV}_API_BASE wins; otherwise fall back to the
   // provider's yaml `default_api_base` (set for BYOK providers, so they need
@@ -294,20 +395,28 @@ async function main(): Promise<void> {
   console.log(`capability: ${capability}`);
   console.log(bar);
 
-  const canonWidth = Math.max(...provider.models.map((m) => m.id.length));
-  const pmidWidth = Math.max(...provider.models.map((m) => m.provider_model_id.length));
+  const canonWidth = Math.max(...models.map((m) => m.id.length));
+  const pmidWidth = Math.max(...models.map((m) => m.provider_model_id.length));
 
   let declaredFailures = 0; // declared but not honoured (unsupported or unprobeable) → CI failure
   let suggestions = 0; // honoured but not declared → could add
   let inconclusive = 0; // probe errored (non-2xx) → support undetermined
 
-  for (const m of provider.models) {
+  for (const m of models) {
     const protocol = resolveProtocol(provider, m);
     const declared = (m.capabilities ?? []).includes(capability);
     process.stdout.write(
       `${pad(m.id, canonWidth)} → ${pad(m.provider_model_id, pmidWidth)}  ${pad(protocol, 9)}  `,
     );
-    const r = await probe(protocol, base, key, m.provider_model_id, provider.auth_scheme);
+    // A 2xx-but-not-honoured result can be intermittent (e.g. a model that
+    // sporadically skips a forced tool call — observed on tencent's minimax-m2.5,
+    // which honoured tools on ~1 of 3 tries). Retry a few times before declaring
+    // it unsupported. Non-2xx errors stay inconclusive on the first try —
+    // retrying an auth / rate-limit / routing failure wouldn't help.
+    let r = await probe(protocol, base, key, m.provider_model_id, provider.auth_scheme);
+    for (let attempt = 1; attempt < 3 && !r.honored && r.status >= 200 && r.status < 300; attempt++) {
+      r = await probe(protocol, base, key, m.provider_model_id, provider.auth_scheme);
+    }
 
     let verdict: string;
     if (r.honored) {

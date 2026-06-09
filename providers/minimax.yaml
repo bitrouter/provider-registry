@@ -25,6 +25,9 @@ models:
         cache_write: 0.375
       output_tokens:
         text: 1.2
+    capabilities:
+      - reasoning
+      - tools
   - id: minimax/minimax-m2.5
     provider_model_id: MiniMax-M2.5
     pricing:
@@ -34,6 +37,9 @@ models:
         cache_write: 0.375
       output_tokens:
         text: 1.2
+    capabilities:
+      - reasoning
+      - tools
   - id: minimax/minimax-m2.1
     provider_model_id: MiniMax-M2.1
     pricing:
@@ -41,6 +47,9 @@ models:
         no_cache: 0.3
       output_tokens:
         text: 1.2
+    capabilities:
+      - reasoning
+      - tools
 status: active
 weight: 1
 submitted_at: 2026-05-25

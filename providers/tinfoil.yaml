@@ -18,7 +18,9 @@ models:
       output_tokens:
         text: 5.25
     capabilities:
+      - reasoning
       - structured_outputs
+      - tools
   - id: z-ai/glm-5.1
     provider_model_id: glm-5-1
     pricing:
@@ -27,7 +29,9 @@ models:
       output_tokens:
         text: 5.25
     capabilities:
+      - reasoning
       - structured_outputs
+      - tools
   - id: moonshotai/kimi-k2.6
     provider_model_id: kimi-k2-6
     pricing:
@@ -36,7 +40,9 @@ models:
       output_tokens:
         text: 5.25
     capabilities:
+      - reasoning
       - structured_outputs
+      - tools
   - id: google/gemma-4-31b-it
     provider_model_id: gemma4-31b
     pricing:
@@ -45,7 +51,9 @@ models:
       output_tokens:
         text: 1.00
     capabilities:
+      - reasoning
       - structured_outputs
+      - tools
   - id: openai/gpt-oss-120b
     provider_model_id: gpt-oss-120b
     pricing:
@@ -54,7 +62,9 @@ models:
       output_tokens:
         text: 1.25
     capabilities:
+      - reasoning
       - structured_outputs
+      - tools
 status: active
 weight: 1
 submitted_at: 2026-05-12
