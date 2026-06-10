@@ -106,3 +106,7 @@ entries:
     canonical: qwen/qwen3.5-35b-a3b
     by: automation
     date: 2026-06-04
+  cd55210d-358e-4df1-ba9c-9acb5f186cc9:
+    slug: claude-fable-5
+    canonical: anthropic/claude-fable-5
+    by: automation

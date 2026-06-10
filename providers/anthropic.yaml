@@ -128,6 +128,15 @@ models:
     capabilities:
       - reasoning
       - tools
+  - id: anthropic/claude-fable-5
+    provider_model_id: claude-fable-5
+    pricing:
+      input_tokens:
+        no_cache: 10
+        cache_read: 1
+        cache_write: 12.5
+      output_tokens:
+        text: 50
 status: active
 weight: 1
 submitted_at: 2026-05-25
