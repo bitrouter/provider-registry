@@ -1,0 +1,204 @@
+name: bitrouter
+api_protocol:
+  - "*": openai
+rate_limits:
+  - "*":
+      requests_per_minute: 600
+models:
+  - id: deepseek/deepseek-v3.2
+    provider_model_id: deepseek-v3.2
+    pricing:
+      input_tokens:
+        no_cache: 0.28
+        cache_read: 0.14
+      output_tokens:
+        text: 0.42
+    capabilities:
+      - reasoning
+      - tools
+  - id: deepseek/deepseek-v4-pro
+    provider_model_id: deepseek-v4-pro
+    pricing:
+      input_tokens:
+        no_cache: 1.74
+        cache_read: 0.145
+      output_tokens:
+        text: 3.48
+    capabilities:
+      - reasoning
+      - tools
+  - id: minimax/minimax-m2.5
+    provider_model_id: MiniMax-M2.5
+    pricing:
+      input_tokens:
+        no_cache: 0.3
+        cache_read: 0.03
+        cache_write: 0.375
+      output_tokens:
+        text: 1.2
+    capabilities:
+      - reasoning
+      - tools
+  - id: minimax/minimax-m2.7
+    provider_model_id: MiniMax-M2.7
+    pricing:
+      input_tokens:
+        no_cache: 0.3
+        cache_read: 0.06
+        cache_write: 0.375
+      output_tokens:
+        text: 1.2
+    capabilities:
+      - reasoning
+      - tools
+  - id: minimax/minimax-m3
+    provider_model_id: MiniMax-M3
+    pricing:
+      input_tokens:
+        no_cache: 0.6
+        cache_read: 0.12
+      output_tokens:
+        text: 2.4
+    capabilities:
+      - reasoning
+      - tools
+  - id: moonshotai/kimi-k2.5
+    provider_model_id: kimi-k2.5
+    pricing:
+      input_tokens:
+        no_cache: 0.6
+        cache_read: 0.1
+      output_tokens:
+        text: 3
+    capabilities:
+      - reasoning
+      - structured_outputs
+      - tools
+  - id: moonshotai/kimi-k2.6
+    provider_model_id: kimi-k2.6
+    pricing:
+      input_tokens:
+        no_cache: 0.95
+        cache_read: 0.16
+      output_tokens:
+        text: 4
+    capabilities:
+      - reasoning
+      - structured_outputs
+      - tools
+  - id: qwen/qwen3.6-plus
+    provider_model_id: qwen3.6-plus
+    pricing:
+      input_tokens:
+        no_cache: 0.5
+        cache_read: 0.05
+      output_tokens:
+        text: 3
+  - id: qwen/qwen3.7-max
+    provider_model_id: qwen3.7-max
+    pricing:
+      input_tokens:
+        no_cache: 2.5
+        cache_read: 0.5
+      output_tokens:
+        text: 7.5
+  - id: qwen/qwen3.7-plus
+    provider_model_id: qwen3.7-plus
+    pricing:
+      input_tokens:
+        no_cache: 0.5
+        cache_read: 0.05
+        cache_write: 0.625
+      output_tokens:
+        text: 3
+  - id: stepfun/step-3.5-flash
+    provider_model_id: step-3.5-flash
+    pricing:
+      input_tokens:
+        no_cache: 0.096
+        cache_read: 0.019
+      output_tokens:
+        text: 0.288
+    capabilities:
+      - reasoning
+      - tools
+  - id: stepfun/step-3.7-flash
+    provider_model_id: step-3.7-flash
+    pricing:
+      input_tokens:
+        no_cache: 0.2
+        cache_read: 0.04
+      output_tokens:
+        text: 1.15
+    capabilities:
+      - structured_outputs
+  - id: xiaomi/mimo-v2-omni
+    provider_model_id: mimo-v2-omni
+    pricing:
+      input_tokens:
+        no_cache: 0.4
+        cache_read: 0.08
+      output_tokens:
+        text: 2
+    capabilities:
+      - reasoning
+      - tools
+  - id: xiaomi/mimo-v2-pro
+    provider_model_id: mimo-v2-pro
+    pricing:
+      input_tokens:
+        no_cache: 1
+        cache_read: 0.2
+      output_tokens:
+        text: 3
+    capabilities:
+      - reasoning
+      - tools
+  - id: xiaomi/mimo-v2.5
+    provider_model_id: mimo-v2.5
+    pricing:
+      input_tokens:
+        no_cache: 0.4
+        cache_read: 0.08
+      output_tokens:
+        text: 2
+    capabilities:
+      - reasoning
+      - tools
+  - id: xiaomi/mimo-v2.5-pro
+    provider_model_id: mimo-v2.5-pro
+    pricing:
+      input_tokens:
+        no_cache: 1
+        cache_read: 0.2
+      output_tokens:
+        text: 3
+    capabilities:
+      - reasoning
+      - tools
+  - id: z-ai/glm-5
+    provider_model_id: glm-5
+    pricing:
+      input_tokens:
+        no_cache: 1
+        cache_read: 0.2
+      output_tokens:
+        text: 3.2
+    capabilities:
+      - reasoning
+      - tools
+  - id: z-ai/glm-5.1
+    provider_model_id: glm-5.1
+    pricing:
+      input_tokens:
+        no_cache: 1.4
+        cache_read: 0.26
+      output_tokens:
+        text: 4.4
+    capabilities:
+      - reasoning
+      - tools
+status: active
+weight: 1
+verified: false
+submitted_at: 2026-06-11
