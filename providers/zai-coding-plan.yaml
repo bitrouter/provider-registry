@@ -1,35 +1,9 @@
 name: zai-coding-plan
-# First-party subscription endpoint — Z.AI / Zhipu "GLM Coding Plan", a
-# fixed-price coding subscription distinct from pay-as-you-go token
-# billing. bitrouter-cloud holds no platform key for this entry; it is
-# routable only via the caller's own GLM Coding Plan key
-# (`POST /v1/byok/keys` on the cloud). A coding-plan key is NOT
-# interchangeable with a general-platform Z.AI / Zhipu key. Default base
-# targets the international coding endpoint; mainland-China callers can
-# override `api_base` to https://open.bigmodel.cn/api/coding/paas/v4 via
-# the BYOK upsert.
-#
-# OpenAI-compatible endpoint (`Authorization: Bearer <key>`, no extra
-# headers required). Official docs:
-#   https://docs.z.ai/devpack/overview
-#   https://docs.bigmodel.cn/cn/coding-plan/quick-start
-# NOTE (ToS): Z.AI documents the coding endpoint as intended for
-# interactive coding tools. Operators routing a caller's coding-plan key
-# through a gateway should keep usage within the caller's own
-# interactive workflow.
-byok_only: true
-default_api_base: https://api.z.ai/api/coding/paas/v4
 api_protocol:
   - "*": openai
 rate_limits:
   - "*":
       requests_per_minute: 60
-# Model list mirrors the standard `zai` catalog: the upstream
-# subscription is the source of truth for which models a given coding
-# plan can actually call (no client-side model gating). Pricing mirrors
-# the standard endpoint for reference only — the GLM Coding Plan is a
-# flat-rate subscription and BYOK traffic is billed by Z.AI, not metered
-# per token by bitrouter-cloud.
 models:
   - id: z-ai/glm-5.1
     provider_model_id: glm-5.1
@@ -53,39 +27,10 @@ models:
     capabilities:
       - reasoning
       - tools
-  - id: z-ai/glm-5-turbo
-    provider_model_id: glm-5-turbo
-    pricing:
-      input_tokens:
-        no_cache: 1.2
-        cache_read: 0.24
-      output_tokens:
-        text: 4
-    capabilities:
-      - reasoning
-      - tools
-  - id: z-ai/glm-5v-turbo
-    provider_model_id: glm-5v-turbo
-    pricing:
-      input_tokens:
-        no_cache: 1.2
-        cache_read: 0.24
-      output_tokens:
-        text: 4
-    capabilities:
-      - reasoning
-      - tools
-  - id: z-ai/glm-4.7
-    provider_model_id: glm-4.7
-    pricing:
-      input_tokens:
-        no_cache: 0.6
-        cache_read: 0.11
-      output_tokens:
-        text: 2.2
-    capabilities:
-      - reasoning
-      - tools
 status: active
 weight: 1
 submitted_at: 2026-06-05
+verified: false
+byok_only: true
+default_api_base: https://api.z.ai/api/coding/paas/v4
+auth_scheme: x-api-key

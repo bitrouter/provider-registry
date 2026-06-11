@@ -4,17 +4,12 @@ api_protocol:
 rate_limits:
   - "*":
       requests_per_minute: 60
-# Catalog source: https://docs.tinfoil.sh/chat-models — tinfoil's own
-# slugs go in `provider_model_id`; the `id` is our canonical name.
-# Pricing taken from tinfoil's published rates; tinfoil does not advertise
-# a separate cache-read rate, so `cache_read` is omitted here.
 models:
   - id: deepseek/deepseek-v4-pro
-    # Tinfoil deployment is configured for 800K context vs. the upstream 1M.
     provider_model_id: deepseek-v4-pro
     pricing:
       input_tokens:
-        no_cache: 1.50
+        no_cache: 1.5
       output_tokens:
         text: 5.25
     capabilities:
@@ -25,7 +20,7 @@ models:
     provider_model_id: glm-5-1
     pricing:
       input_tokens:
-        no_cache: 1.50
+        no_cache: 1.5
       output_tokens:
         text: 5.25
     capabilities:
@@ -36,31 +31,9 @@ models:
     provider_model_id: kimi-k2-6
     pricing:
       input_tokens:
-        no_cache: 1.50
+        no_cache: 1.5
       output_tokens:
         text: 5.25
-    capabilities:
-      - reasoning
-      - structured_outputs
-      - tools
-  - id: google/gemma-4-31b-it
-    provider_model_id: gemma4-31b
-    pricing:
-      input_tokens:
-        no_cache: 0.45
-      output_tokens:
-        text: 1.00
-    capabilities:
-      - reasoning
-      - structured_outputs
-      - tools
-  - id: openai/gpt-oss-120b
-    provider_model_id: gpt-oss-120b
-    pricing:
-      input_tokens:
-        no_cache: 0.75
-      output_tokens:
-        text: 1.25
     capabilities:
       - reasoning
       - structured_outputs
@@ -68,3 +41,6 @@ models:
 status: active
 weight: 1
 submitted_at: 2026-05-12
+verified: false
+byok_only: false
+auth_scheme: x-api-key

@@ -4,11 +4,6 @@ api_protocol:
 rate_limits:
   - "*":
       requests_per_minute: 50
-# Catalog source: GET https://api.intelligence.io.solutions/api/v1/models
-# (public, no auth needed). Headline rates (input/output per million) come
-# from io.net's pricing page; cache_read values, when present, are carried
-# over from prior entries since io.net's public catalog doesn't publish a
-# separate cache rate.
 models:
   - id: deepseek/deepseek-v3.2
     provider_model_id: deepseek-ai/DeepSeek-V3.2
@@ -49,7 +44,7 @@ models:
       input_tokens:
         no_cache: 0.44
       output_tokens:
-        text: 2.00
+        text: 2
     capabilities:
       - reasoning
       - tools
@@ -68,9 +63,9 @@ models:
     provider_model_id: zai-org/GLM-5
     pricing:
       input_tokens:
-        no_cache: 1.00
+        no_cache: 1
       output_tokens:
-        text: 3.00
+        text: 3
     capabilities:
       - reasoning
       - tools
@@ -96,16 +91,9 @@ models:
     capabilities:
       - reasoning
       - tools
-  - id: openai/gpt-oss-120b
-    provider_model_id: openai/gpt-oss-120b
-    pricing:
-      input_tokens:
-        no_cache: 0.10
-      output_tokens:
-        text: 0.40
-    capabilities:
-      - reasoning
-      - tools
 status: active
 weight: 1
 submitted_at: 2026-05-12
+verified: false
+byok_only: false
+auth_scheme: x-api-key

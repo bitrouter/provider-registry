@@ -1,17 +1,9 @@
 name: anthropic
-# First-party provider — bitrouter-cloud holds no platform key for
-# this entry. Routable only via the caller's own Anthropic key
-# (`POST /v1/byok/keys` on the cloud). See
-# bitrouter/bitrouter-cloud#318.
-byok_only: true
-default_api_base: https://api.anthropic.com/v1
 api_protocol:
   - "*": anthropic
 rate_limits:
   - "*":
       requests_per_minute: 60
-# Catalog source: https://models.dev/api.json (provider key `anthropic`); cache_write reflects Anthropic prompt-cache write tier.
-# Pricing is per 1M tokens.
 models:
   - id: anthropic/claude-opus-4.8
     provider_model_id: claude-opus-4-8
@@ -91,43 +83,6 @@ models:
       - reasoning
       - structured_outputs
       - tools
-  - id: anthropic/claude-opus-4.1
-    provider_model_id: claude-opus-4-1
-    pricing:
-      input_tokens:
-        no_cache: 15
-        cache_read: 1.5
-        cache_write: 18.75
-      output_tokens:
-        text: 75
-    capabilities:
-      - reasoning
-      - structured_outputs
-      - tools
-  - id: anthropic/claude-opus-4
-    provider_model_id: claude-opus-4-0
-    pricing:
-      input_tokens:
-        no_cache: 15
-        cache_read: 1.5
-        cache_write: 18.75
-      output_tokens:
-        text: 75
-    capabilities:
-      - reasoning
-      - tools
-  - id: anthropic/claude-sonnet-4
-    provider_model_id: claude-sonnet-4-0
-    pricing:
-      input_tokens:
-        no_cache: 3
-        cache_read: 0.3
-        cache_write: 3.75
-      output_tokens:
-        text: 15
-    capabilities:
-      - reasoning
-      - tools
   - id: anthropic/claude-fable-5
     provider_model_id: claude-fable-5
     pricing:
@@ -141,3 +96,6 @@ status: active
 weight: 1
 submitted_at: 2026-05-25
 verified: true
+byok_only: true
+default_api_base: https://api.anthropic.com/v1
+auth_scheme: x-api-key
