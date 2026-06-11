@@ -32,7 +32,7 @@ models:
     pricing:
       input_tokens:
         no_cache: 0.105
-        cache_read: 0.021
+        cache_read: 0.0021
       output_tokens:
         text: 0.21
     capabilities:
