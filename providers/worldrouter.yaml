@@ -9,11 +9,11 @@ models:
     provider_model_id: claude-sonnet-4-6
     pricing:
       input_tokens:
-        no_cache: 2.1
-        cache_read: 0.21
-        cache_write: 2.625
+        no_cache: 3.0
+        cache_read: 0.3
+        cache_write: 3.75
       output_tokens:
-        text: 10.5
+        text: 15.0
     capabilities:
       - reasoning
       - tools
@@ -21,11 +21,11 @@ models:
     provider_model_id: claude-opus-4-6
     pricing:
       input_tokens:
-        no_cache: 3.5
-        cache_read: 0.35
-        cache_write: 4.375
+        no_cache: 5.0
+        cache_read: 0.5
+        cache_write: 6.25
       output_tokens:
-        text: 17.5
+        text: 25.0
     capabilities:
       - reasoning
       - tools
@@ -33,11 +33,11 @@ models:
     provider_model_id: claude-opus-4-7
     pricing:
       input_tokens:
-        no_cache: 3.5
-        cache_read: 0.35
-        cache_write: 4.375
+        no_cache: 5.0
+        cache_read: 0.5
+        cache_write: 6.25
       output_tokens:
-        text: 17.5
+        text: 25.0
     capabilities:
       - reasoning
       - structured_outputs
@@ -85,11 +85,11 @@ models:
     provider_model_id: gpt-5.4-mini
     pricing:
       input_tokens:
-        no_cache: 0.525
-        cache_read: 0.0525
-        cache_write: 0.525
+        no_cache: 0.75
+        cache_read: 0.075
+        cache_write: 0.75
       output_tokens:
-        text: 3.15
+        text: 4.5
     capabilities:
       - reasoning
       - structured_outputs
@@ -111,11 +111,11 @@ models:
     provider_model_id: gemini-3.1-flash-lite-preview
     pricing:
       input_tokens:
-        no_cache: 0.175
-        cache_read: 0.0175
-        cache_write: 0.175
+        no_cache: 0.25
+        cache_read: 0.025
+        cache_write: 0.25
       output_tokens:
-        text: 1.05
+        text: 1.5
     capabilities:
       - reasoning
       - structured_outputs
