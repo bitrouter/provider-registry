@@ -4,8 +4,12 @@
 **Status:** Approved design, pending implementation plan
 **Scope:** The *model* dimension of the registry only. The *agent* dimension of
 the planned model × agent matrix is explicitly out of scope here.
-**Baseline:** Assumes the per-model `capabilities` feature (branch
-`feat/capabilities`) is implemented and merged. v2 preserves it unchanged.
+**Baseline:** Current `origin/main`. The per-model `capabilities` feature is
+merged (#22/#23) with the vocabulary already expanded to
+`[structured_outputs, tools, reasoning, web_search, logprobs]` (`tools`/`reasoning`
+seeded from models.dev), and context-tier ("staged") pricing is merged (#27,
+`ModelPricing.context_tiers`). v2 preserves both and builds on them.
+**Revised:** reconciled against `main` after the capabilities + context-tier-pricing merge.
 
 ---
 
@@ -82,11 +86,10 @@ So `base_model` ≡ our canonical `id`; their provider model id ≡ our
 
 ## 3. Schema changes
 
-### 3.1 Canonical model — enrich with advisory facts (the "two-layer" model)
+### 3.1 Canonical model — enrich with descriptive facts
 
-Add the following optional fields to `CanonicalModel`, sourced from models.dev.
-These are **advisory** ("the model is capable in principle") and are **never**
-used as routing gates:
+Add the following optional, **descriptive** fields to `CanonicalModel`, sourced
+from models.dev. They are catalog/UX metadata, never routing gates:
 
 ```yaml
 - id: anthropic/claude-sonnet-4.6
@@ -101,26 +104,25 @@ used as routing gates:
   knowledge_cutoff: 2025-08     # ISO YYYY-MM or YYYY-MM-DD
   open_weights: false
   family: claude                # optional grouping/UX hint
-  supports:                     # advisory capability HINTS — not routing gates
-    reasoning: true
-    tool_call: true
-    structured_output: true
 ```
 
-**Naming discipline:** the advisory hint is `supports.structured_output`
-(singular). The verified, routing-gating, per-(provider, model) flag stays
-`capabilities: [structured_outputs]` (plural, existing enum). The two must never
-be conflated:
+**No canonical capability flags.** models.dev's per-model capability flags
+(`reasoning`, `tool_call`, `structured_output`) are *not* mirrored onto the
+canonical model. The merged capabilities feature already treats these as
+**verified, per-(provider, model)** `capabilities` — seeded from models.dev (#23)
+and confirmed against the live upstream by `verify-capabilities.ts`. So a model's
+capability truth lives in exactly one place (the provider attachment) and the
+canonical layer stays purely descriptive. The two layers:
 
-| Layer | Where | Meaning | Used for routing? | Source of truth |
+| Layer | Where | Holds | Routing gate? | Source of truth |
 |---|---|---|---|---|
-| `supports.*` | canonical | model is capable in principle | No (advisory/UX) | models.dev |
-| `capabilities` | provider model | this channel actually honours it | **Yes (hard gate)** | `verify-capabilities.ts` against the live upstream |
+| descriptive | canonical | dates, modalities, token limits, `open_weights`, `family` | No (catalog/UX) | models.dev |
+| `capabilities` | provider model | the subset of `[structured_outputs, tools, reasoning, web_search, logprobs]` it actually honours | **Yes (hard gate)** | models.dev seed → `verify-capabilities.ts` |
 
-This preserves the core insight behind the capabilities feature: a reseller may
-accept `response_format`/`output_config` and silently return prose. The advisory
-hint says the model *can*; only the verified per-provider capability lets the
-router send capability-requiring traffic there.
+This keeps the core insight behind the capabilities feature intact: a reseller
+may accept `response_format`/`output_config` and silently return prose, so a model
+being capable *in principle* never implies a given channel honours it — only the
+verified per-provider capability routes capability-requiring traffic.
 
 ### 3.2 Provider file — `auto_sync` block (new, optional)
 
@@ -183,6 +185,16 @@ having to adjudicate a finer first-party/official split.
 subscription/coding-plan entries), `auth_scheme`, `status`, `weight`,
 `rate_limits`, `api_protocol`, all cross-file invariants.
 
+### 3.6 The `bitrouter` provider (BitRouter Cloud as Provider)
+
+`providers/bitrouter.yaml` (added in #25) is our own first-party pooled upstream —
+the "BitRouter Cloud as Provider" supply that re-exports registry providers'
+API-form offerings under a single `bitrouter` provider. v2 keeps it as-is:
+
+- **Unmarked** by `community` (it is first-party — the default).
+- **No `auto_sync` block** — its catalog is curated by hand, so the importer and
+  `curate apply` must leave it manual.
+
 ---
 
 ## 4. models.dev migration
@@ -199,9 +211,14 @@ subscription/coding-plan entries), `auth_scheme`, `status`, `weight`,
 - **Field mapping (models.dev → ours):**
   - `cost.{input,output,cache_read,cache_write}` → `pricing.input_tokens.*` /
     `pricing.output_tokens.text` (per-1M, same convention — `pricingFromCost` already does this).
+  - **Tiered/staged pricing** (Qwen/Gemini, where a steeper bracket applies above a
+    context threshold) → `pricing.context_tiers` (the merged #27 step-function
+    schema). The importer/sync must populate these and never clobber a hand-set
+    `context_tiers`; a flat models.dev rate just sets the base bracket.
   - `limit.{context,output}` → canonical `max_input_tokens` / `max_output_tokens`.
   - `modalities.{input,output}` → canonical `input_modalities` / `output_modalities`.
-  - `reasoning`/`tool_call`/`structured_output` → canonical `supports.*`.
+  - `reasoning`/`tool_call`/`structured_output` → **seed the provider attachment's
+    `capabilities`** (then verified), *not* the canonical model — see §3.1.
   - `knowledge`/`release_date`/`open_weights`/`family` → canonical fields of the same name.
   - `base_model` → canonical `id`; provider model key → `provider_model_id`.
 
@@ -267,9 +284,9 @@ In-scope repos: `bitrouter/bitrouter` (governs the SDK enums kept in lock-step),
 ## 8. Landing checklist
 
 **Schema (`scripts/schema.ts`)**
-- [ ] Add optional canonical fields: `release_date`, `knowledge_cutoff`,
-      `open_weights`, `family`, and a `supports` object
-      (`reasoning`/`tool_call`/`structured_output`, all optional booleans).
+- [ ] Add optional descriptive canonical fields: `release_date`,
+      `knowledge_cutoff`, `open_weights`, `family`. (No canonical capability
+      flags — capability truth stays in the provider `capabilities`; see §3.1.)
 - [ ] Add the optional provider `auto_sync` block schema (`feed` enum + optional
       `key`, `url`, `writes`), with refinements: `key` only meaningful for
       `feed=models_dev`, `url` only for `feed=v1_models`.
@@ -277,9 +294,12 @@ In-scope repos: `bitrouter/bitrouter` (governs the SDK enums kept in lock-step),
 - [ ] Remove `verified` and any anonymization-related validation.
 
 **Data / migration**
-- [ ] Write the one-shot importer (models.dev source TOMLs → canonical + provider files).
+- [ ] Write the one-shot importer (models.dev source TOMLs → canonical + provider files);
+      map tiered pricing → `pricing.context_tiers` and seed provider `capabilities`
+      from models.dev flags (then verify).
 - [ ] Run it for in-scope providers; enrich `canonical.yaml`; mark `community`
-      where applicable and add `auto_sync` blocks to auto-synced providers.
+      where applicable and add `auto_sync` blocks to auto-synced providers. Leave
+      `providers/bitrouter.yaml` manual (no `auto_sync`).
 - [ ] Delete `providers/anon-b.yaml`.
 - [ ] Migrate `curation/policy.yaml` `modelsdev_keys` → per-provider `auto_sync.key`.
 
@@ -308,7 +328,7 @@ In-scope repos: `bitrouter/bitrouter` (governs the SDK enums kept in lock-step),
 - Whether the `community` flag should default the *other* way (mark vetted
   providers, treat unmarked as community). Current design marks only community
   and treats unmarked as first-party/official.
-- Whether `supports` should also carry `temperature` (models.dev tracks it) or
-  stay limited to `reasoning`/`tool_call`/`structured_output`.
+- Whether to capture models.dev's `temperature` flag anywhere — it is neither a
+  descriptive canonical fact nor a routing-gating capability, so likely dropped as niche.
 - Whether `auto_sync.writes` needs finer granularity than `[models, pricing]`
   (e.g. a `metadata` channel).
