@@ -198,7 +198,17 @@ models:
     capabilities:
       - reasoning
       - tools
+  - id: qwen/qwen3.6-flash
+    provider_model_id: qwen3.6-flash
+    pricing:
+      input_tokens:
+        no_cache: 0.25
+        cache_read: 0.025
+      output_tokens:
+        text: 1.5
 status: active
 weight: 1
-verified: false
 submitted_at: 2026-06-11
+verified: false
+byok_only: false
+auth_scheme: x-api-key

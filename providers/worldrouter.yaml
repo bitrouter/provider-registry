@@ -129,15 +129,6 @@ models:
         cache_write: 0.2
       output_tokens:
         text: 0.5
-  - id: x-ai/grok-4-fast
-    provider_model_id: grok-4-fast
-    pricing:
-      input_tokens:
-        no_cache: 0.2
-        cache_read: 0.05
-        cache_write: 0.2
-      output_tokens:
-        text: 0.5
   - id: x-ai/grok-4.20
     provider_model_id: grok-4.20
     pricing:
@@ -150,18 +141,6 @@ models:
     capabilities:
       - reasoning
       - structured_outputs
-      - tools
-  - id: qwen/qwen3.5-plus
-    provider_model_id: qwen3.5-plus
-    pricing:
-      input_tokens:
-        no_cache: 0.4011
-        cache_read: 0.04011
-        cache_write: 0.501375
-      output_tokens:
-        text: 2.408
-    capabilities:
-      - reasoning
       - tools
   - id: qwen/qwen3.6-plus
     provider_model_id: qwen3.6-plus
@@ -210,3 +189,6 @@ models:
 status: active
 weight: 1
 submitted_at: 2026-05-12
+verified: false
+byok_only: false
+auth_scheme: x-api-key

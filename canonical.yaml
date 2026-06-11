@@ -42,15 +42,6 @@ models:
       - text
     max_input_tokens: 256000
     max_output_tokens: 16384
-  - id: qwen/qwen3.6-35b-a3b
-    name: "Qwen: Qwen3.6 35B A3B"
-    input_modalities:
-      - text
-      - image
-    output_modalities:
-      - text
-    max_input_tokens: 262144
-    max_output_tokens: 262144
   - id: deepseek/deepseek-v4-flash
     name: "DeepSeek: DeepSeek V4 Flash"
     input_modalities:
@@ -92,23 +83,6 @@ models:
       - text
     max_input_tokens: 202752
     max_output_tokens: 65535
-  - id: qwen/qwen3.6-27b
-    name: "Qwen: Qwen3.6 27B"
-    input_modalities:
-      - text
-    output_modalities:
-      - text
-    max_input_tokens: 32768
-    max_output_tokens: 8192
-  - id: qwen/qwen3.5-397b-a17b
-    name: "Qwen: Qwen3.5 397B A17B"
-    input_modalities:
-      - text
-      - image
-    output_modalities:
-      - text
-    max_input_tokens: 262144
-    max_output_tokens: 65536
   - id: xiaomi/mimo-v2-flash
     name: "Xiaomi: MiMo V2 Flash"
     input_modalities:
@@ -198,15 +172,6 @@ models:
       - text
     max_input_tokens: 131072
     max_output_tokens: 4096
-  - id: x-ai/grok-4-fast
-    name: "xAI: Grok 4 Fast"
-    input_modalities:
-      - text
-      - image
-    output_modalities:
-      - text
-    max_input_tokens: 131072
-    max_output_tokens: 4096
   - id: x-ai/grok-4.20
     name: "xAI: Grok 4.20"
     input_modalities:
@@ -216,36 +181,6 @@ models:
       - text
     max_input_tokens: 131072
     max_output_tokens: 4096
-  - id: google/gemma-4-31b-it
-    name: "Google: Gemma 4 31B"
-    description: Gemma 4 31B with built-in thinking mode, image understanding, native function calling,
-      multilingual support.
-    input_modalities:
-      - text
-      - image
-    output_modalities:
-      - text
-    max_input_tokens: 262144
-    max_output_tokens: 8192
-  - id: openai/gpt-oss-120b
-    name: "OpenAI: GPT-OSS 120B"
-    description: OpenAI open-weight 117B MoE (5.1B active) with configurable reasoning effort,
-      chain-of-thought access, and built-in function calling / browsing / code execution.
-    input_modalities:
-      - text
-    output_modalities:
-      - text
-    max_input_tokens: 131072
-    max_output_tokens: 16384
-  - id: qwen/qwen3.5-plus
-    name: "Qwen: Qwen3.5 Plus"
-    description: Alibaba Qwen3.5 Plus — Alibaba's general-purpose proprietary tier in the Qwen3.5 family.
-    input_modalities:
-      - text
-    output_modalities:
-      - text
-    max_input_tokens: 131072
-    max_output_tokens: 8192
   - id: qwen/qwen3.6-plus
     name: "Qwen: Qwen3.6 Plus"
     description: Alibaba Qwen3.6 Plus — Alibaba's general-purpose proprietary tier in the Qwen3.6 family.
@@ -337,43 +272,6 @@ models:
       - text
     max_input_tokens: 400000
     max_output_tokens: 128000
-  - id: openai/gpt-5
-    name: "OpenAI: GPT-5"
-    input_modalities:
-      - text
-      - image
-    output_modalities:
-      - text
-    max_input_tokens: 400000
-    max_output_tokens: 128000
-  - id: openai/gpt-5-mini
-    name: "OpenAI: GPT-5 Mini"
-    input_modalities:
-      - text
-      - image
-    output_modalities:
-      - text
-    max_input_tokens: 400000
-    max_output_tokens: 128000
-  - id: openai/gpt-5-codex
-    name: "OpenAI: GPT-5 Codex"
-    input_modalities:
-      - text
-      - image
-    output_modalities:
-      - text
-    max_input_tokens: 400000
-    max_output_tokens: 128000
-  - id: openai/o3
-    name: "OpenAI: o3"
-    description: OpenAI o3 — reasoning-tuned model in the o-series.
-    input_modalities:
-      - text
-      - image
-    output_modalities:
-      - text
-    max_input_tokens: 200000
-    max_output_tokens: 100000
   - id: anthropic/claude-opus-4.5
     name: "Anthropic: Claude Opus 4.5"
     input_modalities:
@@ -385,33 +283,6 @@ models:
     max_output_tokens: 64000
   - id: anthropic/claude-sonnet-4.5
     name: "Anthropic: Claude Sonnet 4.5"
-    input_modalities:
-      - text
-      - image
-    output_modalities:
-      - text
-    max_input_tokens: 200000
-    max_output_tokens: 64000
-  - id: anthropic/claude-opus-4.1
-    name: "Anthropic: Claude Opus 4.1"
-    input_modalities:
-      - text
-      - image
-    output_modalities:
-      - text
-    max_input_tokens: 200000
-    max_output_tokens: 32000
-  - id: anthropic/claude-opus-4
-    name: "Anthropic: Claude Opus 4"
-    input_modalities:
-      - text
-      - image
-    output_modalities:
-      - text
-    max_input_tokens: 200000
-    max_output_tokens: 32000
-  - id: anthropic/claude-sonnet-4
-    name: "Anthropic: Claude Sonnet 4"
     input_modalities:
       - text
       - image
@@ -468,41 +339,6 @@ models:
       - text
     max_input_tokens: 1000000
     max_output_tokens: 30000
-  - id: moonshotai/kimi-k2-thinking
-    name: "Kimi: K2 Thinking"
-    description: Moonshot AI Kimi K2 Thinking — reasoning-tuned K2 tier.
-    input_modalities:
-      - text
-    output_modalities:
-      - text
-    max_input_tokens: 262144
-    max_output_tokens: 262144
-  - id: z-ai/glm-5-turbo
-    name: "Zhipu: GLM-5 Turbo"
-    input_modalities:
-      - text
-    output_modalities:
-      - text
-    max_input_tokens: 200000
-    max_output_tokens: 131072
-  - id: z-ai/glm-5v-turbo
-    name: "Zhipu: GLM-5V Turbo"
-    description: Zhipu GLM-5V Turbo — multimodal GLM-5 tier.
-    input_modalities:
-      - text
-      - image
-    output_modalities:
-      - text
-    max_input_tokens: 200000
-    max_output_tokens: 131072
-  - id: z-ai/glm-4.7
-    name: "Zhipu: GLM-4.7"
-    input_modalities:
-      - text
-    output_modalities:
-      - text
-    max_input_tokens: 204800
-    max_output_tokens: 131072
   - id: xiaomi/mimo-v2-pro
     name: "Xiaomi: MiMo V2 Pro"
     input_modalities:
@@ -530,50 +366,6 @@ models:
       - text
     max_input_tokens: 1000000
     max_output_tokens: 65536
-  - id: qwen/qwen3.6-max-preview
-    name: "Qwen: Qwen3.6 Max Preview"
-    input_modalities:
-      - text
-    output_modalities:
-      - text
-    max_input_tokens: 262144
-    max_output_tokens: 65536
-  - id: qwen/qwen3.5-122b-a10b
-    name: "Qwen: Qwen3.5 122B A10B"
-    input_modalities:
-      - text
-      - image
-      - audio
-    output_modalities:
-      - text
-    max_input_tokens: 262144
-    max_output_tokens: 65536
-  - id: qwen/qwen3.5-27b
-    name: "Qwen: Qwen3.5 27B"
-    input_modalities:
-      - text
-      - image
-      - audio
-    output_modalities:
-      - text
-    max_input_tokens: 262144
-    max_output_tokens: 65536
-  - id: qwen/qwen3-max
-    name: "Qwen: Qwen3 Max"
-    input_modalities:
-      - text
-    output_modalities:
-      - text
-    max_input_tokens: 262144
-    max_output_tokens: 65536
-  - id: minimax/minimax-m2.1
-    name: "MiniMax: M2.1"
-    input_modalities:
-      - text
-    output_modalities:
-      - text
-    max_input_tokens: 204800
-    max_output_tokens: 131072
   - id: anthropic/claude-opus-4.8
     name: "Anthropic: Claude Opus 4.8"
     input_modalities:
@@ -618,15 +410,6 @@ models:
       - text
     max_input_tokens: 262144
     max_output_tokens: 16384
-  - id: qwen/qwen3.5-35b-a3b
-    name: "Qwen: Qwen3.5-35B-A3B"
-    input_modalities:
-      - text
-      - image
-    output_modalities:
-      - text
-    max_input_tokens: 262144
-    max_output_tokens: 262144
   - id: anthropic/claude-fable-5
     name: "Anthropic: Claude Fable 5"
     input_modalities:
@@ -636,3 +419,12 @@ models:
       - text
     max_input_tokens: 1000000
     max_output_tokens: 128000
+  - id: qwen/qwen3.6-flash
+    name: "Qwen: Qwen3.6 Flash"
+    description: Alibaba Qwen3.6 Flash — Alibaba's fast, low-latency tier in the Qwen3.6 family.
+    input_modalities:
+      - text
+    output_modalities:
+      - text
+    max_input_tokens: 1000000
+    max_output_tokens: 65536

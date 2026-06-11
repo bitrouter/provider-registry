@@ -1,17 +1,9 @@
 name: moonshotai
-# First-party provider — bitrouter-cloud holds no platform key for
-# this entry. Routable only via the caller's own Moonshot (Kimi) key
-# (`POST /v1/byok/keys` on the cloud). See
-# bitrouter/bitrouter-cloud#318.
-byok_only: true
-default_api_base: https://api.moonshot.ai/v1
 api_protocol:
   - "*": openai
 rate_limits:
   - "*":
       requests_per_minute: 60
-# Catalog source: https://models.dev/api.json (provider key `moonshotai`, api=https://api.moonshot.ai/v1).
-# Pricing is per 1M tokens.
 models:
   - id: moonshotai/kimi-k2.6
     provider_model_id: kimi-k2.6
@@ -37,18 +29,10 @@ models:
       - reasoning
       - structured_outputs
       - tools
-  - id: moonshotai/kimi-k2-thinking
-    provider_model_id: kimi-k2-thinking
-    pricing:
-      input_tokens:
-        no_cache: 0.6
-        cache_read: 0.15
-      output_tokens:
-        text: 2.5
-    capabilities:
-      - reasoning
-      - tools
 status: active
 weight: 1
 submitted_at: 2026-05-25
 verified: true
+byok_only: true
+default_api_base: https://api.moonshot.ai/v1
+auth_scheme: x-api-key

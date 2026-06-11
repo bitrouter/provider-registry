@@ -1,17 +1,9 @@
 name: zai
-# First-party provider — bitrouter-cloud holds no platform key for
-# this entry. Routable only via the caller's own Z.AI / Zhipu key
-# (`POST /v1/byok/keys` on the cloud). See
-# bitrouter/bitrouter-cloud#318.
-byok_only: true
-default_api_base: https://api.z.ai/api/paas/v4
 api_protocol:
   - "*": openai
 rate_limits:
   - "*":
       requests_per_minute: 60
-# Catalog source: https://models.dev/api.json (provider key `zai`, api=https://api.z.ai/api/paas/v4).
-# Pricing is per 1M tokens.
 models:
   - id: z-ai/glm-5.1
     provider_model_id: glm-5.1
@@ -35,40 +27,10 @@ models:
     capabilities:
       - reasoning
       - tools
-  - id: z-ai/glm-5-turbo
-    provider_model_id: glm-5-turbo
-    pricing:
-      input_tokens:
-        no_cache: 1.2
-        cache_read: 0.24
-      output_tokens:
-        text: 4
-    capabilities:
-      - reasoning
-      - tools
-  - id: z-ai/glm-5v-turbo
-    provider_model_id: glm-5v-turbo
-    pricing:
-      input_tokens:
-        no_cache: 1.2
-        cache_read: 0.24
-      output_tokens:
-        text: 4
-    capabilities:
-      - reasoning
-      - tools
-  - id: z-ai/glm-4.7
-    provider_model_id: glm-4.7
-    pricing:
-      input_tokens:
-        no_cache: 0.6
-        cache_read: 0.11
-      output_tokens:
-        text: 2.2
-    capabilities:
-      - reasoning
-      - tools
 status: active
 weight: 1
 submitted_at: 2026-05-25
 verified: true
+byok_only: true
+default_api_base: https://api.z.ai/api/paas/v4
+auth_scheme: x-api-key

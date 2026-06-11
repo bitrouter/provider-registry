@@ -5,17 +5,6 @@ rate_limits:
   - "*":
       requests_per_minute: 40
 models:
-  - id: qwen/qwen3.6-35b-a3b
-    provider_model_id: Qwen/Qwen3.6-35B-A3B
-    pricing:
-      input_tokens:
-        no_cache: 0.17
-      output_tokens:
-        text: 1.2
-    capabilities:
-      - reasoning
-      - structured_outputs
-      - tools
   - id: deepseek/deepseek-v4-flash
     provider_model_id: deepseek-ai/DeepSeek-V4-Flash
     pricing:
@@ -51,3 +40,6 @@ models:
 status: active
 weight: 1
 submitted_at: 2026-05-12
+verified: false
+byok_only: false
+auth_scheme: x-api-key

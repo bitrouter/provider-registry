@@ -1,17 +1,9 @@
 name: google
-# First-party provider — bitrouter-cloud holds no platform key for
-# this entry. Routable only via the caller's own Google AI Studio /
-# Gemini API key (`POST /v1/byok/keys` on the cloud). See
-# bitrouter/bitrouter-cloud#318.
-byok_only: true
-default_api_base: https://generativelanguage.googleapis.com/v1beta
 api_protocol:
   - "*": google
 rate_limits:
   - "*":
       requests_per_minute: 60
-# Catalog source: https://models.dev/api.json (provider key `google`); >200k tier on the Gemini 3 family is higher than the base price listed here.
-# Pricing is per 1M tokens.
 models:
   - id: google/gemini-3.1-pro-preview
     provider_model_id: gemini-3.1-pro-preview
@@ -65,16 +57,14 @@ models:
         cache_read: 0.125
       output_tokens:
         text: 10
+    capabilities:
+      - reasoning
+      - tools
     deprecation_date: 2026-08-03
-    capabilities:
-      - reasoning
-      - tools
-  - id: google/gemma-4-31b-it
-    provider_model_id: gemma-4-31b-it
-    capabilities:
-      - reasoning
-      - tools
 status: active
 weight: 1
 submitted_at: 2026-05-25
 verified: true
+byok_only: true
+default_api_base: https://generativelanguage.googleapis.com/v1beta
+auth_scheme: x-api-key
