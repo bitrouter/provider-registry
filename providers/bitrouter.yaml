@@ -27,6 +27,17 @@ models:
     capabilities:
       - reasoning
       - tools
+  - id: deepseek/deepseek-v4-flash
+    provider_model_id: deepseek-v4-flash
+    pricing:
+      input_tokens:
+        no_cache: 0.105
+        cache_read: 0.021
+      output_tokens:
+        text: 0.21
+    capabilities:
+      - reasoning
+      - tools
   - id: minimax/minimax-m2.5
     provider_model_id: MiniMax-M2.5
     pricing:
