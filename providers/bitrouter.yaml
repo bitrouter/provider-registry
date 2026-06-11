@@ -9,10 +9,10 @@ models:
     provider_model_id: deepseek-v3.2
     pricing:
       input_tokens:
-        no_cache: 0.28
-        cache_read: 0.14
+        no_cache: 0.21
+        cache_read: 0.105
       output_tokens:
-        text: 0.42
+        text: 0.315
     capabilities:
       - reasoning
       - tools
@@ -20,10 +20,10 @@ models:
     provider_model_id: deepseek-v4-pro
     pricing:
       input_tokens:
-        no_cache: 1.74
-        cache_read: 0.145
+        no_cache: 1.305
+        cache_read: 0.10875
       output_tokens:
-        text: 3.48
+        text: 2.61
     capabilities:
       - reasoning
       - tools
@@ -31,11 +31,11 @@ models:
     provider_model_id: MiniMax-M2.5
     pricing:
       input_tokens:
-        no_cache: 0.3
-        cache_read: 0.03
-        cache_write: 0.375
+        no_cache: 0.225
+        cache_read: 0.0225
+        cache_write: 0.28125
       output_tokens:
-        text: 1.2
+        text: 0.9
     capabilities:
       - reasoning
       - tools
@@ -43,11 +43,11 @@ models:
     provider_model_id: MiniMax-M2.7
     pricing:
       input_tokens:
-        no_cache: 0.3
-        cache_read: 0.06
-        cache_write: 0.375
+        no_cache: 0.225
+        cache_read: 0.045
+        cache_write: 0.28125
       output_tokens:
-        text: 1.2
+        text: 0.9
     capabilities:
       - reasoning
       - tools
@@ -55,10 +55,10 @@ models:
     provider_model_id: MiniMax-M3
     pricing:
       input_tokens:
-        no_cache: 0.6
-        cache_read: 0.12
+        no_cache: 0.45
+        cache_read: 0.09
       output_tokens:
-        text: 2.4
+        text: 1.8
     capabilities:
       - reasoning
       - tools
@@ -66,10 +66,10 @@ models:
     provider_model_id: kimi-k2.5
     pricing:
       input_tokens:
-        no_cache: 0.6
-        cache_read: 0.1
+        no_cache: 0.45
+        cache_read: 0.075
       output_tokens:
-        text: 3
+        text: 2.25
     capabilities:
       - reasoning
       - structured_outputs
@@ -78,10 +78,10 @@ models:
     provider_model_id: kimi-k2.6
     pricing:
       input_tokens:
-        no_cache: 0.95
-        cache_read: 0.16
+        no_cache: 0.7125
+        cache_read: 0.12
       output_tokens:
-        text: 4
+        text: 3
     capabilities:
       - reasoning
       - structured_outputs
@@ -90,35 +90,35 @@ models:
     provider_model_id: qwen3.6-plus
     pricing:
       input_tokens:
-        no_cache: 0.5
-        cache_read: 0.05
+        no_cache: 0.375
+        cache_read: 0.0375
       output_tokens:
-        text: 3
+        text: 2.25
   - id: qwen/qwen3.7-max
     provider_model_id: qwen3.7-max
     pricing:
       input_tokens:
-        no_cache: 2.5
-        cache_read: 0.5
+        no_cache: 1.875
+        cache_read: 0.375
       output_tokens:
-        text: 7.5
+        text: 5.625
   - id: qwen/qwen3.7-plus
     provider_model_id: qwen3.7-plus
     pricing:
       input_tokens:
-        no_cache: 0.5
-        cache_read: 0.05
-        cache_write: 0.625
+        no_cache: 0.375
+        cache_read: 0.0375
+        cache_write: 0.46875
       output_tokens:
-        text: 3
+        text: 2.25
   - id: stepfun/step-3.5-flash
     provider_model_id: step-3.5-flash
     pricing:
       input_tokens:
-        no_cache: 0.096
-        cache_read: 0.019
+        no_cache: 0.072
+        cache_read: 0.01425
       output_tokens:
-        text: 0.288
+        text: 0.216
     capabilities:
       - reasoning
       - tools
@@ -126,20 +126,20 @@ models:
     provider_model_id: step-3.7-flash
     pricing:
       input_tokens:
-        no_cache: 0.2
-        cache_read: 0.04
+        no_cache: 0.15
+        cache_read: 0.03
       output_tokens:
-        text: 1.15
+        text: 0.8625
     capabilities:
       - structured_outputs
   - id: xiaomi/mimo-v2-omni
     provider_model_id: mimo-v2-omni
     pricing:
       input_tokens:
-        no_cache: 0.4
-        cache_read: 0.08
+        no_cache: 0.3
+        cache_read: 0.06
       output_tokens:
-        text: 2
+        text: 1.5
     capabilities:
       - reasoning
       - tools
@@ -147,10 +147,10 @@ models:
     provider_model_id: mimo-v2-pro
     pricing:
       input_tokens:
-        no_cache: 1
-        cache_read: 0.2
+        no_cache: 0.75
+        cache_read: 0.15
       output_tokens:
-        text: 3
+        text: 2.25
     capabilities:
       - reasoning
       - tools
@@ -158,10 +158,10 @@ models:
     provider_model_id: mimo-v2.5
     pricing:
       input_tokens:
-        no_cache: 0.4
-        cache_read: 0.08
+        no_cache: 0.3
+        cache_read: 0.06
       output_tokens:
-        text: 2
+        text: 1.5
     capabilities:
       - reasoning
       - tools
@@ -169,10 +169,10 @@ models:
     provider_model_id: mimo-v2.5-pro
     pricing:
       input_tokens:
-        no_cache: 1
-        cache_read: 0.2
+        no_cache: 0.75
+        cache_read: 0.15
       output_tokens:
-        text: 3
+        text: 2.25
     capabilities:
       - reasoning
       - tools
@@ -180,10 +180,10 @@ models:
     provider_model_id: glm-5
     pricing:
       input_tokens:
-        no_cache: 1
-        cache_read: 0.2
+        no_cache: 0.75
+        cache_read: 0.15
       output_tokens:
-        text: 3.2
+        text: 2.4
     capabilities:
       - reasoning
       - tools
@@ -191,10 +191,10 @@ models:
     provider_model_id: glm-5.1
     pricing:
       input_tokens:
-        no_cache: 1.4
-        cache_read: 0.26
+        no_cache: 1.05
+        cache_read: 0.195
       output_tokens:
-        text: 4.4
+        text: 3.3
     capabilities:
       - reasoning
       - tools
@@ -202,10 +202,10 @@ models:
     provider_model_id: qwen3.6-flash
     pricing:
       input_tokens:
-        no_cache: 0.25
-        cache_read: 0.025
+        no_cache: 0.1875
+        cache_read: 0.01875
       output_tokens:
-        text: 1.5
+        text: 1.125
 status: active
 weight: 1
 submitted_at: 2026-06-11
