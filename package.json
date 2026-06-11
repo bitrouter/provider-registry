@@ -4,6 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "test": "bun test",
     "validate": "bun run scripts/validate.ts",
     "manage": "bun run scripts/manage.ts",
     "fetch-models": "bun run scripts/fetch-provider-models.ts",

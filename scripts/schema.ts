@@ -98,12 +98,86 @@ export const OutputTokenPricing = z
   })
   .strict();
 
-export const ModelPricing = z
+// A higher context-pricing bracket: a steeper per-token rate that applies
+// once the prompt crosses a context-length threshold. The selected bracket's
+// rates apply to the whole request (a step function, not graduated marginal
+// brackets), chosen by the request's total input-token count. Mirrors the
+// Rust consumer's `ContextTier`; kept in lock-step so a yaml the consumer
+// accepts also validates here.
+//
+// Upstreams that publish such tiers: Alibaba Qwen Model Studio
+// (https://help.aliyun.com/en/model-studio/models) and the Gemini API
+// (https://ai.google.dev/gemini-api/docs/pricing).
+export const ContextTier = z
   .object({
+    // Exclusive lower bound on total input tokens. A request whose input size
+    // is strictly greater than this enters the bracket; a request exactly at
+    // the bound stays in the lower bracket (a base bracket documented as
+    // "≤ 128k" is written as a tier with `above_input_tokens: 128000`).
+    above_input_tokens: z.number().int().positive(),
     input_tokens: InputTokenPricing.optional(),
     output_tokens: OutputTokenPricing.optional(),
   })
   .strict();
+export type ContextTier = z.infer<typeof ContextTier>;
+
+export const ModelPricing = z
+  .object({
+    input_tokens: InputTokenPricing.optional(),
+    output_tokens: OutputTokenPricing.optional(),
+    // Optional higher context brackets. Empty/omitted ⇒ flat pricing. Kept in
+    // lock-step with the Rust consumer's `ModelPricing.context_tiers` so a
+    // yaml the consumer accepts also validates here. The consumer's
+    // per-request bracket pick is order-independent, but the validator
+    // additionally enforces the invariants below so malformed pricing is
+    // caught here first.
+    context_tiers: z.array(ContextTier).optional(),
+  })
+  .strict()
+  .superRefine((data, ctx) => {
+    const tiers = data.context_tiers;
+    if (!tiers || tiers.length === 0) return;
+
+    // A tiered model must declare a complete base bracket — it is the
+    // fallback for requests at or below the lowest threshold.
+    if (
+      data.input_tokens?.no_cache === undefined ||
+      data.output_tokens?.text === undefined
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["context_tiers"],
+        message:
+          "context_tiers requires a complete base bracket (input_tokens.no_cache and output_tokens.text)",
+      });
+    }
+
+    let prev: number | undefined;
+    tiers.forEach((tier, i) => {
+      // Each bracket must be billable on its own.
+      if (
+        tier.input_tokens?.no_cache === undefined ||
+        tier.output_tokens?.text === undefined
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["context_tiers", i],
+          message:
+            "each context tier must set input_tokens.no_cache and output_tokens.text",
+        });
+      }
+      // Thresholds strictly ascending (implies unique) so the ladder reads
+      // unambiguously and the consumer's bracket pick is deterministic.
+      if (prev !== undefined && tier.above_input_tokens <= prev) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["context_tiers", i, "above_input_tokens"],
+          message: `above_input_tokens must strictly increase (got ${tier.above_input_tokens} after ${prev})`,
+        });
+      }
+      prev = tier.above_input_tokens;
+    });
+  });
 export type ModelPricing = z.infer<typeof ModelPricing>;
 
 // ── Canonical model file ────────────────────────────────────────────────
