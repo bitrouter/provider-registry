@@ -20,6 +20,15 @@
 //   A capability is "honoured" iff the reply is PURE JSON conforming to the
 //   probe schema. Prose / markdown-fenced JSON ⇒ not honoured.
 //
+//   image_input (vision): a real PNG carrying a sentinel token is attached
+//     (openai `image_url`, anthropic `image` block, google `inlineData`) and the
+//     model must transcribe the token back — honoured iff it does, which proves
+//     the channel actually consumed the image instead of dropping it.
+//   image_output (generation): an image output modality is requested (google
+//     `generationConfig.responseModalities:[IMAGE]`) and the reply must carry an
+//     inline image part with non-empty bytes. Chat Completions / Messages have no
+//     image-output wire form, so only the google transport is probed.
+//
 // Credentials come from environment variables, using the conventional
 // per-provider scheme:
 //   {PROVIDER_NAME_UPPER}_API_KEY    (e.g. OPENAI_API_KEY)
@@ -29,7 +38,8 @@
 //   OPENAI_API_KEY=... OPENAI_API_BASE=https://api.openai.com/v1 \
 //     bun run scripts/verify-capabilities.ts openai [capability]
 //
-// `capability` defaults to `structured_outputs`; `tools` is also probe-implemented.
+// `capability` defaults to `structured_outputs`. Probe-implemented today:
+// `structured_outputs`, `tools`, `image_input`, `image_output`.
 // Exit code is non-zero iff a DECLARED capability is not honoured (a CI gate);
 // undeclared-but-supported rows are reported as suggestions, not failures.
 
@@ -41,6 +51,8 @@ import {
   type ProviderFile,
   type ProviderModel,
 } from "./schema";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 const PROBE_PROMPT =
   "What is the weather like in London right now? Make a reasonable guess for the values.";
@@ -314,6 +326,172 @@ async function probeTools(
   }
 }
 
+// ── Modality probes ──────────────────────────────────────────────────────
+// Official multimodal docs per protocol:
+//   image_input  openai    <https://platform.openai.com/docs/guides/vision>
+//                anthropic <https://platform.claude.com/docs/en/build-with-claude/vision>
+//                google    <https://ai.google.dev/gemini-api/docs/image-understanding>
+//   image_output google    <https://ai.google.dev/gemini-api/docs/image-generation>
+
+// A PNG that renders IMAGE_SENTINEL as black text on white. The sentinel is an
+// unguessable token, so a model can only echo it back if it truly read the
+// image. Regenerate the fixture with:
+//   magick -size 480x160 xc:white -gravity center -pointsize 72 -fill black \
+//     -annotate 0 'VX7K2Q' scripts/fixtures/probe-image-text.png
+const IMAGE_SENTINEL = "VX7K2Q";
+const IMAGE_FIXTURE = join(import.meta.dir, "fixtures", "probe-image-text.png");
+const IMAGE_INPUT_PROMPT =
+  "Transcribe the exact characters shown in this image. Reply with only those characters.";
+const IMAGE_OUTPUT_PROMPT =
+  "Generate a simple image: a solid red circle centered on a white background.";
+
+function imageFixtureB64(): string {
+  return readFileSync(IMAGE_FIXTURE).toString("base64");
+}
+
+// Sentinel match is tolerant of case and incidental punctuation/spacing.
+function hasSentinel(text: string): boolean {
+  return text.toUpperCase().replace(/[^A-Z0-9]/g, "").includes(IMAGE_SENTINEL);
+}
+
+// True iff any response part is an inline image with non-empty bytes (tolerates
+// camelCase `inlineData` and snake_case `inline_data`).
+function hasInlineImage(parts: Array<Record<string, unknown>>): boolean {
+  return parts.some((p) => {
+    const inline = (p.inlineData ?? p.inline_data) as
+      | { mimeType?: string; mime_type?: string; data?: string }
+      | undefined;
+    const mt = inline?.mimeType ?? inline?.mime_type;
+    return (
+      typeof mt === "string" &&
+      mt.startsWith("image/") &&
+      typeof inline?.data === "string" &&
+      inline.data.length > 0
+    );
+  });
+}
+
+// Probe vision: attach the sentinel PNG and require the model to read it back.
+async function probeImageInput(
+  protocol: ApiProtocol,
+  base: string,
+  key: string,
+  pmid: string,
+  authScheme: AuthScheme,
+): Promise<CapResult> {
+  const root = base.replace(/\/$/, "");
+  const b64 = imageFixtureB64();
+  try {
+    if (protocol === "openai") {
+      const { status, text, json } = await postJson(
+        `${root}/chat/completions`,
+        { Authorization: `Bearer ${key}` },
+        {
+          model: pmid,
+          max_completion_tokens: PROBE_MAX_TOKENS,
+          messages: [
+            {
+              role: "user",
+              content: [
+                { type: "text", text: IMAGE_INPUT_PROMPT },
+                { type: "image_url", image_url: { url: `data:image/png;base64,${b64}` } },
+              ],
+            },
+          ],
+        },
+      );
+      if (status < 200 || status >= 300) return { honored: false, status, detail: errOf(json, text) };
+      const choices = json.choices as Array<{ message?: { content?: unknown } }> | undefined;
+      const content = choices?.[0]?.message?.content;
+      return { honored: typeof content === "string" && hasSentinel(content), status, detail: "" };
+    }
+
+    if (protocol === "anthropic") {
+      const authHeader: Record<string, string> =
+        authScheme === "bearer" ? { Authorization: `Bearer ${key}` } : { "x-api-key": key };
+      const { status, text, json } = await postJson(
+        `${root}/messages`,
+        { ...authHeader, "anthropic-version": "2023-06-01" },
+        {
+          model: pmid,
+          max_tokens: PROBE_MAX_TOKENS,
+          messages: [
+            {
+              role: "user",
+              content: [
+                { type: "image", source: { type: "base64", media_type: "image/png", data: b64 } },
+                { type: "text", text: IMAGE_INPUT_PROMPT },
+              ],
+            },
+          ],
+        },
+      );
+      if (status < 200 || status >= 300) return { honored: false, status, detail: errOf(json, text) };
+      const blocks = (json.content as Array<{ type: string; text?: string }> | undefined) ?? [];
+      const content = blocks.filter((b) => b.type === "text").map((b) => b.text ?? "").join("");
+      return { honored: hasSentinel(content), status, detail: "" };
+    }
+
+    if (protocol === "google") {
+      const { status, text, json } = await postJson(
+        `${root}/models/${pmid}:generateContent`,
+        { "x-goog-api-key": key },
+        {
+          contents: [
+            {
+              role: "user",
+              parts: [
+                { inlineData: { mimeType: "image/png", data: b64 } },
+                { text: IMAGE_INPUT_PROMPT },
+              ],
+            },
+          ],
+        },
+      );
+      if (status < 200 || status >= 300) return { honored: false, status, detail: errOf(json, text) };
+      const cand = (json.candidates as Array<{ content?: { parts?: Array<{ text?: string }> } }> | undefined)?.[0];
+      const content = (cand?.content?.parts ?? []).map((p) => p.text ?? "").join("");
+      return { honored: hasSentinel(content), status, detail: "" };
+    }
+
+    return { honored: false, status: 0, detail: `unsupported protocol '${protocol}'` };
+  } catch (err) {
+    return { honored: false, status: 0, detail: `network: ${(err as Error).message}` };
+  }
+}
+
+// Probe image generation: request an image modality and require an inline image
+// in the reply. Only the google transport carries image output; Chat Completions
+// (OpenAI uses a separate Images/Responses API) and Messages have no wire form.
+async function probeImageOutput(
+  protocol: ApiProtocol,
+  base: string,
+  key: string,
+  pmid: string,
+  _authScheme: AuthScheme,
+): Promise<CapResult> {
+  const root = base.replace(/\/$/, "");
+  try {
+    if (protocol === "google") {
+      const { status, text, json } = await postJson(
+        `${root}/models/${pmid}:generateContent`,
+        { "x-goog-api-key": key },
+        {
+          contents: [{ role: "user", parts: [{ text: IMAGE_OUTPUT_PROMPT }] }],
+          generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
+        },
+      );
+      if (status < 200 || status >= 300) return { honored: false, status, detail: errOf(json, text) };
+      const cand = (json.candidates as Array<{ content?: { parts?: Array<Record<string, unknown>> } }> | undefined)?.[0];
+      const parts = cand?.content?.parts ?? [];
+      return { honored: hasInlineImage(parts), status, detail: "" };
+    }
+    return { honored: false, status: 0, detail: `image_output has no wire form in '${protocol}' transport` };
+  } catch (err) {
+    return { honored: false, status: 0, detail: `network: ${(err as Error).message}` };
+  }
+}
+
 // Registry of capability → probe. Add new entries as capabilities land.
 const PROBES: Partial<
   Record<
@@ -323,6 +501,8 @@ const PROBES: Partial<
 > = {
   structured_outputs: probeStructuredOutputs,
   tools: probeTools,
+  image_input: probeImageInput,
+  image_output: probeImageOutput,
 };
 
 async function main(): Promise<void> {

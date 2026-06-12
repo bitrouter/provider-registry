@@ -36,12 +36,27 @@ export type AuthScheme = z.infer<typeof AuthScheme>;
 // `Capability` enum; kept in lock-step with the Rust consumer so a yaml the
 // consumer accepts also validates here. A declared capability must be confirmed
 // against the live provider by `scripts/verify-capabilities.ts`.
+//
+// The `*_input` / `*_output` modality capabilities mirror the SDK's multimodal
+// support (LanguageModelV3 parity): the SDK derives the capabilities a request
+// needs from its file parts (`image_input` for an `image/*` part, `audio_input`,
+// `video_input`, else `file_input`) and its requested output modalities
+// (`image_output`, `audio_output`), then routes only to providers advertising
+// them. Like the other capabilities these are per-channel, not per-model: a
+// reseller proxy can strip image parts or refuse an image-output request even
+// when the underlying model is multimodal, so they too are verified live.
 export const Capability = z.enum([
   "structured_outputs",
   "tools",
   "reasoning",
   "web_search",
   "logprobs",
+  "image_input",
+  "audio_input",
+  "video_input",
+  "file_input",
+  "image_output",
+  "audio_output",
 ]);
 export type Capability = z.infer<typeof Capability>;
 
