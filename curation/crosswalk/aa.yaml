@@ -110,3 +110,35 @@ entries:
     slug: claude-fable-5
     canonical: anthropic/claude-fable-5
     by: automation
+  0e66bae9-41f1-42fc-9276-ce8cb6f72919:
+    slug: qwen3-5-397b-a17b
+    canonical: qwen/qwen3.5-397b-a17b
+    by: automation
+  149096f3-57b7-4413-80c2-a2c010a2995a:
+    slug: glm-5-turbo
+    canonical: z-ai/glm-5-turbo
+    by: automation
+  5d11e7a1-4f70-4e5a-9364-e193761d6757:
+    slug: gpt-5-codex
+    canonical: openai/gpt-5-codex
+    by: automation
+  8c29d66d-bf98-4ea3-8572-5409353ecc66:
+    slug: qwen3-6-27b
+    canonical: qwen/qwen3.6-27b
+    by: automation
+  5e965af0-ca5c-4f47-9ba9-06000508b84a:
+    slug: gpt-5-medium
+    canonical: openai/gpt-5
+    by: automation
+  8665ca00-c687-44c7-875c-22618cb31c4f:
+    slug: qwen3-6-35b-a3b
+    canonical: qwen/qwen3.6-35b-a3b
+    by: automation
+  6fc35842-0165-44cf-8570-c484a92b3d8c:
+    slug: glm-4-7
+    canonical: z-ai/glm-4.7
+    by: automation
+  169e47f5-3d4d-4ad4-8f8b-ab46f0c73f67:
+    slug: qwen3-5-27b
+    canonical: qwen/qwen3.5-27b
+    by: automation
