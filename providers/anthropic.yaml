@@ -57,6 +57,7 @@ models:
       - reasoning
       - structured_outputs
       - tools
+      - image_input
   - id: anthropic/claude-opus-4.5
     provider_model_id: claude-opus-4-5
     pricing:
