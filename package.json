@@ -6,6 +6,7 @@
   "scripts": {
     "test": "bun test",
     "validate": "bun run scripts/validate.ts",
+    "build-registry-json": "bun run scripts/build-registry-json.ts",
     "manage": "bun run scripts/manage.ts",
     "fetch-models": "bun run scripts/fetch-provider-models.ts",
     "check-new-models": "bun run scripts/check-new-models.ts",

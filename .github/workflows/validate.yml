@@ -22,5 +22,8 @@ jobs:
       - name: bun run validate
         run: bun run validate
 
+      - name: registry.json in sync with YAML source
+        run: bun test
+
       - name: bun tsc --noEmit (sanity check scripts compile)
         run: bunx tsc --noEmit
