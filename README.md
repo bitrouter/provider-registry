@@ -12,9 +12,11 @@ held server-side in `bitrouter-cloud`.
 canonical.yaml              # the shared model vocabulary
 providers/
   <name>.yaml               # one file per provider (filename == name)
+registry.json               # GENERATED — compiled artifact the cloud fetches (never hand-edit)
 scripts/
   schema.ts                 # shared Zod schemas + IO helpers
   validate.ts               # `bun run validate`
+  build-registry-json.ts    # `bun run build-registry-json` → registry.json
   manage.ts                 # `bun run manage <subcommand>`
 .github/workflows/validate.yml
 ```
@@ -29,12 +31,16 @@ scripts/
 - provider names are unique;
 - any `status: active` provider declares at least one model.
 
-The same script runs in CI on every push and pull request. To run
-locally:
+The same script runs in CI on every push and pull request, alongside
+`bun test`, which regenerates `registry.json` and fails if it drifts from
+the YAML (see [How `bitrouter-cloud` consumes this](#how-bitrouter-cloud-consumes-this)).
+To run locally:
 
 ```bash
 bun install
 bun run validate
+bun run build-registry-json   # regenerate the artifact after editing any YAML
+bun test                      # golden-in-sync check
 ```
 
 ## Management
@@ -77,14 +83,33 @@ required values cause the script to exit non-zero rather than hang.
 
 ## How `bitrouter-cloud` consumes this
 
-`bitrouter-cloud` reads the registry from a filesystem path
-(`ROUTER_REGISTRY_PATH`, default `/opt/provider-registry`). The
-intended deployment workflow is:
+`bitrouter-cloud` fetches the **compiled `registry.json`** artifact at runtime
+from this repo's raw `main` URL
+(`https://raw.githubusercontent.com/bitrouter/provider-registry/main/registry.json`)
+and hot-swaps its in-memory registry on a fixed poll interval — so a merge here
+reaches the running service within one interval, **no redeploy**. The fetch is a
+conditional GET (ETag), validate-before-swap, and keep-last-good on any error.
 
-1. Provider opens a PR here → CI runs `bun run validate`.
-2. A maintainer reviews and merges.
-3. `bitrouter-cloud`'s deployment pipeline updates its submodule
-   reference (or re-syncs the directory) and rolls out a new image.
+`registry.json` is a **generated artifact, never hand-edited**: the two-layer
+registry (`{ schema_version, canonical[], providers[] }`) compiled from the YAML
+by `bun run build-registry-json`. CI guards it — editing any YAML without
+rebuilding fails the `bun test` golden-in-sync check. The workflow:
+
+1. Provider opens a PR editing `canonical.yaml` / `providers/*.yaml`.
+2. Author runs `bun run build-registry-json` and commits the updated
+   `registry.json` (CI's `bun test` enforces this).
+3. CI runs `bun run validate` + `bun test`; a maintainer reviews and merges.
+4. The cloud picks up the new `registry.json` on its next poll — no deploy.
+
+A self-hosted cloud can still read the YAML directory from a filesystem path via
+`ROUTER_REGISTRY_PATH`; that remains the bootstrap / offline fallback used when
+no fetch URL is configured.
+
+**`schema_version` lock-step.** `registry.json`'s `schema_version` (currently
+`1`) must match the cloud's `REGISTRY_SCHEMA_VERSION`. Bump it only on a breaking
+change to the artifact shape, and — mirroring the SDK release lock-step — ship a
+cloud that understands version *N* **before** publishing version *N* here; the
+cloud rejects an unrecognized version and keeps its last-good registry.
 
 Credentials for each provider live in `bitrouter-cloud`'s database
 (`provider_registry_keys` table) and are rotated through its admin API,
