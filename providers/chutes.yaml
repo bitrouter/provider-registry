@@ -88,5 +88,4 @@ byok_only: false
 auth_scheme: x-api-key
 community: true
 auto_sync:
-  feed: v1_models
-  url: https://llm.chutes.ai/v1
+  feed: models_dev
