@@ -11,6 +11,9 @@ export interface CatalogModel {
   id: string; // the provider's model id (i.e. a provider_model_id)
   name?: string;
   release_date?: string;
+  knowledge?: string; // knowledge cutoff date (YYYY-MM or YYYY-MM-DD)
+  open_weights?: boolean;
+  family?: string;
   cost?: { input?: number; output?: number; cache_read?: number; cache_write?: number };
   modalities?: { input?: string[]; output?: string[] };
   limit?: { context?: number; output?: number };
