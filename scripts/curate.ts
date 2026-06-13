@@ -60,8 +60,6 @@ const Policy = z.object({
     .default({ grace_days: 60 }),
   protected: z.array(z.string()).default([]),
   org_aliases: z.record(z.string(), z.string()).default({}),
-  // provider name → models.dev provider key, when they differ (e.g. stepfun)
-  modelsdev_keys: z.record(z.string(), z.string()).default({}),
   // safety cap: never onboard more than this many canonical models per run
   max_onboard_per_run: z.number().int().positive().default(8),
 });
@@ -404,15 +402,32 @@ async function cmdSuggest(opts: { all: boolean; pin: boolean }): Promise<void> {
   console.log(`\n# ${n} proposal(s).${opts.all ? "" : " --all = every org / below cutoff; --pin = freeze mechanically-resolved models."}`);
 }
 
-// ── apply command (verified-provider catalog sync) ──────────────────────
-// The mutating path, scoped to `verified` providers (public-repo safe). It uses
-// KEYLESS sources only: models.dev for each provider's catalog + pricing, and
-// OpenRouter (also keyless) for canonical-id authority + metadata. For an
-// AA-top-N model a verified provider actually serves (per models.dev), it adds
-// the canonical entry, caches the AA→canonical judgment in the crosswalk, and
-// attaches the model with models.dev pricing. Verified-provider models that
-// fell out of AA top-N (and aren't protected) get a staged deprecation_date.
-// Anonymous providers are never touched here.
+// ── apply command (auto_sync provider catalog sync) ─────────────────────
+// The mutating path, scoped to providers with `auto_sync` (public-repo safe).
+// It uses KEYLESS sources only: models.dev for each auto_sync=models_dev
+// provider's catalog + pricing, and OpenRouter (also keyless) for canonical-id
+// authority + metadata. For an AA-top-N model an auto_sync provider actually
+// serves (per models.dev), it adds the canonical entry, caches the AA→canonical
+// judgment in the crosswalk, and attaches the model with models.dev pricing.
+// Auto_sync providers whose models fell out of AA top-N (and aren't protected)
+// get a staged deprecation_date. Providers without auto_sync are never touched.
+
+// Returns {name, key}[] for providers whose auto_sync.feed === "models_dev".
+// key = auto_sync.key ?? name (models.dev may use a different slug, e.g. stepfun-ai).
+export function modelsDevProviders(
+  providers: Array<{ data: { name: string; auto_sync?: { feed: string; key?: string } } }>,
+): Array<{ name: string; key: string }> {
+  return providers
+    .filter((p) => p.data.auto_sync?.feed === "models_dev")
+    .map((p) => ({ name: p.data.name, key: p.data.auto_sync!.key ?? p.data.name }));
+}
+
+// TODO(v2-phase3-v1_models): providers with auto_sync.feed === "v1_models" should be
+// probed at auto_sync.url ?? data.default_api_base + "/models" (OpenAI-compatible
+// list endpoint). The response gives model ids + optional context/pricing metadata.
+// Fold in the logic from scripts/check-new-models.ts for that feed. Deferred —
+// the models_dev path above is the production path; v1_models providers are
+// synced manually for now.
 
 interface ORModel {
   id: string;
@@ -504,20 +519,23 @@ async function cmdApply(opts: { asOf: string; write: boolean; topN?: number }): 
     if (orCatalog.has(guess) && !canonIds.has(guess)) targets.push({ id: guess, uuid: g.bestModel.id, slug: g.bestModel.slug });
   }
 
-  // TODO(v2-phase3): replace with modelsDevProviders() selector driven off auto_sync.feed
-  const verified = providers.filter((p) => p.data.auto_sync?.feed === "models_dev");
-  // each verified provider's catalog from models.dev (keyless)
-  const modelsDevKey = (name: string) => policy.modelsdev_keys[name] ?? name;
+  // Select providers whose auto_sync.feed === "models_dev" (key = auto_sync.key ?? name).
+  // Providers with no auto_sync block (manual / source-of-truth) are skipped entirely.
+  const mdProviders = modelsDevProviders(providers);
+  // Keep ProviderFile data handy for org + servesModel lookups.
+  const providerDataByName = new Map(providers.map(({ data }) => [data.name, data]));
+
+  // Load each models_dev provider's catalog (keyless).
   const providerCatalog = new Map<string, CatalogModel[]>();
-  for (const { data } of verified) {
-    const key = modelsDevKey(data.name);
+  for (const { name, key } of mdProviders) {
     const models = catalog.get(key);
-    if (models) providerCatalog.set(data.name, [...models.values()]);
-    console.error(`  ${data.name} (models.dev:${key}, ${providerOrg(data)}): ${models ? `${models.size} models` : "no catalog — skipped"}`);
+    const data = providerDataByName.get(name)!;
+    if (models) providerCatalog.set(name, [...models.values()]);
+    console.error(`  ${name} (models.dev:${key}, ${providerOrg(data)}): ${models ? `${models.size} models` : "no catalog — skipped"}`);
   }
 
   const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
-  // the models.dev model a verified provider serves for canonical `id`, or null
+  // The models.dev model an auto_sync provider serves for canonical `id`, or null.
   const servesModel = (data: ProviderFile, providerName: string, id: string): CatalogModel | null => {
     if (providerOrg(data) !== id.split("/")[0]) return null;
     const needle = norm(id.split("/")[1]!);
@@ -533,10 +551,10 @@ async function cmdApply(opts: { asOf: string; write: boolean; topN?: number }): 
   let onboarded = 0;
   for (const t of targets) {
     if (onboarded >= policy.max_onboard_per_run) break;
-    const servers = verified
-      .map((p) => ({ name: p.data.name, model: servesModel(p.data, p.data.name, t.id) }))
+    const servers = mdProviders
+      .map((p) => ({ name: p.name, model: servesModel(providerDataByName.get(p.name)!, p.name, t.id) }))
       .filter((s): s is { name: string; model: CatalogModel } => s.model !== null);
-    if (servers.length === 0) continue; // only onboard models a verified provider actually serves
+    if (servers.length === 0) continue; // only onboard models an auto_sync provider actually serves
     canonicalAdds.push(canonicalFromOR(orCatalog.get(t.id)!));
     crosswalkAdds.push({ uuid: t.uuid, slug: t.slug, id: t.id });
     for (const s of servers) {
@@ -548,13 +566,14 @@ async function cmdApply(opts: { asOf: string; write: boolean; topN?: number }): 
     onboarded++;
   }
 
-  // deprecation staging for verified providers
+  // deprecation staging for auto_sync providers
   const deprecations: Array<{ provider: string; id: string }> = [];
-  for (const { data } of verified) {
+  for (const { name } of mdProviders) {
+    const data = providerDataByName.get(name)!;
     for (const m of data.models) {
       if (keptCanonical.has(m.id) || isProtected(m.id) || m.deprecation_date) continue;
       // only deprecate something the provider org owns and AA ranks out
-      deprecations.push({ provider: data.name, id: m.id });
+      deprecations.push({ provider: name, id: m.id });
     }
   }
 
@@ -563,7 +582,7 @@ async function cmdApply(opts: { asOf: string; write: boolean; topN?: number }): 
   const depIso = depDate.toISOString().slice(0, 10);
 
   // report
-  console.log(`\ncurate apply — as-of ${opts.asOf} — ${opts.write ? "WRITE" : "dry-run"} — verified providers only`);
+  console.log(`\ncurate apply — as-of ${opts.asOf} — ${opts.write ? "WRITE" : "dry-run"} — auto_sync providers only`);
   console.log(`onboard ${canonicalAdds.length} | attach ${[...attaches.values()].flat().length} | deprecate ${deprecations.length}`);
   for (const c of canonicalAdds) console.log(`  + canonical ${c.id}`);
   for (const [prov, ms] of attaches) for (const m of ms) console.log(`  + attach   ${prov} ← ${m.id} (${m.provider_model_id})`);
@@ -588,11 +607,11 @@ async function cmdApply(opts: { asOf: string; write: boolean; topN?: number }): 
   }
   const depByProvider = new Map<string, Set<string>>();
   for (const d of deprecations) depByProvider.set(d.provider, (depByProvider.get(d.provider) ?? new Set()).add(d.id));
-  for (const { data } of verified) {
-    const adds = attaches.get(data.name);
-    const deps = depByProvider.get(data.name);
+  for (const { name } of mdProviders) {
+    const adds = attaches.get(name);
+    const deps = depByProvider.get(name);
     if (!adds && !deps) continue;
-    const doc = parseDocument(await readFile(providerPath(data.name), "utf8"));
+    const doc = parseDocument(await readFile(providerPath(name), "utf8"));
     // Stage deprecations on the EXISTING model nodes first (they're parsed
     // YAMLMaps with .get/.set), guarding node types — then append new models as
     // proper nodes. Doing it in this order, and via createNode, avoids calling
@@ -605,7 +624,7 @@ async function cmdApply(opts: { asOf: string; write: boolean; topN?: number }): 
     }
     if (adds) for (const m of adds) doc.addIn(["models"], doc.createNode(m));
     ProviderFile.parse(doc.toJSON()); // validate before writing
-    await writeFile(providerPath(data.name), doc.toString());
+    await writeFile(providerPath(name), doc.toString());
   }
   console.log("\n✓ applied. Run `bun run validate` to confirm.");
 }
@@ -627,4 +646,5 @@ async function main(): Promise<void> {
   }
 }
 
-await main();
+// Only run when invoked directly (not when imported by tests or other scripts).
+if (import.meta.main) await main();
