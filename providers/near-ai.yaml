@@ -1,0 +1,139 @@
+# NEAR AI — confidential (TEE) inference, BYOK-only.
+#
+# Served through bitrouter's attested private-ai-gateway (Intel TDX + NVIDIA GPU
+# TEE), not directly at NEAR. `byok_only: true` means this provider is only
+# reachable with the caller's own NEAR key (held server-side in bitrouter-cloud,
+# never here). `default_api_base` is the gateway's /v1 base; bitrouter-cloud's
+# /v1/aci/* verification proxy reads this same value.
+#
+# `id` is the shared canonical id; `provider_model_id` is NEAR's raw model id
+# (the string sent upstream). Capabilities are provisional (mirrors tinfoil) and
+# should be confirmed by scripts/verify-capabilities.ts once the gateway is live.
+name: near-ai
+byok_only: true
+default_api_base: https://CHANGE-ME-near-gateway.internal/v1
+auth_scheme: bearer
+verified: false
+status: active
+weight: 1
+
+api_protocol:
+  - "*": openai
+
+rate_limits:
+  - "*":
+      requests_per_minute: 60
+
+models:
+  # ── Anthropic (confidential) ──────────────────────────────────────────
+  - id: anthropic/claude-haiku-4.5
+    provider_model_id: anthropic/claude-haiku-4-5
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: anthropic/claude-opus-4.6
+    provider_model_id: anthropic/claude-opus-4-6
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: anthropic/claude-opus-4.7
+    provider_model_id: anthropic/claude-opus-4-7
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: anthropic/claude-sonnet-4.5
+    provider_model_id: anthropic/claude-sonnet-4-5
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: anthropic/claude-sonnet-4.6
+    provider_model_id: anthropic/claude-sonnet-4-6
+    capabilities: [reasoning, structured_outputs, tools]
+  # ── DeepSeek ──────────────────────────────────────────────────────────
+  - id: deepseek/deepseek-v4-flash
+    provider_model_id: deepseek-ai/DeepSeek-V4-Flash
+    capabilities: [reasoning, structured_outputs, tools]
+  # ── Google ────────────────────────────────────────────────────────────
+  - id: google/gemini-2.5-flash
+    provider_model_id: google/gemini-2.5-flash
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: google/gemini-2.5-flash-lite
+    provider_model_id: google/gemini-2.5-flash-lite
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: google/gemini-2.5-pro
+    provider_model_id: google/gemini-2.5-pro
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: google/gemini-3.1-flash-lite
+    provider_model_id: google/gemini-3.1-flash-lite
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: google/gemini-3.5-flash
+    provider_model_id: google/gemini-3.5-flash
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: google/gemma-4-31b-it
+    provider_model_id: google/gemma-4-31B-it
+    capabilities: [structured_outputs, tools]
+  # ── Moonshot ──────────────────────────────────────────────────────────
+  - id: moonshotai/kimi-k2.6
+    provider_model_id: moonshotai/kimi-k2.6
+    capabilities: [reasoning, structured_outputs, tools]
+  # ── OpenAI ────────────────────────────────────────────────────────────
+  - id: openai/gpt-4.1
+    provider_model_id: openai/gpt-4.1
+    capabilities: [structured_outputs, tools]
+  - id: openai/gpt-4.1-mini
+    provider_model_id: openai/gpt-4.1-mini
+    capabilities: [structured_outputs, tools]
+  - id: openai/gpt-4.1-nano
+    provider_model_id: openai/gpt-4.1-nano
+    capabilities: [structured_outputs, tools]
+  - id: openai/gpt-5
+    provider_model_id: openai/gpt-5
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: openai/gpt-5.1
+    provider_model_id: openai/gpt-5.1
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: openai/gpt-5.2
+    provider_model_id: openai/gpt-5.2
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: openai/gpt-5.4
+    provider_model_id: openai/gpt-5.4
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: openai/gpt-5.4-mini
+    provider_model_id: openai/gpt-5.4-mini
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: openai/gpt-5.4-nano
+    provider_model_id: openai/gpt-5.4-nano
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: openai/gpt-5.5
+    provider_model_id: openai/gpt-5.5
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: openai/gpt-5-mini
+    provider_model_id: openai/gpt-5-mini
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: openai/gpt-5-nano
+    provider_model_id: openai/gpt-5-nano
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: openai/gpt-oss-120b
+    provider_model_id: openai/gpt-oss-120b
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: openai/o3
+    provider_model_id: openai/o3
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: openai/o3-mini
+    provider_model_id: openai/o3-mini
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: openai/o4-mini
+    provider_model_id: openai/o4-mini
+    capabilities: [reasoning, structured_outputs, tools]
+  # ── Qwen ──────────────────────────────────────────────────────────────
+  - id: qwen/qwen3.5-122b-a10b
+    provider_model_id: Qwen/Qwen3.5-122B-A10B
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: qwen/qwen3.6-27b-fp8
+    provider_model_id: Qwen/Qwen3.6-27B-FP8
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: qwen/qwen3.6-35b-a3b-fp8
+    provider_model_id: Qwen/Qwen3.6-35B-A3B-FP8
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: qwen/qwen3.7-max
+    provider_model_id: qwen/qwen3.7-max
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: qwen/qwen3-vl-30b-a3b-instruct
+    provider_model_id: Qwen/Qwen3-VL-30B-A3B-Instruct
+    capabilities: [structured_outputs, tools]
+  # ── Zhipu ─────────────────────────────────────────────────────────────
+  - id: z-ai/glm-5.1
+    provider_model_id: zai-org/GLM-5.1-FP8
+    capabilities: [reasoning, structured_outputs, tools]
