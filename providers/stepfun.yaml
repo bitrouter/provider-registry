@@ -39,4 +39,6 @@ models:
 status: active
 weight: 1
 submitted_at: 2026-06-01
-verified: true
+auto_sync:
+  feed: models_dev
+  key: stepfun-ai

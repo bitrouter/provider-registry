@@ -64,7 +64,8 @@ models:
 status: active
 weight: 1
 submitted_at: 2026-05-25
-verified: true
 byok_only: true
 default_api_base: https://generativelanguage.googleapis.com/v1beta
 auth_scheme: x-api-key
+auto_sync:
+  feed: models_dev

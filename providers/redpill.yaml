@@ -25,3 +25,4 @@ models:
       - tools
 status: active
 weight: 1
+community: true

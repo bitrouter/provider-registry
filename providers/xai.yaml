@@ -39,4 +39,5 @@ models:
 status: active
 weight: 1
 submitted_at: 2026-05-25
-verified: true
+auto_sync:
+  feed: models_dev
