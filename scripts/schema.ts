@@ -287,11 +287,11 @@ export const ProviderFile = z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/, "submitted_at must be ISO YYYY-MM-DD")
       .optional(),
-    // When `true`, the cloud's public `/v1/providers` response surfaces
-    // the provider `name` instead of the anonymized `p_xxxx` id. Default
-    // false so providers are anonymous to discovery clients unless
-    // explicitly opted in.
-    verified: z.boolean().optional().default(false),
+    // Marks an unaffiliated community reseller (vs a first-party / official
+    // upstream, which is the unmarked default). Surfaced publicly on the
+    // cloud's /v1/providers. Replaces the former `verified` flag — providers
+    // are no longer anonymized, so the real name is always public.
+    community: z.boolean().optional().default(false),
     // When `true`, this provider is only routable via the caller's BYOK
     // key — there is no platform-side credential. The cloud's routing
     // table pushes a placeholder target so the BYOK overlay has somewhere
