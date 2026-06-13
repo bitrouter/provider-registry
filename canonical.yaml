@@ -43,6 +43,14 @@ models:
       - text
     max_input_tokens: 128000
     max_output_tokens: 8192
+  - id: z-ai/glm-5.2
+    name: "Zhipu: GLM-5.2"
+    input_modalities:
+      - text
+    output_modalities:
+      - text
+    max_input_tokens: 1000000
+    max_output_tokens: 131072
   - id: deepseek/deepseek-v4-pro
     name: "DeepSeek: DeepSeek V4 Pro"
     input_modalities:
