@@ -16,6 +16,16 @@ test("community defaults false and verified is rejected", () => {
   expect(() => ProviderFile.parse({ ...base, verified: true })).toThrow();
 });
 
+test("canonical accepts descriptive v2 fields and rejects bad dates", () => {
+  const m = CanonicalModel.parse({
+    id: "anthropic/claude-sonnet-4.6",
+    release_date: "2026-02-19", knowledge_cutoff: "2025-08",
+    open_weights: false, family: "claude",
+  });
+  expect(m.release_date).toBe("2026-02-19");
+  expect(() => CanonicalModel.parse({ id: "a/b", release_date: "2026-2-9" })).toThrow();
+});
+
 test("auto_sync: feed enum + key/url feed-gating", () => {
   const p = (auto_sync: unknown) => ProviderFile.parse({ ...base, auto_sync });
   expect(p({ feed: "models_dev", key: "stepfun-ai" }).auto_sync?.feed).toBe("models_dev");
