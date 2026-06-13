@@ -16,6 +16,18 @@ test("community defaults false and verified is rejected", () => {
   expect(() => ProviderFile.parse({ ...base, verified: true })).toThrow();
 });
 
+test("auto_sync: feed enum + key/url feed-gating", () => {
+  const p = (auto_sync: unknown) => ProviderFile.parse({ ...base, auto_sync });
+  expect(p({ feed: "models_dev", key: "stepfun-ai" }).auto_sync?.feed).toBe("models_dev");
+  expect(p({ feed: "v1_models", url: "https://x.test/v1" }).auto_sync?.url).toBe("https://x.test/v1");
+  // omitted block is allowed (manual)
+  expect(ProviderFile.parse({ ...base }).auto_sync).toBeUndefined();
+  // key only valid for models_dev; url only valid for v1_models
+  expect(() => p({ feed: "v1_models", key: "x" })).toThrow();
+  expect(() => p({ feed: "models_dev", url: "https://x.test/v1" })).toThrow();
+  expect(() => p({ feed: "bogus" })).toThrow();
+});
+
 const pricingBase = {
   input_tokens: { no_cache: 1.3, cache_read: 0.13 },
   output_tokens: { text: 7.8 },

@@ -66,6 +66,36 @@ export const ProviderStatus = z.enum([
   "suspended",
   "withdrawn",
 ]);
+
+// The upstream catalog feed a provider's models are auto-synced from. We are the
+// source of truth; this only tells the sync bot where to read. Omit the whole
+// block for manual / source-of-truth providers.
+export const AutoSyncFeed = z.enum(["models_dev", "v1_models"]);
+export const AutoSyncWrite = z.enum(["models", "pricing"]);
+
+export const AutoSync = z
+  .object({
+    feed: AutoSyncFeed,
+    // models_dev only: their provider id when it differs from ours (default = our name).
+    key: z.string().min(1).optional(),
+    // v1_models only: catalog base when there's no default_api_base to reuse. HTTPS.
+    url: z
+      .string()
+      .url()
+      .refine((u) => u.startsWith("https://"), { message: "auto_sync.url must be HTTPS" })
+      .optional(),
+    // What the sync bot may write back. Defaults: [models, pricing] for models_dev,
+    // [models] for v1_models (resolved by the sync script, not here).
+    writes: z.array(AutoSyncWrite).optional(),
+  })
+  .strict()
+  .superRefine((d, ctx) => {
+    if (d.key !== undefined && d.feed !== "models_dev")
+      ctx.addIssue({ code: "custom", path: ["key"], message: "`key` is only valid when feed=models_dev" });
+    if (d.url !== undefined && d.feed !== "v1_models")
+      ctx.addIssue({ code: "custom", path: ["url"], message: "`url` is only valid when feed=v1_models" });
+  });
+export type AutoSync = z.infer<typeof AutoSync>;
 export type ProviderStatus = z.infer<typeof ProviderStatus>;
 
 export const InputModality = z.enum(["text", "image", "audio"]);
@@ -316,6 +346,10 @@ export const ProviderFile = z
     // (Anthropic's native default), matching the Rust consumer's serde
     // default. Ignored for OpenAI/Google providers.
     auth_scheme: AuthScheme.optional().default("x-api-key"),
+    // Optional upstream feed for catalog auto-sync — see `AutoSync`. Omit for
+    // manual / source-of-truth providers (the role `verified` played in gating
+    // a provider out of the curation pipeline).
+    auto_sync: AutoSync.optional(),
   })
   .strict()
   .superRefine((data, ctx) => {
