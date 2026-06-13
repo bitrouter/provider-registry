@@ -5,9 +5,18 @@
 // currently valid, not that malformed pricing is rejected.
 
 import { describe, expect, test } from "bun:test";
-import { ModelPricing } from "./schema";
+import { CanonicalModel, ModelPricing, ProviderFile } from "./schema";
 
-const base = {
+const base = { name: "p", status: "active", models: [] as unknown[] };
+
+test("community defaults false and verified is rejected", () => {
+  expect(ProviderFile.parse({ ...base }).community).toBe(false);
+  expect(ProviderFile.parse({ ...base, community: true }).community).toBe(true);
+  // `verified` is gone — strict() must reject it
+  expect(() => ProviderFile.parse({ ...base, verified: true })).toThrow();
+});
+
+const pricingBase = {
   input_tokens: { no_cache: 1.3, cache_read: 0.13 },
   output_tokens: { text: 7.8 },
 };
@@ -20,7 +29,7 @@ const tier = (above: number, noCache: number, text: number) => ({
 
 describe("ModelPricing without tiers", () => {
   test("flat pricing parses", () => {
-    expect(ModelPricing.safeParse(base).success).toBe(true);
+    expect(ModelPricing.safeParse(pricingBase).success).toBe(true);
   });
 
   test("empty pricing parses (unconfigured is allowed at schema level)", () => {
@@ -31,7 +40,7 @@ describe("ModelPricing without tiers", () => {
 describe("ModelPricing with context_tiers", () => {
   test("a single well-formed tier parses", () => {
     const r = ModelPricing.safeParse({
-      ...base,
+      ...pricingBase,
       context_tiers: [tier(128000, 2, 12)],
     });
     expect(r.success).toBe(true);
@@ -39,7 +48,7 @@ describe("ModelPricing with context_tiers", () => {
 
   test("multiple strictly-ascending tiers parse", () => {
     const r = ModelPricing.safeParse({
-      ...base,
+      ...pricingBase,
       context_tiers: [tier(128000, 2, 12), tier(256000, 3, 18)],
     });
     expect(r.success).toBe(true);
@@ -57,7 +66,7 @@ describe("ModelPricing with context_tiers", () => {
 
   test("a tier missing its own no_cache/text is rejected", () => {
     const r = ModelPricing.safeParse({
-      ...base,
+      ...pricingBase,
       context_tiers: [
         { above_input_tokens: 128000, output_tokens: { text: 12 } }, // no input no_cache
       ],
@@ -68,7 +77,7 @@ describe("ModelPricing with context_tiers", () => {
 
   test("non-ascending thresholds are rejected", () => {
     const r = ModelPricing.safeParse({
-      ...base,
+      ...pricingBase,
       context_tiers: [tier(256000, 3, 18), tier(128000, 2, 12)],
     });
     expect(r.success).toBe(false);
@@ -77,7 +86,7 @@ describe("ModelPricing with context_tiers", () => {
 
   test("duplicate thresholds are rejected", () => {
     const r = ModelPricing.safeParse({
-      ...base,
+      ...pricingBase,
       context_tiers: [tier(128000, 2, 12), tier(128000, 3, 18)],
     });
     expect(r.success).toBe(false);
@@ -95,7 +104,7 @@ describe("ModelPricing with context_tiers", () => {
 
   test("unknown keys in a tier are rejected (strict)", () => {
     const r = ModelPricing.safeParse({
-      ...base,
+      ...pricingBase,
       context_tiers: [{ ...tier(128000, 2, 12), bogus: 1 }],
     });
     expect(r.success).toBe(false);
