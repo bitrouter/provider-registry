@@ -247,6 +247,17 @@ export const CanonicalModel = z
     output_modalities: z.array(OutputModality).optional(),
     max_input_tokens: z.number().int().positive().optional(),
     max_output_tokens: z.number().int().positive().optional(),
+    // Descriptive metadata from models.dev (never routing gates).
+    release_date: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "release_date must be ISO YYYY-MM-DD")
+      .optional(),
+    knowledge_cutoff: z
+      .string()
+      .regex(/^\d{4}-\d{2}(-\d{2})?$/, "knowledge_cutoff must be ISO YYYY-MM or YYYY-MM-DD")
+      .optional(),
+    open_weights: z.boolean().optional(),
+    family: z.string().min(1).optional(),
   })
   .strict();
 export type CanonicalModel = z.infer<typeof CanonicalModel>;
