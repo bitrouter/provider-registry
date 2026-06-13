@@ -221,6 +221,21 @@ models:
     capabilities:
       - reasoning
       - tools
+  # GLM-5.2 (released 2026-06-13) has no standalone per-token price published yet
+  # (coding-plan-only on models.dev / z.ai). Priced at parity with GLM-5.1; revisit if
+  # z.ai later publishes a distinct GLM-5.2 API price.
+  - id: z-ai/glm-5.2
+    provider_model_id: glm-5.2
+    pricing:
+      input_tokens:
+        no_cache: 1.05
+        cache_read: 0.195
+      output_tokens:
+        text: 3.3
+    capabilities:
+      - reasoning
+      - structured_outputs
+      - tools
   - id: qwen/qwen3.6-flash
     provider_model_id: qwen3.6-flash
     pricing:
