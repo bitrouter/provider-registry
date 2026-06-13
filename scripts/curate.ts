@@ -504,7 +504,8 @@ async function cmdApply(opts: { asOf: string; write: boolean; topN?: number }): 
     if (orCatalog.has(guess) && !canonIds.has(guess)) targets.push({ id: guess, uuid: g.bestModel.id, slug: g.bestModel.slug });
   }
 
-  const verified = providers.filter((p) => p.data.verified);
+  // TODO(v2-phase3): replace with modelsDevProviders() selector driven off auto_sync.feed
+  const verified = providers.filter((p) => p.data.auto_sync?.feed === "models_dev");
   // each verified provider's catalog from models.dev (keyless)
   const modelsDevKey = (name: string) => policy.modelsdev_keys[name] ?? name;
   const providerCatalog = new Map<string, CatalogModel[]>();
