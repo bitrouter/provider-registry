@@ -117,10 +117,10 @@ describe("ModelPricing with context_tiers", () => {
 
   test("a zero or negative threshold is rejected", () => {
     expect(
-      ModelPricing.safeParse({ ...base, context_tiers: [tier(0, 2, 12)] }).success,
+      ModelPricing.safeParse({ ...pricingBase, context_tiers: [tier(0, 2, 12)] }).success,
     ).toBe(false);
     expect(
-      ModelPricing.safeParse({ ...base, context_tiers: [tier(-1, 2, 12)] }).success,
+      ModelPricing.safeParse({ ...pricingBase, context_tiers: [tier(-1, 2, 12)] }).success,
     ).toBe(false);
   });
 
@@ -130,5 +130,29 @@ describe("ModelPricing with context_tiers", () => {
       context_tiers: [{ ...tier(128000, 2, 12), bogus: 1 }],
     });
     expect(r.success).toBe(false);
+  });
+});
+
+describe("auto_sync writes field", () => {
+  const p = (auto_sync: unknown) => ProviderFile.parse({ ...base, auto_sync });
+
+  test("writes array is accepted and round-trips", () => {
+    const result = p({ feed: "models_dev", writes: ["models", "pricing"] });
+    expect(result.auto_sync?.writes).toEqual(["models", "pricing"]);
+  });
+
+  test("unknown write value is rejected", () => {
+    expect(() => p({ feed: "models_dev", writes: ["bogus"] })).toThrow();
+  });
+});
+
+describe("CanonicalModel additional edge cases", () => {
+  test("knowledge_cutoff accepts full YYYY-MM-DD date", () => {
+    const m = CanonicalModel.parse({ id: "a/b", knowledge_cutoff: "2025-08-15" });
+    expect(m.knowledge_cutoff).toBe("2025-08-15");
+  });
+
+  test("family must be non-empty (empty string is rejected)", () => {
+    expect(() => CanonicalModel.parse({ id: "a/b", family: "" })).toThrow();
   });
 });
