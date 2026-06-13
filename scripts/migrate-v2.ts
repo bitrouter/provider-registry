@@ -8,13 +8,21 @@ import { PROVIDERS_DIR } from "./schema";
 
 type Feed = { feed: "models_dev" | "v1_models"; key?: string; url?: string };
 const COMMUNITY = new Set(["chutes", "ionet", "akashml", "redpill", "tinfoil", "worldrouter"]);
+// Use the models.dev feed for every provider models.dev catalogs (key = the
+// models.dev provider id when it differs from ours). Only providers models.dev
+// does NOT have — akashml/redpill/tinfoil/worldrouter and our own `bitrouter`
+// pool — stay manual (no auto_sync block). No `v1_models` feeds are needed today
+// (chutes + io-net are both on models.dev).
 const AUTO_SYNC: Record<string, Feed> = {
   anthropic: { feed: "models_dev" }, openai: { feed: "models_dev" }, google: { feed: "models_dev" },
   deepseek: { feed: "models_dev" }, alibaba: { feed: "models_dev" }, moonshotai: { feed: "models_dev" },
   zai: { feed: "models_dev" }, minimax: { feed: "models_dev" }, xai: { feed: "models_dev" },
   xiaomi: { feed: "models_dev" }, stepfun: { feed: "models_dev", key: "stepfun-ai" },
-  chutes: { feed: "v1_models", url: "https://llm.chutes.ai/v1" },
-  ionet: { feed: "v1_models", url: "https://api.intelligence.io.solutions/api/v1" },
+  chutes: { feed: "models_dev" }, ionet: { feed: "models_dev", key: "io-net" },
+  tencent: { feed: "models_dev", key: "tencent-tokenhub" },
+  "alibaba-coding-plan": { feed: "models_dev" },
+  "zai-coding-plan": { feed: "models_dev" },
+  "moonshotai-coding-plan": { feed: "models_dev", key: "kimi-for-coding" },
 };
 
 async function main() {

@@ -80,3 +80,6 @@ models:
 status: active
 weight: 1
 submitted_at: 2026-05-23
+auto_sync:
+  feed: models_dev
+  key: tencent-tokenhub

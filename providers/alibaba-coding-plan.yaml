@@ -27,3 +27,5 @@ submitted_at: 2026-06-05
 byok_only: true
 default_api_base: https://coding-intl.dashscope.aliyuncs.com/v1
 auth_scheme: x-api-key
+auto_sync:
+  feed: models_dev
