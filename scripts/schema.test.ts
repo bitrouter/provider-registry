@@ -7,13 +7,25 @@
 import { describe, expect, test } from "bun:test";
 import { CanonicalModel, ModelPricing, ProviderFile } from "./schema";
 
-const base = { name: "p", status: "active", models: [] as unknown[] };
+const base = {
+  name: "p",
+  status: "active",
+  api_base: "https://p.test/v1",
+  models: [] as unknown[],
+};
 
 test("community defaults false and verified is rejected", () => {
   expect(ProviderFile.parse({ ...base }).community).toBe(false);
   expect(ProviderFile.parse({ ...base, community: true }).community).toBe(true);
   // `verified` is gone — strict() must reject it
   expect(() => ProviderFile.parse({ ...base, verified: true })).toThrow();
+});
+
+test("api_base is required and must be HTTPS", () => {
+  expect(ProviderFile.parse({ ...base }).api_base).toBe("https://p.test/v1");
+  const { api_base: _omit, ...noBase } = base;
+  expect(() => ProviderFile.parse(noBase)).toThrow(); // required, no default
+  expect(() => ProviderFile.parse({ ...base, api_base: "http://p.test/v1" })).toThrow(); // non-HTTPS
 });
 
 test("canonical accepts descriptive v2 fields and rejects bad dates", () => {

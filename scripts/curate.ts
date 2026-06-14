@@ -423,7 +423,7 @@ export function modelsDevProviders(
 }
 
 // TODO(v2-phase3-v1_models): providers with auto_sync.feed === "v1_models" should be
-// probed at auto_sync.url ?? data.default_api_base + "/models" (OpenAI-compatible
+// probed at auto_sync.url ?? data.api_base + "/models" (OpenAI-compatible
 // list endpoint). The response gives model ids + optional context/pricing metadata.
 // Fold in the logic from scripts/check-new-models.ts for that feed. Deferred —
 // the models_dev path above is the production path; v1_models providers are

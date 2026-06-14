@@ -17,7 +17,7 @@
 //
 // Base-URL resolution (BYOK providers only need a *key*, not a base):
 //   1. {NAME}_API_BASE env        2. PROVIDER_BASE_OVERRIDES=name=url
-//   3. provider yaml default_api_base   4. PUBLIC_BASES below
+//   3. provider yaml api_base   4. PUBLIC_BASES below
 //
 // Auth uses {NAME}_API_KEY. Providers with neither a key nor a public
 // catalog are skipped (so a half-filled .env just probes what it can).
@@ -52,7 +52,7 @@ const TARGETS: Target[] = [
 ];
 
 // Documented public catalogs whose base URL is not stored in the yaml
-// (these providers are not BYOK, so they carry no `default_api_base`).
+// (these providers are not BYOK, so they carry no `api_base`).
 const PUBLIC_BASES: Record<string, string> = {
   chutes: "https://llm.chutes.ai/v1",
   ionet: "https://api.intelligence.io.solutions/api/v1",
@@ -96,7 +96,7 @@ function resolveBase(
   return (
     pickEnv(data.name, "API_BASE") ??
     overrides.get(data.name) ??
-    data.default_api_base ??
+    data.api_base ??
     PUBLIC_BASES[data.name]
   );
 }

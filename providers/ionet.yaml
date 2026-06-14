@@ -1,6 +1,7 @@
 name: ionet
 api_protocol:
   - "*": openai
+api_base: https://api.intelligence.io.solutions/api/v1
 rate_limits:
   - "*":
       requests_per_minute: 50

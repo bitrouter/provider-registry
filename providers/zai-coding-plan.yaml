@@ -31,7 +31,7 @@ status: active
 weight: 1
 submitted_at: 2026-06-05
 byok_only: true
-default_api_base: https://api.z.ai/api/coding/paas/v4
+api_base: https://api.z.ai/api/coding/paas/v4
 auth_scheme: x-api-key
 auto_sync:
   feed: models_dev
