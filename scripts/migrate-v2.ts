@@ -19,7 +19,8 @@ const AUTO_SYNC: Record<string, Feed> = {
   zai: { feed: "models_dev" }, minimax: { feed: "models_dev" }, xai: { feed: "models_dev" },
   xiaomi: { feed: "models_dev" }, stepfun: { feed: "models_dev", key: "stepfun-ai" },
   chutes: { feed: "models_dev" }, ionet: { feed: "models_dev", key: "io-net" },
-  tencent: { feed: "models_dev", key: "tencent-tokenhub" },
+  // tencent stays MANUAL: models.dev's tencent-tokenhub catalog (1 model) is not
+  // our TokenHub provider's; its models + prices are curated by hand.
   "alibaba-coding-plan": { feed: "models_dev" },
   "zai-coding-plan": { feed: "models_dev" },
   "moonshotai-coding-plan": { feed: "models_dev", key: "kimi-for-coding" },
