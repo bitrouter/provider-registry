@@ -1,9 +1,5 @@
 name: xai
-# First-party provider — bitrouter-cloud holds no platform key for
-# this entry. Routable only via the caller's own xAI key (`POST
-# /v1/byok/keys` on the cloud). See bitrouter/bitrouter-cloud#318.
-byok_only: true
-default_api_base: https://api.x.ai/v1
+api_base: https://api.x.ai/v1
 api_protocol:
   - "*": openai
 rate_limits:
@@ -39,4 +35,5 @@ models:
 status: active
 weight: 1
 submitted_at: 2026-05-25
-verified: true
+auto_sync:
+  feed: models_dev

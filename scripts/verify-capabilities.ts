@@ -555,12 +555,12 @@ async function main(): Promise<void> {
   }
 
   // Base URL: an explicit {ENV}_API_BASE wins; otherwise fall back to the
-  // provider's yaml `default_api_base` (set for BYOK providers, so they need
+  // provider's yaml `api_base` (set for BYOK providers, so they need
   // only the API key — matching check-new-models / .env.example). Anonymous
   // providers hold the base server-side, so they require the env override.
-  const base = process.env[`${env}_API_BASE`] ?? provider.default_api_base;
+  const base = process.env[`${env}_API_BASE`] ?? provider.api_base;
   if (!base) {
-    console.error(`✗ ${env}_API_BASE must be set ('${providerName}' has no default_api_base in its yaml)`);
+    console.error(`✗ ${env}_API_BASE must be set ('${providerName}' has no api_base in its yaml)`);
     process.exit(2);
   }
   if (!base.startsWith("https://")) {

@@ -1,6 +1,7 @@
 name: redpill
 api_protocol:
   - "*": openai
+api_base: https://api.redpill.ai/v1
 rate_limits:
   - "*":
       requests_per_minute: 60
@@ -25,3 +26,4 @@ models:
       - tools
 status: active
 weight: 1
+community: true

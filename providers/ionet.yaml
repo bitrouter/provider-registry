@@ -1,6 +1,7 @@
 name: ionet
 api_protocol:
   - "*": openai
+api_base: https://api.intelligence.io.solutions/api/v1
 rate_limits:
   - "*":
       requests_per_minute: 50
@@ -94,6 +95,8 @@ models:
 status: active
 weight: 1
 submitted_at: 2026-05-12
-verified: false
-byok_only: false
 auth_scheme: x-api-key
+community: true
+auto_sync:
+  feed: models_dev
+  key: io-net

@@ -1,21 +1,5 @@
 name: moonshotai-coding-plan
-# First-party subscription endpoint — Moonshot "Kimi Code" coding
-# subscription (membership-based). bitrouter-cloud holds no platform key
-# for this entry; it is routable only via the caller's own Kimi Code key
-# (`POST /v1/byok/keys` on the cloud). A Kimi Code membership key is NOT
-# the same as a Moonshot open-platform key and works only on the coding
-# endpoint.
-#
-# OpenAI-compatible endpoint (`Authorization: Bearer <key>`, no extra
-# headers required). The coding plan exposes a single server-side model
-# alias, `kimi-for-coding`, that maps to Moonshot's latest coding model.
-# Official docs:
-#   https://www.kimi.com/code/docs/en/
-# NOTE (ToS): Moonshot forbids forging another tool's client identifier
-# (User-Agent). bitrouter-cloud sends its own honest User-Agent, so no
-# client-impersonation is involved.
-byok_only: true
-default_api_base: https://api.kimi.com/coding/v1
+api_base: https://api.kimi.com/coding/v1
 api_protocol:
   - "*": openai
 rate_limits:
@@ -41,3 +25,6 @@ models:
 status: active
 weight: 1
 submitted_at: 2026-06-05
+auto_sync:
+  feed: models_dev
+  key: kimi-for-coding
