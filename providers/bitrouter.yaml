@@ -233,5 +233,5 @@ models:
 status: active
 weight: 1
 submitted_at: 2026-06-11
-byok_only: false
 auth_scheme: x-api-key
+byok: false

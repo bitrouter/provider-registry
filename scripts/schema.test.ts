@@ -28,6 +28,12 @@ test("api_base is required and must be HTTPS", () => {
   expect(() => ProviderFile.parse({ ...base, api_base: "http://p.test/v1" })).toThrow(); // non-HTTPS
 });
 
+test("byok defaults true and can be disabled; byok_only is rejected", () => {
+  expect(ProviderFile.parse({ ...base }).byok).toBe(true);
+  expect(ProviderFile.parse({ ...base, byok: false }).byok).toBe(false);
+  expect(() => ProviderFile.parse({ ...base, byok_only: true })).toThrow(); // strict()
+});
+
 test("canonical accepts descriptive v2 fields and rejects bad dates", () => {
   const m = CanonicalModel.parse({
     id: "anthropic/claude-sonnet-4.6",

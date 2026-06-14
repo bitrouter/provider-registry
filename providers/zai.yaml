@@ -30,7 +30,6 @@ models:
 status: active
 weight: 1
 submitted_at: 2026-05-25
-byok_only: true
 api_base: https://api.z.ai/api/paas/v4
 auth_scheme: x-api-key
 auto_sync:

@@ -85,7 +85,6 @@ models:
       - tools
 status: active
 weight: 1
-byok_only: false
 auth_scheme: x-api-key
 community: true
 auto_sync:
