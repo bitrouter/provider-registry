@@ -1,9 +1,4 @@
 name: deepseek
-# First-party provider — bitrouter-cloud holds no platform key for
-# this entry. Routable only via the caller's own DeepSeek key
-# (`POST /v1/byok/keys` on the cloud). See
-# bitrouter/bitrouter-cloud#318.
-byok_only: true
 api_base: https://api.deepseek.com
 api_protocol:
   - "*": openai

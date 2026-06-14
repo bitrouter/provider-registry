@@ -333,13 +333,14 @@ export const ProviderFile = z
     // cloud's /v1/providers. Replaces the former `verified` flag — providers
     // are no longer anonymized, so the real name is always public.
     community: z.boolean().optional().default(false),
-    // When `true`, this provider is only routable via the caller's BYOK
-    // key — there is no platform-side credential. The cloud's routing
-    // table pushes a placeholder target so the BYOK overlay has somewhere
-    // to inject the caller's key; targets that never receive an override
-    // are dropped before dispatch. The placeholder dispatches against
-    // `api_base` (now always present) when the caller's BYOK row omits one.
-    byok_only: z.boolean().optional().default(false),
+    // Whether callers may bring their own key (BYOK) for this provider.
+    // Defaults `true` — BYOK is available for every provider that is open to
+    // public self-registration. Set `false` only when a caller cannot obtain
+    // their own key (e.g. our own pooled `bitrouter` provider, or an invite-only
+    // aggregator). The cloud routes via its platform key when it holds one,
+    // builds a BYOK placeholder (dispatched against `api_base`) when `byok` and
+    // it holds none, and applies the BYOK overlay only when `byok`.
+    byok: z.boolean().optional().default(true),
     // The provider's public upstream base URL — REQUIRED for every provider
     // (v2 transparency: endpoints are public, not held server-side). HTTPS only
     // — matches the cloud's `validate_upstream_base` guard so a yaml that passes
