@@ -15,7 +15,7 @@ name: moonshotai-coding-plan
 # (User-Agent). bitrouter-cloud sends its own honest User-Agent, so no
 # client-impersonation is involved.
 byok_only: true
-default_api_base: https://api.kimi.com/coding/v1
+api_base: https://api.kimi.com/coding/v1
 api_protocol:
   - "*": openai
 rate_limits:

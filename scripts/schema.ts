@@ -78,7 +78,7 @@ export const AutoSync = z
     feed: AutoSyncFeed,
     // models_dev only: their provider id when it differs from ours (default = our name).
     key: z.string().min(1).optional(),
-    // v1_models only: catalog base when there's no default_api_base to reuse. HTTPS.
+    // v1_models only: catalog base when there's no api_base to reuse. HTTPS.
     url: z
       .string()
       .url()
@@ -337,21 +337,20 @@ export const ProviderFile = z
     // key — there is no platform-side credential. The cloud's routing
     // table pushes a placeholder target so the BYOK overlay has somewhere
     // to inject the caller's key; targets that never receive an override
-    // are dropped before dispatch. Requires `default_api_base` so the
-    // placeholder target knows where to send the request when the user
-    // did not override the base URL.
+    // are dropped before dispatch. The placeholder dispatches against
+    // `api_base` (now always present) when the caller's BYOK row omits one.
     byok_only: z.boolean().optional().default(false),
-    // Upstream base URL used for `byok_only` providers when the caller's
-    // BYOK row does not carry an `api_base` override. HTTPS only —
-    // matches the cloud's `validate_upstream_base` guard so a yaml that
-    // passes the validator can never be rejected at routing time.
-    default_api_base: z
+    // The provider's public upstream base URL — REQUIRED for every provider
+    // (v2 transparency: endpoints are public, not held server-side). HTTPS only
+    // — matches the cloud's `validate_upstream_base` guard so a yaml that passes
+    // the validator can never be rejected at routing time. A `byok_only` caller
+    // may still override it per-request via their own BYOK `api_base`.
+    api_base: z
       .string()
       .url()
       .refine((u) => u.startsWith("https://"), {
-        message: "default_api_base must be an HTTPS URL",
-      })
-      .optional(),
+        message: "api_base must be an HTTPS URL",
+      }),
     // Outbound credential scheme for this provider's Messages (`anthropic`)
     // requests — see `AuthScheme`. Optional; omitted means `x-api-key`
     // (Anthropic's native default), matching the Rust consumer's serde
@@ -374,17 +373,6 @@ export const ProviderFile = z
         });
       }
       seen.add(m.id);
-    }
-    // Mirror the cloud loader's invariant: a `byok_only` provider with
-    // no `default_api_base` is unroutable (the placeholder target needs
-    // a base URL to dispatch against when the caller's BYOK row omits
-    // `api_base`).
-    if (data.byok_only && !data.default_api_base) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["default_api_base"],
-        message: `provider '${data.name}' declares byok_only=true but no default_api_base`,
-      });
     }
   });
 export type ProviderFile = z.infer<typeof ProviderFile>;

@@ -7,7 +7,7 @@ name: tencent
 # Official: https://www.tencentcloud.com/ (TI / MaaS TokenHub)
 api_protocol:
   - "*": openai
-default_api_base: https://tokenhub-intl.tencentcloudmaas.com/v1
+api_base: https://tokenhub-intl.tencentcloudmaas.com/v1
 rate_limits:
   - "*":
       requests_per_minute: 60

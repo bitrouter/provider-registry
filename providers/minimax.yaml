@@ -33,7 +33,7 @@ status: active
 weight: 1
 submitted_at: 2026-05-25
 byok_only: true
-default_api_base: https://api.minimax.io/anthropic/v1
+api_base: https://api.minimax.io/anthropic/v1
 auth_scheme: x-api-key
 auto_sync:
   feed: models_dev

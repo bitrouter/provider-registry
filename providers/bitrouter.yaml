@@ -1,6 +1,7 @@
 name: bitrouter
 api_protocol:
   - "*": openai
+api_base: https://provider-api.bitrouter.ai/v1
 rate_limits:
   - "*":
       requests_per_minute: 600

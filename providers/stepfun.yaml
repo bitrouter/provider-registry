@@ -4,7 +4,7 @@ name: stepfun
 # (`POST /v1/byok/keys` on the cloud). See
 # bitrouter/bitrouter-cloud#318.
 byok_only: true
-default_api_base: https://api.stepfun.ai/v1
+api_base: https://api.stepfun.ai/v1
 api_protocol:
   - "*": openai
 rate_limits:
