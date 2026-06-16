@@ -1,0 +1,25 @@
+name: cerebras
+api_protocol:
+  - "*": openai
+rate_limits:
+  - "*":
+      requests_per_minute: 60
+models:
+  - id: openai/gpt-oss-120b
+    provider_model_id: gpt-oss-120b
+    pricing:
+      input_tokens:
+        no_cache: 0.25
+      output_tokens:
+        text: 0.69
+    capabilities:
+      - reasoning
+      - structured_outputs
+      - tools
+status: active
+weight: 1
+submitted_at: 2026-06-16
+verified: true
+byok_only: true
+default_api_base: https://api.cerebras.ai/v1
+auth_scheme: x-api-key
