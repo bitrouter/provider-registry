@@ -1,6 +1,7 @@
 name: tinfoil
 api_protocol:
   - "*": openai
+api_base: https://inference.tinfoil.sh/v1
 rate_limits:
   - "*":
       requests_per_minute: 60
@@ -41,6 +42,5 @@ models:
 status: active
 weight: 1
 submitted_at: 2026-05-12
-verified: false
-byok_only: false
 auth_scheme: x-api-key
+community: true

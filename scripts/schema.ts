@@ -66,6 +66,36 @@ export const ProviderStatus = z.enum([
   "suspended",
   "withdrawn",
 ]);
+
+// The upstream catalog feed a provider's models are auto-synced from. We are the
+// source of truth; this only tells the sync bot where to read. Omit the whole
+// block for manual / source-of-truth providers.
+export const AutoSyncFeed = z.enum(["models_dev", "v1_models"]);
+export const AutoSyncWrite = z.enum(["models", "pricing"]);
+
+export const AutoSync = z
+  .object({
+    feed: AutoSyncFeed,
+    // models_dev only: their provider id when it differs from ours (default = our name).
+    key: z.string().min(1).optional(),
+    // v1_models only: catalog base when there's no api_base to reuse. HTTPS.
+    url: z
+      .string()
+      .url()
+      .refine((u) => u.startsWith("https://"), { message: "auto_sync.url must be HTTPS" })
+      .optional(),
+    // What the sync bot may write back. Defaults: [models, pricing] for models_dev,
+    // [models] for v1_models (resolved by the sync script, not here).
+    writes: z.array(AutoSyncWrite).optional(),
+  })
+  .strict()
+  .superRefine((d, ctx) => {
+    if (d.key !== undefined && d.feed !== "models_dev")
+      ctx.addIssue({ code: "custom", path: ["key"], message: "`key` is only valid when feed=models_dev" });
+    if (d.url !== undefined && d.feed !== "v1_models")
+      ctx.addIssue({ code: "custom", path: ["url"], message: "`url` is only valid when feed=v1_models" });
+  });
+export type AutoSync = z.infer<typeof AutoSync>;
 export type ProviderStatus = z.infer<typeof ProviderStatus>;
 
 export const InputModality = z.enum(["text", "image", "audio"]);
@@ -217,6 +247,17 @@ export const CanonicalModel = z
     output_modalities: z.array(OutputModality).optional(),
     max_input_tokens: z.number().int().positive().optional(),
     max_output_tokens: z.number().int().positive().optional(),
+    // Descriptive metadata from models.dev (never routing gates).
+    release_date: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "release_date must be ISO YYYY-MM-DD")
+      .optional(),
+    knowledge_cutoff: z
+      .string()
+      .regex(/^\d{4}-\d{2}(-\d{2})?$/, "knowledge_cutoff must be ISO YYYY-MM or YYYY-MM-DD")
+      .optional(),
+    open_weights: z.boolean().optional(),
+    family: z.string().min(1).optional(),
   })
   .strict();
 export type CanonicalModel = z.infer<typeof CanonicalModel>;
@@ -287,35 +328,39 @@ export const ProviderFile = z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/, "submitted_at must be ISO YYYY-MM-DD")
       .optional(),
-    // When `true`, the cloud's public `/v1/providers` response surfaces
-    // the provider `name` instead of the anonymized `p_xxxx` id. Default
-    // false so providers are anonymous to discovery clients unless
-    // explicitly opted in.
-    verified: z.boolean().optional().default(false),
-    // When `true`, this provider is only routable via the caller's BYOK
-    // key — there is no platform-side credential. The cloud's routing
-    // table pushes a placeholder target so the BYOK overlay has somewhere
-    // to inject the caller's key; targets that never receive an override
-    // are dropped before dispatch. Requires `default_api_base` so the
-    // placeholder target knows where to send the request when the user
-    // did not override the base URL.
-    byok_only: z.boolean().optional().default(false),
-    // Upstream base URL used for `byok_only` providers when the caller's
-    // BYOK row does not carry an `api_base` override. HTTPS only —
-    // matches the cloud's `validate_upstream_base` guard so a yaml that
-    // passes the validator can never be rejected at routing time.
-    default_api_base: z
+    // Marks an unaffiliated community reseller (vs a first-party / official
+    // upstream, which is the unmarked default). Surfaced publicly on the
+    // cloud's /v1/providers. Replaces the former `verified` flag — providers
+    // are no longer anonymized, so the real name is always public.
+    community: z.boolean().optional().default(false),
+    // Whether callers may bring their own key (BYOK) for this provider.
+    // Defaults `true` — BYOK is available for every provider that is open to
+    // public self-registration. Set `false` only when a caller cannot obtain
+    // their own key (e.g. our own pooled `bitrouter` provider, or an invite-only
+    // aggregator). The cloud routes via its platform key when it holds one,
+    // builds a BYOK placeholder (dispatched against `api_base`) when `byok` and
+    // it holds none, and applies the BYOK overlay only when `byok`.
+    byok: z.boolean().optional().default(true),
+    // The provider's public upstream base URL — REQUIRED for every provider
+    // (v2 transparency: endpoints are public, not held server-side). HTTPS only
+    // — matches the cloud's `validate_upstream_base` guard so a yaml that passes
+    // the validator can never be rejected at routing time. A `byok_only` caller
+    // may still override it per-request via their own BYOK `api_base`.
+    api_base: z
       .string()
       .url()
       .refine((u) => u.startsWith("https://"), {
-        message: "default_api_base must be an HTTPS URL",
-      })
-      .optional(),
+        message: "api_base must be an HTTPS URL",
+      }),
     // Outbound credential scheme for this provider's Messages (`anthropic`)
     // requests — see `AuthScheme`. Optional; omitted means `x-api-key`
     // (Anthropic's native default), matching the Rust consumer's serde
     // default. Ignored for OpenAI/Google providers.
     auth_scheme: AuthScheme.optional().default("x-api-key"),
+    // Optional upstream feed for catalog auto-sync — see `AutoSync`. Omit for
+    // manual / source-of-truth providers (the role `verified` played in gating
+    // a provider out of the curation pipeline).
+    auto_sync: AutoSync.optional(),
   })
   .strict()
   .superRefine((data, ctx) => {
@@ -329,17 +374,6 @@ export const ProviderFile = z
         });
       }
       seen.add(m.id);
-    }
-    // Mirror the cloud loader's invariant: a `byok_only` provider with
-    // no `default_api_base` is unroutable (the placeholder target needs
-    // a base URL to dispatch against when the caller's BYOK row omits
-    // `api_base`).
-    if (data.byok_only && !data.default_api_base) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["default_api_base"],
-        message: `provider '${data.name}' declares byok_only=true but no default_api_base`,
-      });
     }
   });
 export type ProviderFile = z.infer<typeof ProviderFile>;

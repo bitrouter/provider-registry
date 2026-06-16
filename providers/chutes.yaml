@@ -1,6 +1,7 @@
 name: chutes
 api_protocol:
   - "*": openai
+api_base: https://llm.chutes.ai/v1
 rate_limits:
   - "*":
       requests_per_minute: 30
@@ -84,6 +85,7 @@ models:
       - tools
 status: active
 weight: 1
-verified: false
-byok_only: false
 auth_scheme: x-api-key
+community: true
+auto_sync:
+  feed: models_dev

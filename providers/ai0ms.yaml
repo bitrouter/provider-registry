@@ -1,11 +1,15 @@
-name: anon-b
+name: ai0ms
+# AI0MS (all.ai0ms.com) — an anonymous OpenAI-compatible aggregator reseller.
+# Formerly the registry's `anon-b` entry; recovered, named, and made transparent
+# under v2 (real name + public endpoint, marked `community`). Bearer auth.
+# Rates mirror OpenRouter's published pricing for the underlying OpenAI models.
 api_protocol:
   - "*": openai
+api_base: https://all.ai0ms.com/v1
 rate_limits:
   - "*":
       requests_per_minute: 60
-# USD per million tokens. Rates mirror OpenRouter's published pricing for
-# the underlying OpenAI models.
+community: true
 models:
   - id: openai/gpt-5.4
     provider_model_id: gpt-5.4
@@ -43,3 +47,4 @@ models:
 status: active
 weight: 1
 submitted_at: 2026-05-25
+byok: false

@@ -1,6 +1,7 @@
 name: cerebras
 api_protocol:
   - "*": openai
+api_base: https://api.cerebras.ai/v1
 rate_limits:
   - "*":
       requests_per_minute: 60
@@ -19,7 +20,6 @@ models:
 status: active
 weight: 1
 submitted_at: 2026-06-16
-verified: true
-byok_only: true
-default_api_base: https://api.cerebras.ai/v1
 auth_scheme: x-api-key
+auto_sync:
+  feed: models_dev

@@ -49,11 +49,6 @@ org_aliases:
   zai: z-ai
   kimi: moonshotai
 
-# Provider name → models.dev provider key, only where they differ. `curate apply`
-# reads each verified provider's catalog from models.dev (keyless) under this key.
-modelsdev_keys:
-  stepfun: stepfun-ai
-
 # Per-AA-model judgments (word-order flips, suffix drift, variant collapse,
 # deliberate ignores) live in curation/crosswalk/aa.yaml, keyed on AA's stable
 # UUID — NOT here. That file is the cache the pure resolver reads; this file is
