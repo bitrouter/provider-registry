@@ -1,0 +1,115 @@
+# Release automation for the distribution artifact `dist/providers.json`,
+# following the release-plz pattern in a SINGLE workflow.
+#
+# On every push to `main` it rebuilds the aggregation and then does exactly one
+# of three things, decided by a content check:
+#
+#   * rebuild differs from the committed dist   → there are unreleased provider
+#       changes: open or UPDATE the persistent release PR. peter-evans force-
+#       resets `bot/release` to base + one commit of the latest generation, so an
+#       already-open PR is rewritten in place (stays open, auto-updates) instead
+#       of stacking a second PR.
+#   * rebuild matches the committed dist AND this push modified dist/providers.json
+#       → the release PR just merged (the only thing that writes dist): push the
+#       `reg-<timestamp>` tag at the merge commit.
+#   * otherwise → nothing to do (e.g. a docs-only push leaves dist unchanged).
+#
+# The build is deterministic (no timestamps, sorted keys), so a regeneration that
+# changes nothing produces no diff — it neither opens a PR nor tags. The release
+# PR's own merge regenerates identical bytes, so it can't re-open itself.
+#
+# Reuses the same GitHub App token as curate.yml so CI runs on the bot PR.
+
+name: release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+# Serialize (don't cancel) so a tag push or branch update is never interrupted.
+concurrency:
+  group: registry-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.repository == 'bitrouter/provider-registry'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate GitHub App token
+        id: token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.RELEASE_BOT_APP_ID }}
+          private-key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.token.outputs.token }}
+          fetch-depth: 0 # need the pre-push commit to diff the push range
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - name: Rebuild artifact
+        run: |
+          bun run validate
+          bun run build
+
+      - name: Classify push
+        id: check
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.event.after }}
+        run: |
+          set -euo pipefail
+          ZERO=0000000000000000000000000000000000000000
+          if ! git diff --quiet -- dist/providers.json; then
+            # rebuild differs from committed dist → unreleased provider changes
+            echo "state=changed" >> "$GITHUB_OUTPUT"
+          elif [ "$BEFORE" != "$ZERO" ] && ! git diff --quiet "$BEFORE" "$AFTER" -- dist/providers.json; then
+            # dist already current AND this push wrote dist → release PR merged
+            echo "state=released" >> "$GITHUB_OUTPUT"
+          else
+            echo "state=noop" >> "$GITHUB_OUTPUT"
+          fi
+          echo "classified: $(tail -1 "$GITHUB_OUTPUT")"
+
+      - name: Open / update release PR
+        if: steps.check.outputs.state == 'changed'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ steps.token.outputs.token }}
+          branch: bot/release
+          base: main
+          title: "chore(release): provider registry snapshot"
+          commit-message: "chore(release): update dist/providers.json"
+          body: |
+            Automated release PR — regenerates `dist/providers.json` from the
+            current `providers/` directory.
+
+            The branch is force-updated to the latest generation on every push to
+            `main`, so this single PR always reflects the newest snapshot. Merging
+            it pushes a `reg-<timestamp>` tag at the merge commit.
+          labels: automated-release
+          delete-branch: false
+
+      - name: Tag release
+        if: steps.check.outputs.state == 'released'
+        run: |
+          set -euo pipefail
+          if git tag --points-at HEAD | grep -q '^reg-'; then
+            echo "HEAD already carries a reg-* tag — skipping (idempotent re-run)"
+            exit 0
+          fi
+          TAG="$(date -u +'reg-%Y%m%dT%H%M%SZ')"
+          git tag "$TAG"
+          git push origin "$TAG"
+          echo "Pushed tag $TAG"
