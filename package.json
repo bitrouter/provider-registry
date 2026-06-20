@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "test": "bun test",
+    "build": "bun run scripts/build-dist.ts",
     "validate": "bun run scripts/validate.ts",
     "manage": "bun run scripts/manage.ts",
     "fetch-models": "bun run scripts/fetch-provider-models.ts",

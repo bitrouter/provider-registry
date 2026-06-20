@@ -3,8 +3,11 @@ node_modules
 
 # output
 out
-dist
 *.tgz
+
+# build output — only the released aggregation artifact is tracked
+dist/*
+!dist/providers.json
 
 # code coverage
 coverage
