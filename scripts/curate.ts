@@ -431,10 +431,11 @@ export function modelsDevProviders(
 
 interface ORModel {
   id: string;
-  name?: string;
-  context_length?: number;
-  architecture?: { input_modalities?: string[]; output_modalities?: string[] };
-  top_provider?: { max_completion_tokens?: number };
+  // OpenRouter sends `null` (not an omitted key) for unknown optional fields.
+  name?: string | null;
+  context_length?: number | null;
+  architecture?: { input_modalities?: string[] | null; output_modalities?: string[] | null };
+  top_provider?: { max_completion_tokens?: number | null };
 }
 async function fetchOpenRouterCatalog(): Promise<Map<string, ORModel>> {
   const r = await fetchWithRetry(OPENROUTER_URL, { headers: { Accept: "application/json" } });
@@ -454,17 +455,19 @@ function providerOrg(data: ProviderFile): string | null {
   for (const [org, c] of counts) if (c > n) ((best = org), (n = c));
   return best;
 }
-function canonicalFromOR(or: ORModel): z.infer<typeof CanonicalModel> {
+export function canonicalFromOR(or: ORModel): z.infer<typeof CanonicalModel> {
   const allow = new Set(["text", "image", "audio"]);
   const inMod = (or.architecture?.input_modalities ?? ["text"]).filter((m) => allow.has(m));
   const outMod = (or.architecture?.output_modalities ?? ["text"]).filter((m) => m === "text" || m === "audio");
   return CanonicalModel.parse({
     id: or.id,
-    name: or.name,
+    // The canonical schema's optional fields accept `undefined` but reject
+    // `null`, so coerce OpenRouter's nulls → undefined (omit the field).
+    name: or.name ?? undefined,
     input_modalities: inMod.length ? inMod : ["text"],
     output_modalities: outMod.length ? outMod : ["text"],
-    max_input_tokens: or.context_length,
-    max_output_tokens: or.top_provider?.max_completion_tokens,
+    max_input_tokens: or.context_length ?? undefined,
+    max_output_tokens: or.top_provider?.max_completion_tokens ?? undefined,
   });
 }
 // models.dev `cost` is already per-1M tokens — the same convention as the yamls.
