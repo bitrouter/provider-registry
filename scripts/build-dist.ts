@@ -2,8 +2,8 @@
 //
 // The aggregation is the public distribution artifact: one JSON file holding
 // every provider's validated config under `{ "data": [ { "id", ... }, ... ] }`.
-// Consumers (e.g. the cloud, pinned to a `reg-<timestamp>` tag) read this single
-// file instead of walking the YAML tree.
+// Consumers (pinned to a `reg-<timestamp>` tag) read this single file instead
+// of walking the YAML tree.
 //
 // Two invariants make it safe to drive an automated release PR off the output:
 //   1. It is loaded through `loadProviders()`, so every file is Zod-validated

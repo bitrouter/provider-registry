@@ -6,7 +6,7 @@
 // probe to confirm the route actually serves traffic. Reports HTTP status,
 // latency, token accounting, and the reply preview.
 //
-// Credentials come from environment variables, matching bitrouter-cloud's
+// Credentials come from environment variables, matching the router's
 // resolution convention exactly:
 //
 //   {PROVIDER_NAME_UPPER}_API_KEY    (e.g. TENCENT_API_KEY)
@@ -150,7 +150,7 @@ async function main(): Promise<void> {
   }
   if (!base.startsWith("https://")) {
     console.error(
-      `✗ ${env}_API_BASE must be HTTPS — bitrouter-cloud's url_validator rejects non-HTTPS upstreams`,
+      `✗ ${env}_API_BASE must be HTTPS — the router rejects non-HTTPS upstreams`,
     );
     process.exit(2);
   }
