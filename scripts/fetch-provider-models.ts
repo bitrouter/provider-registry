@@ -3,7 +3,7 @@
 //   - choosing the correct `provider_model_id` for a new canonical model
 //
 // Reads credentials from environment variables in the same convention
-// the cloud uses: `{NAME}_API_KEY` and `{NAME}_API_BASE`. Either or both
+// the router uses: `{NAME}_API_KEY` and `{NAME}_API_BASE`. Either or both
 // may be missing — providers with no env vars are queried unauthenticated
 // (some upstreams expose `/models` publicly) and the script reports the
 // outcome either way.
