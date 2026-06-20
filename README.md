@@ -1,12 +1,11 @@
 # bitrouter provider registry
 
-Public source-of-truth for the providers routable by
-[`bitrouter-cloud`](https://github.com/bitrouter/bitrouter-cloud). Each
+Public source-of-truth for the providers routable by BitRouter. Each
 provider opens a PR against this repo declaring which canonical models
 they serve and at what price. **No credentials live here** — API keys are
-held server-side in `bitrouter-cloud`. Everything else is public: each
-provider's endpoint (`api_base`), prices, capabilities, and trust signal
-(`community`).
+held server-side by the router, never in this repo. Everything else is
+public: each provider's endpoint (`api_base`), prices, capabilities, and
+trust signal (`community`).
 
 ## Layout
 
@@ -14,11 +13,16 @@ provider's endpoint (`api_base`), prices, capabilities, and trust signal
 canonical.yaml              # the shared model vocabulary
 providers/
   <name>.yaml               # one file per provider (filename == name)
+dist/
+  providers.json            # compiled aggregation artifact (released + tagged)
+curation/                   # ranking policy + models.dev→canonical crosswalk
 scripts/
   schema.ts                 # shared Zod schemas + IO helpers
   validate.ts               # `bun run validate`
+  build-dist.ts             # `bun run build`  → dist/providers.json
   manage.ts                 # `bun run manage <subcommand>`
-.github/workflows/validate.yml
+  curate.ts                 # `bun run curate` (auto-sync from models.dev)
+.github/workflows/          # validate, curate, release
 ```
 
 ## Provider file (`providers/<name>.yaml`)
@@ -26,7 +30,7 @@ scripts/
 | field | required | meaning |
 |---|---|---|
 | `name` | ✓ | Must equal the filename stem (lowercase, hyphenated). |
-| `api_base` | ✓ | The provider's **public** upstream base URL (HTTPS). v2 declares every endpoint openly; the cloud routes against it (a BYOK caller may override it per-request). |
+| `api_base` | ✓ | The provider's **public** upstream base URL (HTTPS). v2 declares every endpoint openly; the router routes against it (a BYOK caller may override it per-request). |
 | `api_protocol` | ✓ | Wire protocol per model-id glob, e.g. `- "*": openai` (`openai` \| `anthropic` \| `google` \| `responses`). |
 | `status` | ✓ | `active` \| `staging` \| `suspended` \| `withdrawn` — only `active` is routable. |
 | `models` | ✓ | `{ id (canonical), provider_model_id, pricing?, capabilities?, api_protocol?, rate_limits?, deprecation_date? }`. |
@@ -106,17 +110,15 @@ bun run manage canonical remove openai/gpt-4o   # blocked while any provider ref
 TTY. In CI / scripted contexts pass everything via flags; missing
 required values cause the script to exit non-zero rather than hang.
 
-## How `bitrouter-cloud` consumes this
+## Distribution
 
-`bitrouter-cloud` reads the registry from a filesystem path
-(`ROUTER_REGISTRY_PATH`, default `/opt/provider-registry`). The
-intended deployment workflow is:
+Consumers read a single compiled artifact — `dist/providers.json`
+(`{ "data": [ { "id", … } ] }`, every provider's validated config) —
+instead of walking the YAML tree. `bun run build` regenerates it
+deterministically (providers sorted, keys sorted, no timestamps), so an
+unchanged registry always produces a byte-identical file.
 
-1. Provider opens a PR here → CI runs `bun run validate`.
-2. A maintainer reviews and merges.
-3. `bitrouter-cloud`'s deployment pipeline updates its submodule
-   reference (or re-syncs the directory) and rolls out a new image.
-
-Credentials for each provider live in `bitrouter-cloud`'s database
-(`provider_registry_keys` table) and are rotated through its admin API,
-independent of this repo.
+Releases are automated (release-plz style): each push to `main`
+regenerates the artifact and keeps a single release PR open; merging it
+publishes the snapshot and pushes an immutable `reg-YYYYMMDDThhmmssZ` tag.
+Pin a tag to consume a fixed, reproducible registry state.
