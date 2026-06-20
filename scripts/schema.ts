@@ -13,7 +13,13 @@ import { z } from "zod";
 
 // ── Primitive enums ─────────────────────────────────────────────────────
 
-export const ApiProtocol = z.enum(["openai", "anthropic", "google"]);
+// Wire protocol the consumer uses to dispatch to this provider. The maker-name
+// strings map onto spec-named transports (`openai`→Chat Completions,
+// `anthropic`→Messages, `google`→Generate Content); `responses` selects the
+// OpenAI Responses API for providers that serve it at the same base URL. Kept
+// in lock-step with the Rust consumer's protocol mapping so a yaml it accepts
+// also validates here.
+export const ApiProtocol = z.enum(["openai", "anthropic", "google", "responses"]);
 export type ApiProtocol = z.infer<typeof ApiProtocol>;
 
 // Outbound credential scheme for the Messages (`anthropic`) transport:

@@ -1,6 +1,6 @@
 name: bitrouter
 api_protocol:
-  - "*": openai
+  - "*": responses
 api_base: https://provider-api.bitrouter.ai/v1
 rate_limits:
   - "*":

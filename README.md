@@ -27,7 +27,7 @@ scripts/
 |---|---|---|
 | `name` | ✓ | Must equal the filename stem (lowercase, hyphenated). |
 | `api_base` | ✓ | The provider's **public** upstream base URL (HTTPS). v2 declares every endpoint openly; the cloud routes against it (a BYOK caller may override it per-request). |
-| `api_protocol` | ✓ | Wire protocol per model-id glob, e.g. `- "*": openai` (`openai` \| `anthropic` \| `google`). |
+| `api_protocol` | ✓ | Wire protocol per model-id glob, e.g. `- "*": openai` (`openai` \| `anthropic` \| `google` \| `responses`). |
 | `status` | ✓ | `active` \| `staging` \| `suspended` \| `withdrawn` — only `active` is routable. |
 | `models` | ✓ | `{ id (canonical), provider_model_id, pricing?, capabilities?, api_protocol?, rate_limits?, deprecation_date? }`. |
 | `community` | — | `true` marks an unaffiliated community reseller; omit for first-party / official upstreams (default). Always public. |
