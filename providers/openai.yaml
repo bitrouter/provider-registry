@@ -64,6 +64,7 @@ models:
     capabilities:
       - reasoning
       - tools
+    deprecation_date: 2026-08-19
   - id: openai/gpt-5.2
     provider_model_id: gpt-5.2
     pricing:
@@ -76,6 +77,7 @@ models:
       - reasoning
       - structured_outputs
       - tools
+    deprecation_date: 2026-08-19
   - id: openai/gpt-5.2-codex
     provider_model_id: gpt-5.2-codex
     pricing:
@@ -87,6 +89,7 @@ models:
     capabilities:
       - reasoning
       - tools
+    deprecation_date: 2026-08-19
   - id: openai/gpt-5.1
     provider_model_id: gpt-5.1
     pricing:
@@ -99,6 +102,7 @@ models:
       - reasoning
       - structured_outputs
       - tools
+    deprecation_date: 2026-08-19
   - id: openai/gpt-5.1-codex
     provider_model_id: gpt-5.1-codex
     pricing:
@@ -110,6 +114,7 @@ models:
     capabilities:
       - reasoning
       - tools
+    deprecation_date: 2026-08-19
   - id: openai/gpt-5.1-codex-mini
     provider_model_id: gpt-5.1-codex-mini
     pricing:
@@ -121,6 +126,36 @@ models:
     capabilities:
       - reasoning
       - tools
+  - id: openai/o1
+    provider_model_id: o1
+    pricing:
+      input_tokens:
+        no_cache: 15
+        cache_read: 7.5
+      output_tokens:
+        text: 60
+  - id: openai/o3-mini
+    provider_model_id: o3-mini
+    pricing:
+      input_tokens:
+        no_cache: 1.1
+        cache_read: 0.55
+      output_tokens:
+        text: 4.4
+  - id: openai/gpt-4-turbo
+    provider_model_id: gpt-4-turbo
+    pricing:
+      input_tokens:
+        no_cache: 10
+      output_tokens:
+        text: 30
+  - id: openai/gpt-4
+    provider_model_id: gpt-4
+    pricing:
+      input_tokens:
+        no_cache: 30
+      output_tokens:
+        text: 60
 status: active
 weight: 1
 submitted_at: 2026-05-25

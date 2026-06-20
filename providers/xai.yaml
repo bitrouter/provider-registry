@@ -32,6 +32,7 @@ models:
     # id `grok-4.20` matches the reasoning family); corrected by hand.
     capabilities:
       - tools
+    deprecation_date: 2026-08-19
 status: active
 weight: 1
 submitted_at: 2026-05-25

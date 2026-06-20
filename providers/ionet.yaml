@@ -17,6 +17,7 @@ models:
     capabilities:
       - reasoning
       - tools
+    deprecation_date: 2026-08-19
   - id: deepseek/deepseek-v4-pro
     provider_model_id: deepseek-ai/DeepSeek-V4-Pro
     pricing:
@@ -49,6 +50,7 @@ models:
     capabilities:
       - reasoning
       - tools
+    deprecation_date: 2026-08-19
   - id: moonshotai/kimi-k2.6
     provider_model_id: moonshotai/Kimi-K2.6
     pricing:
@@ -70,6 +72,7 @@ models:
     capabilities:
       - reasoning
       - tools
+    deprecation_date: 2026-08-19
   - id: z-ai/glm-5.1
     provider_model_id: zai-org/GLM-5.1
     pricing:
@@ -92,6 +95,7 @@ models:
     capabilities:
       - reasoning
       - tools
+    deprecation_date: 2026-08-19
 status: active
 weight: 1
 submitted_at: 2026-05-12

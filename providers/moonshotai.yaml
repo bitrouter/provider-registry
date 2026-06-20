@@ -29,6 +29,7 @@ models:
       - reasoning
       - structured_outputs
       - tools
+    deprecation_date: 2026-08-19
 status: active
 weight: 1
 submitted_at: 2026-05-25
