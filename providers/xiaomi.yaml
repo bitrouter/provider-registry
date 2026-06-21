@@ -30,6 +30,7 @@ models:
     capabilities:
       - reasoning
       - tools
+    deprecation_date: 2026-08-20
   - id: xiaomi/mimo-v2-pro
     provider_model_id: mimo-v2-pro
     pricing:
@@ -41,6 +42,7 @@ models:
     capabilities:
       - reasoning
       - tools
+    deprecation_date: 2026-08-20
   - id: xiaomi/mimo-v2-omni
     provider_model_id: mimo-v2-omni
     pricing:
@@ -52,6 +54,7 @@ models:
     capabilities:
       - reasoning
       - tools
+    deprecation_date: 2026-08-20
   - id: xiaomi/mimo-v2-flash
     provider_model_id: mimo-v2-flash
     pricing:
@@ -63,6 +66,7 @@ models:
     capabilities:
       - reasoning
       - tools
+    deprecation_date: 2026-08-20
 status: active
 weight: 1
 submitted_at: 2026-05-25
