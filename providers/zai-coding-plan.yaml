@@ -1,4 +1,5 @@
 name: zai-coding-plan
+billing: subscription
 api_protocol:
   - "*": openai
 rate_limits:

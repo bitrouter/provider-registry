@@ -8,6 +8,7 @@
         }
       ],
       "auth_scheme": "x-api-key",
+      "billing": "token",
       "byok": false,
       "community": true,
       "id": "ai0ms",
@@ -84,6 +85,7 @@
         }
       ],
       "auth_scheme": "x-api-key",
+      "billing": "token",
       "byok": true,
       "community": true,
       "id": "akashml",
@@ -162,6 +164,7 @@
       "auto_sync": {
         "feed": "models_dev"
       },
+      "billing": "token",
       "byok": true,
       "community": false,
       "id": "alibaba",
@@ -230,6 +233,7 @@
       "auto_sync": {
         "feed": "models_dev"
       },
+      "billing": "subscription",
       "byok": true,
       "community": false,
       "id": "alibaba-coding-plan",
@@ -284,6 +288,7 @@
       "auto_sync": {
         "feed": "models_dev"
       },
+      "billing": "token",
       "byok": true,
       "community": false,
       "id": "anthropic",
@@ -438,6 +443,7 @@
         }
       ],
       "auth_scheme": "x-api-key",
+      "billing": "token",
       "byok": false,
       "community": false,
       "id": "bitrouter",
@@ -812,6 +818,7 @@
       "auto_sync": {
         "feed": "models_dev"
       },
+      "billing": "token",
       "byok": true,
       "community": false,
       "id": "cerebras",
@@ -857,6 +864,7 @@
       "auto_sync": {
         "feed": "models_dev"
       },
+      "billing": "token",
       "byok": true,
       "community": true,
       "id": "chutes",
@@ -1003,6 +1011,7 @@
       "auto_sync": {
         "feed": "models_dev"
       },
+      "billing": "token",
       "byok": true,
       "community": false,
       "id": "deepseek",
@@ -1065,6 +1074,7 @@
       "auto_sync": {
         "feed": "models_dev"
       },
+      "billing": "token",
       "byok": true,
       "community": false,
       "id": "google",
@@ -1180,6 +1190,7 @@
         "feed": "models_dev",
         "key": "io-net"
       },
+      "billing": "token",
       "byok": true,
       "community": true,
       "id": "ionet",
@@ -1342,6 +1353,7 @@
       "auto_sync": {
         "feed": "models_dev"
       },
+      "billing": "token",
       "byok": true,
       "community": false,
       "id": "minimax",
@@ -1406,6 +1418,7 @@
       "auto_sync": {
         "feed": "models_dev"
       },
+      "billing": "token",
       "byok": true,
       "community": false,
       "id": "moonshotai",
@@ -1471,6 +1484,7 @@
         "feed": "models_dev",
         "key": "kimi-for-coding"
       },
+      "billing": "subscription",
       "byok": true,
       "community": false,
       "id": "moonshotai-coding-plan",
@@ -1516,6 +1530,7 @@
       "auto_sync": {
         "feed": "models_dev"
       },
+      "billing": "token",
       "byok": true,
       "community": false,
       "id": "openai",
@@ -1717,6 +1732,7 @@
         }
       ],
       "auth_scheme": "x-api-key",
+      "billing": "token",
       "byok": true,
       "community": true,
       "id": "redpill",
@@ -1773,6 +1789,7 @@
         "feed": "models_dev",
         "key": "stepfun-ai"
       },
+      "billing": "token",
       "byok": true,
       "community": false,
       "id": "stepfun",
@@ -1831,6 +1848,7 @@
         }
       ],
       "auth_scheme": "x-api-key",
+      "billing": "token",
       "byok": true,
       "community": false,
       "id": "tencent",
@@ -2032,6 +2050,7 @@
         }
       ],
       "auth_scheme": "x-api-key",
+      "billing": "token",
       "byok": true,
       "community": true,
       "id": "tinfoil",
@@ -2108,6 +2127,7 @@
         }
       ],
       "auth_scheme": "x-api-key",
+      "billing": "token",
       "byok": true,
       "community": true,
       "id": "worldrouter",
@@ -2405,6 +2425,7 @@
       "auto_sync": {
         "feed": "models_dev"
       },
+      "billing": "token",
       "byok": true,
       "community": false,
       "id": "xai",
@@ -2466,6 +2487,7 @@
       "auto_sync": {
         "feed": "models_dev"
       },
+      "billing": "token",
       "byok": true,
       "community": false,
       "id": "xiaomi",
@@ -2579,6 +2601,7 @@
       "auto_sync": {
         "feed": "models_dev"
       },
+      "billing": "token",
       "byok": true,
       "community": false,
       "id": "zai",
@@ -2658,6 +2681,7 @@
       "auto_sync": {
         "feed": "models_dev"
       },
+      "billing": "subscription",
       "byok": true,
       "community": false,
       "id": "zai-coding-plan",

@@ -14,9 +14,13 @@ provider's endpoint (`api_base`), prices, capabilities, and trust signal
 canonical.yaml              # the shared model vocabulary
 providers/
   <name>.yaml               # one file per provider (filename == name)
+dist/                       # generated distribution artifacts (`bun run build`)
+  providers.json            # { data: [ <provider>, ... ] }
+  canonical.json            # { data: [ <canonical model>, ... ] }
 scripts/
   schema.ts                 # shared Zod schemas + IO helpers
   validate.ts               # `bun run validate`
+  build-dist.ts             # `bun run build` — regenerate dist/
   manage.ts                 # `bun run manage <subcommand>`
 .github/workflows/validate.yml
 ```
@@ -32,6 +36,7 @@ scripts/
 | `models` | ✓ | `{ id (canonical), provider_model_id, pricing?, capabilities?, api_protocol?, rate_limits?, deprecation_date? }`. |
 | `community` | — | `true` marks an unaffiliated community reseller; omit for first-party / official upstreams (default). Always public. |
 | `byok` | — | Whether callers may bring their own key. **Default `true`** — BYOK is available for every publicly-registerable provider. Set `false` only where a caller cannot obtain a key (a pooled or invite-only provider). |
+| `billing` | — | `token` (default, pay-as-you-go) \| `subscription` (flat-rate plan, e.g. a first-party coding plan). Descriptive only; consumers rank provider preference with it alongside `community`. |
 | `auto_sync` | — | Upstream catalog feed for the sync bot: `{ feed: models_dev \| v1_models, key?, url?, writes? }`. Omit for manual / source-of-truth providers — *we* are the source; the feed only says where the bot reads. |
 | `auth_scheme` | — | `x-api-key` (default) \| `bearer` — the Messages transport only (ignored by OpenAI/Google). |
 | `weight`, `rate_limits` | — | Routing weight + declared RPM/TPM. |
@@ -67,6 +72,22 @@ locally:
 bun install
 bun run validate
 ```
+
+## Distribution (`dist/`)
+
+`bun run build` compiles the registry into two deterministic JSON artifacts —
+the public, validated snapshot consumers read instead of walking the YAML tree:
+
+- `dist/providers.json` — `{ data: [ <provider>, … ] }`, every provider's
+  resolved config (defaults applied), sorted by id.
+- `dist/canonical.json` — `{ data: [ <canonical model>, … ] }`, the canonical
+  model vocabulary, sorted by id.
+
+Both are byte-deterministic (sorted keys, no timestamps), so an unchanged
+registry regenerates identical bytes. The `release` workflow keeps them current
+on `main` and tags each release `reg-<timestamp>`. Consumers fetch them either
+from a pinned tag or from the raw files on `main`, e.g.
+`https://raw.githubusercontent.com/bitrouter/provider-registry/main/dist/providers.json`.
 
 ## Management
 

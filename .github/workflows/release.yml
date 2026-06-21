@@ -1,5 +1,6 @@
-# Release automation for the distribution artifact `dist/providers.json`,
-# following the release-plz pattern in a SINGLE workflow.
+# Release automation for the distribution artifacts under `dist/`
+# (`providers.json` + `canonical.json`), following the release-plz pattern in a
+# SINGLE workflow.
 #
 # On every push to `main` it rebuilds the aggregation and then does exactly one
 # of three things, decided by a content check:
@@ -9,7 +10,7 @@
 #       resets `bot/release` to base + one commit of the latest generation, so an
 #       already-open PR is rewritten in place (stays open, auto-updates) instead
 #       of stacking a second PR.
-#   * rebuild matches the committed dist AND this push modified dist/providers.json
+#   * rebuild matches the committed dist AND this push modified a dist/ artifact
 #       → the release PR just merged (the only thing that writes dist): push the
 #       `reg-<timestamp>` tag at the merge commit.
 #   * otherwise → nothing to do (e.g. a docs-only push leaves dist unchanged).
@@ -71,10 +72,10 @@ jobs:
         run: |
           set -euo pipefail
           ZERO=0000000000000000000000000000000000000000
-          if ! git diff --quiet -- dist/providers.json; then
+          if ! git diff --quiet -- dist/providers.json dist/canonical.json; then
             # rebuild differs from committed dist → unreleased provider changes
             echo "state=changed" >> "$GITHUB_OUTPUT"
-          elif [ "$BEFORE" != "$ZERO" ] && ! git diff --quiet "$BEFORE" "$AFTER" -- dist/providers.json; then
+          elif [ "$BEFORE" != "$ZERO" ] && ! git diff --quiet "$BEFORE" "$AFTER" -- dist/providers.json dist/canonical.json; then
             # dist already current AND this push wrote dist → release PR merged
             echo "state=released" >> "$GITHUB_OUTPUT"
           else
@@ -90,10 +91,10 @@ jobs:
           branch: bot/release
           base: main
           title: "chore(release): provider registry snapshot"
-          commit-message: "chore(release): update dist/providers.json"
+          commit-message: "chore(release): update dist/ artifacts"
           body: |
-            Automated release PR — regenerates `dist/providers.json` from the
-            current `providers/` directory.
+            Automated release PR — regenerates `dist/providers.json` and
+            `dist/canonical.json` from the current `providers/` + `canonical.yaml`.
 
             The branch is force-updated to the latest generation on every push to
             `main`, so this single PR always reflects the newest snapshot. Merging

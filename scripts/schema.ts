@@ -73,6 +73,17 @@ export const ProviderStatus = z.enum([
   "withdrawn",
 ]);
 
+// How a caller pays this provider for inference. `token` = pay-as-you-go,
+// metered per token against an API key (the common case). `subscription` =
+// a flat-rate plan (e.g. a first-party "coding plan") whose key unlocks a
+// fixed quota rather than per-token billing. Purely descriptive — it does
+// not gate routing — but consumers use it together with `community` to rank
+// provider preference (a first-party subscription a caller already pays for
+// is cheaper at the margin than the same models billed per token). Defaults
+// `token`; set `subscription` only for flat-rate plans.
+export const Billing = z.enum(["token", "subscription"]);
+export type Billing = z.infer<typeof Billing>;
+
 // The upstream catalog feed a provider's models are auto-synced from. We are the
 // source of truth; this only tells the sync bot where to read. Omit the whole
 // block for manual / source-of-truth providers.
@@ -347,6 +358,11 @@ export const ProviderFile = z
     // builds a BYOK placeholder (dispatched against `api_base`) when `byok` and
     // it holds none, and applies the BYOK overlay only when `byok`.
     byok: z.boolean().optional().default(true),
+    // How a caller pays this provider — see `Billing`. Defaults `token`
+    // (pay-as-you-go). Set `subscription` for flat-rate plans (e.g. a
+    // first-party coding plan). Optional + defaulted, so a consumer that does
+    // not read it is unaffected.
+    billing: Billing.optional().default("token"),
     // The provider's public upstream base URL — REQUIRED for every provider
     // (v2 transparency: endpoints are public, not held server-side). HTTPS only
     // — matches the cloud's `validate_upstream_base` guard so a yaml that passes

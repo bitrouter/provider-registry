@@ -34,6 +34,14 @@ test("byok defaults true and can be disabled; byok_only is rejected", () => {
   expect(() => ProviderFile.parse({ ...base, byok_only: true })).toThrow(); // strict()
 });
 
+test("billing defaults token and accepts subscription; unknown values rejected", () => {
+  expect(ProviderFile.parse({ ...base }).billing).toBe("token");
+  expect(ProviderFile.parse({ ...base, billing: "subscription" }).billing).toBe(
+    "subscription",
+  );
+  expect(() => ProviderFile.parse({ ...base, billing: "freemium" })).toThrow();
+});
+
 test("canonical accepts descriptive v2 fields and rejects bad dates", () => {
   const m = CanonicalModel.parse({
     id: "anthropic/claude-sonnet-4.6",

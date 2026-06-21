@@ -1,4 +1,5 @@
 name: moonshotai-coding-plan
+billing: subscription
 api_base: https://api.kimi.com/coding/v1
 api_protocol:
   - "*": openai
