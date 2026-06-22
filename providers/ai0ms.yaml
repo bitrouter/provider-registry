@@ -47,4 +47,6 @@ models:
 status: active
 weight: 1
 submitted_at: 2026-05-25
-byok: false
+# Anonymous aggregator with no public self-registration — never BYOK / poolable
+# by a caller's key (replaces the old `byok: false`).
+access: private

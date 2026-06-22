@@ -137,17 +137,20 @@ export async function buildArtifacts(): Promise<{
   // ── Provider view ──
   // `id` is the provider name (schema requires it to equal the filename stem).
   // For a curated provider, resolve the glob `api_protocol` / `rate_limits`
-  // onto each model and drop the provider-level arrays. For an `auto_discover`
-  // provider there are no models to resolve onto (its catalog is discovered at
-  // runtime), so KEEP the provider-level glob arrays — the consumer applies
-  // them to the models it discovers.
+  // onto each model and drop the provider-level arrays. A provider with NO
+  // curated models has a runtime-discovered catalog (it declares an `auto_sync`
+  // feed), so there is nothing to resolve onto — KEEP the provider-level glob
+  // arrays for the consumer to apply to whatever it discovers. We also emit a
+  // derived `byok` alias (`access === "api_key"`) for consumers not yet
+  // migrated off the boolean.
   const providerData = providers
     .map(({ data }) => {
       const { api_protocol, rate_limits, models: _m, ...rest } = data;
-      if (data.auto_discover) {
-        return { id: data.name, ...rest, api_protocol, rate_limits, models: [] };
+      const byok = data.access === "api_key";
+      if (data.models.length === 0) {
+        return { id: data.name, ...rest, byok, api_protocol, rate_limits, models: [] };
       }
-      return { id: data.name, ...rest, models: resolveModels(data) };
+      return { id: data.name, ...rest, byok, models: resolveModels(data) };
     })
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 

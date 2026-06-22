@@ -34,16 +34,15 @@ scripts/
 | `api_base` | ✓ | The provider's **public** upstream base URL (HTTPS). v2 declares every endpoint openly; the router routes against it (a BYOK caller may override it per-request). |
 | `api_protocol` | ✓ | Wire protocol per model-id glob. Value is a single maker name or an ordered **set**, e.g. `- "*": openai` or `- "*": [openai, responses]` (`openai` \| `anthropic` \| `google` \| `responses`). Longest glob wins; `build-dist` resolves it per (provider, model). |
 | `status` | ✓ | `active` \| `staging` \| `suspended` \| `withdrawn` — only `active` is routable. |
-| `models` | ✓ | `{ id (canonical), provider_model_id, pricing?, capabilities?, api_protocol?, rate_limits?, deprecation_date? }`. May be empty for an `auto_discover` provider. |
+| `models` | ✓ | `{ id (canonical), provider_model_id, pricing?, capabilities?, api_protocol?, rate_limits?, deprecation_date? }`. May be empty for a provider that declares an `auto_sync` feed (runtime-discovered catalog). |
 | `kind` | — | `first_party` \| `gateway` \| `cloud` \| `third_party`. Drives the consumer's routing-priority class + poolability. Omitted ⇒ derived from `community`. |
 | `auth` | — | Full outbound auth declaration: `{ kind: bearer\|header\|oauth\|native, env?, header?, extra_headers?, handler?, params? }`. **Public config only** — env/header/handler names + public OAuth params; never a secret. Supersedes `auth_scheme`. |
-| `auto_discover` | — | `true` for a transport+auth-only provider (a gateway proxying an uncurated set) whose catalog the consumer discovers at runtime; relaxes the active-needs-models rule. |
+| `access` | — | How a caller obtains access: `api_key` (default, public self-registration → portable key — the BYOK case) \| `local_oauth` \| `local_pkce` (credentials minted by a local interactive flow — no portable key) \| `private` (no public registration, platform-pooled/invite-only). Drives the BYOK page (api_key only), poolability, and the consumer's auto-enable rule. Replaces the old `byok` boolean (now derived: `byok` iff `api_key`; the dist still emits it). |
 | `protocol_endpoints` | — | Per-protocol base-URL override `{ <protocol>: <https url> }` for a provider serving protocols at different paths under one host. |
 | `display_name`, `doc_url` | — | Human-readable name; link to the provider's official API docs (HTTPS). |
 | `community` | — | `true` marks an unaffiliated community reseller; omit for first-party / official upstreams (default). Always public. A derived alias of `kind: third_party`. |
-| `byok` | — | Whether callers may bring their own key. **Default `true`** — BYOK is available for every publicly-registerable provider. Set `false` only where a caller cannot obtain a key (a pooled or invite-only provider). |
 | `billing` | — | `token` (default, pay-as-you-go) \| `subscription` (flat-rate plan, e.g. a first-party coding plan). Descriptive only; consumers rank provider preference with it alongside `kind`. |
-| `auto_sync` | — | Upstream catalog feed for the sync bot: `{ feed: models_dev \| v1_models, key?, url?, writes? }`. Omit for manual / source-of-truth providers — *we* are the source; the feed only says where the bot reads. |
+| `auto_sync` | — | Upstream catalog feed: `{ feed: models_dev \| v1_models, key?, url?, writes? }`. Dual role — the curation bot reads it to refresh canonical entries, AND consumers read the same channel at runtime to pull a provider's FULL catalog (beyond canonical). A provider with `auto_sync` but no curated `models` is a pure runtime-discovered catalog (relaxes the active-needs-models rule). Omit for manual / source-of-truth providers. |
 | `auth_scheme` | — | *(Deprecated — use `auth`.)* `x-api-key` (default) \| `bearer` — the Messages transport only. |
 | `weight`, `rate_limits` | — | Routing weight + declared RPM/TPM. |
 
@@ -88,9 +87,11 @@ as glob → value pattern lists, but the dist expands them to the concrete value
 per (provider, model), so a consumer reads a value and never runs a glob engine.
 
 - `dist/providers.json` — **provider view**: `{ data: [ <provider>, … ] }`,
-  sorted by id. Each provider carries its top-level config (`api_base`, `byok`,
-  `community`, `billing`, `auth_scheme`, …) and a `models[]` list where every
-  entry has the resolved `api_protocol` (a single string) + `rate_limits`.
+  sorted by id. Each provider carries its top-level config (`api_base`, `access`,
+  `byok` (derived), `community`, `billing`, `auth`, …) and a `models[]` list
+  where every entry has the resolved `api_protocol` + `rate_limits`. A provider
+  with a runtime-discovered catalog (an `auto_sync` feed, no curated models)
+  keeps its provider-level `api_protocol` globs for the consumer to apply.
 - `dist/models.json` — **model view**: `{ data: [ <canonical model>, … ] }`,
   sorted by id — the canonical model vocabulary with, per model, a `providers[]`
   list naming every provider that serves it and that pair's resolved config.

@@ -8,13 +8,13 @@
 #   provider routing happens inside OpenRouter)
 #
 # `auto_discover`: OpenRouter proxies hundreds of upstream models that it
-# routes internally — the catalog is not curated here; the consumer discovers
-# it from the gateway's `/models` endpoint at runtime. All models speak Chat
-# Completions, so a single `*` protocol applies to whatever is discovered.
+# routes internally — the catalog is not curated here; the consumer pulls it
+# from the gateway's `/models` endpoint at runtime via `auto_sync: v1_models`.
+# All models speak Chat Completions, so a single `*` protocol applies to
+# whatever is discovered.
 name: openrouter
 display_name: OpenRouter
 kind: gateway
-auto_discover: true
 api_base: https://openrouter.ai/api/v1
 doc_url: https://openrouter.ai/docs/api-reference/overview
 api_protocol:
@@ -24,3 +24,5 @@ auth:
   env: OPENROUTER_API_KEY
 models: []
 status: active
+auto_sync:
+  feed: v1_models

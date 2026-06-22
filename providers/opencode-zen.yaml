@@ -9,12 +9,12 @@
 #   anthropic→/messages, google→/models/<id>:<verb>).
 #
 # `Authorization: Bearer <OPENCODE_ZEN_API_KEY>` (shared with opencode-go).
-# `auto_discover`: the catalog is the gateway's `/models`; per-family protocol
-# globs (longest match wins) apply to whatever is discovered.
+# The catalog is the gateway's `/models`, pulled at runtime via `auto_sync:
+# v1_models`; per-family protocol globs (longest match wins) apply to whatever
+# is discovered.
 name: opencode-zen
 display_name: opencode zen
 kind: gateway
-auto_discover: true
 api_base: https://opencode.ai/zen/v1
 doc_url: https://opencode.ai/docs/zen/
 api_protocol:
@@ -27,3 +27,5 @@ auth:
   env: OPENCODE_ZEN_API_KEY
 models: []
 status: active
+auto_sync:
+  feed: v1_models

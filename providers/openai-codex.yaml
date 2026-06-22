@@ -11,13 +11,15 @@
 # - https://developers.openai.com/codex/auth
 # - https://github.com/sst/opencode/blob/dev/packages/opencode/src/plugin/codex.ts
 #
-# Codex speaks the Responses API exclusively. `auto_discover` since the catalog
-# is the backend's, not curated here.
+# Codex speaks the Responses API exclusively. The catalog is the backend's, not
+# curated here — pulled at runtime via `auto_sync: v1_models`. `access:
+# local_pkce` — credentials come from the local OAuth+PKCE flow against the
+# user's ChatGPT subscription, so there is no portable key to BYOK or pool.
 name: openai-codex
 display_name: OpenAI Codex
 kind: first_party
 billing: subscription
-auto_discover: true
+access: local_pkce
 api_base: https://chatgpt.com/backend-api/codex
 doc_url: https://developers.openai.com/codex/auth
 api_protocol:
@@ -36,3 +38,5 @@ auth:
     redirect_uri: http://localhost:1455/auth/callback
 models: []
 status: active
+auto_sync:
+  feed: v1_models

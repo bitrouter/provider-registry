@@ -8,12 +8,12 @@
 #   by the consumer (openai→/chat/completions default, anthropic→/messages for
 #   MiniMax).
 #
-# `auto_discover`: catalog is the gateway's `/models`; protocol globs apply.
+# The catalog is the gateway's `/models`, pulled at runtime via `auto_sync:
+# v1_models`; protocol globs apply to whatever is discovered.
 name: opencode-go
 display_name: opencode go
 kind: gateway
 billing: subscription
-auto_discover: true
 api_base: https://opencode.ai/zen/go/v1
 doc_url: https://opencode.ai/docs/go/
 api_protocol:
@@ -24,3 +24,5 @@ auth:
   env: OPENCODE_ZEN_API_KEY
 models: []
 status: active
+auto_sync:
+  feed: v1_models
