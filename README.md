@@ -13,13 +13,14 @@ trust signal (`community`).
 canonical.yaml              # the shared model vocabulary
 providers/
   <name>.yaml               # one file per provider (filename == name)
-dist/
-  providers.json            # compiled aggregation artifact (released + tagged)
+dist/                       # generated distribution artifacts (`bun run build`)
+  providers.json            # provider view: { data: [ <provider w/ resolved models> ] }
+  models.json               # model view:    { data: [ <canonical model + providers> ] }
 curation/                   # ranking policy + models.dev→canonical crosswalk
 scripts/
   schema.ts                 # shared Zod schemas + IO helpers
   validate.ts               # `bun run validate`
-  build-dist.ts             # `bun run build`  → dist/providers.json
+  build-dist.ts             # `bun run build` — regenerate dist/
   manage.ts                 # `bun run manage <subcommand>`
   curate.ts                 # `bun run curate` (auto-sync from models.dev)
 .github/workflows/          # validate, curate, release
@@ -36,6 +37,7 @@ scripts/
 | `models` | ✓ | `{ id (canonical), provider_model_id, pricing?, capabilities?, api_protocol?, rate_limits?, deprecation_date? }`. |
 | `community` | — | `true` marks an unaffiliated community reseller; omit for first-party / official upstreams (default). Always public. |
 | `byok` | — | Whether callers may bring their own key. **Default `true`** — BYOK is available for every publicly-registerable provider. Set `false` only where a caller cannot obtain a key (a pooled or invite-only provider). |
+| `billing` | — | `token` (default, pay-as-you-go) \| `subscription` (flat-rate plan, e.g. a first-party coding plan). Descriptive only; consumers rank provider preference with it alongside `community`. |
 | `auto_sync` | — | Upstream catalog feed for the sync bot: `{ feed: models_dev \| v1_models, key?, url?, writes? }`. Omit for manual / source-of-truth providers — *we* are the source; the feed only says where the bot reads. |
 | `auth_scheme` | — | `x-api-key` (default) \| `bearer` — the Messages transport only (ignored by OpenAI/Google). |
 | `weight`, `rate_limits` | — | Routing weight + declared RPM/TPM. |
@@ -71,6 +73,29 @@ locally:
 bun install
 bun run validate
 ```
+
+## Distribution (`dist/`)
+
+`bun run build` compiles the registry into two deterministic JSON artifacts —
+the public, validated snapshot consumers read instead of walking the YAML tree.
+Both are **fully resolved**: the source authors `api_protocol` / `rate_limits`
+as glob → value pattern lists, but the dist expands them to the concrete value
+per (provider, model), so a consumer reads a value and never runs a glob engine.
+
+- `dist/providers.json` — **provider view**: `{ data: [ <provider>, … ] }`,
+  sorted by id. Each provider carries its top-level config (`api_base`, `byok`,
+  `community`, `billing`, `auth_scheme`, …) and a `models[]` list where every
+  entry has the resolved `api_protocol` (a single string) + `rate_limits`.
+- `dist/models.json` — **model view**: `{ data: [ <canonical model>, … ] }`,
+  sorted by id — the canonical model vocabulary with, per model, a `providers[]`
+  list naming every provider that serves it and that pair's resolved config.
+  Consumers needing the authoritative model set read `data[].id`.
+
+Both are byte-deterministic (sorted keys, no timestamps), so an unchanged
+registry regenerates identical bytes. The `release` workflow keeps them current
+on `main` and tags each release `reg-<timestamp>`. Consumers fetch them either
+from a pinned tag or from the raw files on `main`, e.g.
+`https://raw.githubusercontent.com/bitrouter/provider-registry/main/dist/providers.json`.
 
 ## Management
 
@@ -109,16 +134,3 @@ bun run manage canonical remove openai/gpt-4o   # blocked while any provider ref
 `add` without all flags will prompt for missing fields when stdin is a
 TTY. In CI / scripted contexts pass everything via flags; missing
 required values cause the script to exit non-zero rather than hang.
-
-## Distribution
-
-Consumers read a single compiled artifact — `dist/providers.json`
-(`{ "data": [ { "id", … } ] }`, every provider's validated config) —
-instead of walking the YAML tree. `bun run build` regenerates it
-deterministically (providers sorted, keys sorted, no timestamps), so an
-unchanged registry always produces a byte-identical file.
-
-Releases are automated (release-plz style): each push to `main`
-regenerates the artifact and keeps a single release PR open; merging it
-publishes the snapshot and pushes an immutable `reg-YYYYMMDDThhmmssZ` tag.
-Pin a tag to consume a fixed, reproducible registry state.
