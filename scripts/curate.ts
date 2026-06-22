@@ -632,6 +632,105 @@ async function cmdApply(opts: { asOf: string; write: boolean; topN?: number }): 
   console.log("\n✓ applied. Run `bun run validate` to confirm.");
 }
 
+// Map a models.dev model id onto a canonical id, keyless. Two lookups onto the
+// canonical set: the full `maker/model` id (precise — used for maker-prefixed
+// feeds like OpenRouter) and the bare model slug (for feeds that list bare ids
+// like opencode / github-copilot). Normalization is case- and punctuation-
+// insensitive so `claude-opus-4-5` matches `anthropic/claude-opus-4.5`. A slug
+// shared by two canonical ids is ambiguous → never matched by slug, so a bare id
+// only resolves when its slug is unique. A maker-PREFIXED id resolves by full id
+// only: it names its own maker, so a non-match is a real miss — slug-matching it
+// against a *different* maker's same-named model would be a wrong attach, and a
+// miss is the safer failure for catalog data.
+export function buildCanonicalResolver(canonicalIds: string[]): (mdId: string) => string | null {
+  const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const byFull = new Map<string, string>();
+  const bySlug = new Map<string, string | null>();
+  for (const id of canonicalIds) {
+    byFull.set(norm(id), id);
+    const slug = norm(id.split("/")[1]!);
+    bySlug.set(slug, bySlug.has(slug) ? null : id);
+  }
+  return (mdId) => {
+    const full = byFull.get(norm(mdId));
+    if (full) return full;
+    if (mdId.includes("/")) return null; // maker-prefixed: full match only
+    return bySlug.get(norm(mdId)) ?? null;
+  };
+}
+
+// ── sync command (keyless catalog attach) ───────────────────────────────
+// Attach the models an `auto_sync: models_dev` provider serves that ALREADY
+// exist in the canonical catalog — pulled from models.dev (token-billed
+// providers also get that provider's resale pricing; flat-rate subscriptions
+// get none). KEYLESS: no Artificial Analysis, no OpenRouter. Onboarding a
+// *new* canonical model needs AA ranking and lives in `apply`; merely listing
+// the canonical models a provider already serves does not, so it runs on its own
+// (and in CI without the AA secret). Idempotent: models a provider already lists
+// are left untouched. Providers without `auto_sync: models_dev` are never read.
+async function cmdSync(opts: { write: boolean }): Promise<void> {
+  const [canon, providers] = await Promise.all([loadCanonical(), loadProviders()]);
+  let catalog: Catalog;
+  try {
+    catalog = await loadCatalog();
+  } catch (err) {
+    console.error(`✗ ${(err as Error).message} — sync needs models.dev (keyless)`);
+    process.exit(2);
+  }
+
+  const resolveCanonical = buildCanonicalResolver(canon.map((m) => m.id));
+  const providerDataByName = new Map(providers.map(({ data }) => [data.name, data]));
+  const attaches = new Map<string, ProviderModel[]>();
+  for (const { name, key } of modelsDevProviders(providers)) {
+    const data = providerDataByName.get(name)!;
+    const models = catalog.get(key);
+    if (!models) {
+      console.error(`  ${name} (models.dev:${key}): no catalog — skipped`);
+      continue;
+    }
+    const have = new Set(data.models.map((m) => m.id));
+    const staged = new Set<string>();
+    // Subscriptions are flat-rate (billed by the plan, not per token), so they
+    // carry no per-token `pricing` — same as the hand-written claude-code /
+    // openai-codex catalogs. Token-billed providers attach models.dev pricing.
+    const subscription = data.billing === "subscription";
+    for (const md of models.values()) {
+      const canonId = resolveCanonical(md.id);
+      if (!canonId || have.has(canonId) || staged.has(canonId)) continue;
+      staged.add(canonId);
+      attaches.set(name, [
+        ...(attaches.get(name) ?? []),
+        ProviderModel.parse({
+          id: canonId,
+          provider_model_id: md.id,
+          ...(subscription ? {} : { pricing: pricingFromCost(md.cost) }),
+        }),
+      ]);
+    }
+  }
+
+  const total = [...attaches.values()].flat().length;
+  console.log(`\ncurate sync — ${opts.write ? "WRITE" : "dry-run"} — keyless models.dev catalog attach`);
+  console.log(`attach ${total} model(s) across ${attaches.size} provider(s)`);
+  for (const [prov, ms] of attaches) for (const m of ms) console.log(`  + ${prov} ← ${m.id} (${m.provider_model_id})`);
+  if (!total) console.log("  (nothing to attach)");
+  if (!opts.write) {
+    console.log("\n(dry run — pass --write to apply)");
+    return;
+  }
+  for (const [name, adds] of attaches) {
+    const doc = parseDocument(await readFile(providerPath(name), "utf8"));
+    for (const m of adds) doc.addIn(["models"], doc.createNode(m));
+    // A provider that started as `models: []` keeps that empty seq's flow style;
+    // force block style so the catalog matches the hand-written providers.
+    const seq = doc.get("models", true) as { flow?: boolean } | undefined;
+    if (seq) seq.flow = false;
+    ProviderFile.parse(doc.toJSON()); // validate before writing
+    await writeFile(providerPath(name), doc.toString());
+  }
+  console.log("\n✓ synced. Run `bun run validate` to confirm.");
+}
+
 // ── dispatch ────────────────────────────────────────────────────────────
 async function main(): Promise<void> {
   const argv = process.argv.slice(2);
@@ -642,6 +741,8 @@ async function main(): Promise<void> {
   const topN = topNArg ? Number(topNArg) : undefined;
   if (cmd === "suggest") {
     await cmdSuggest({ all: argv.includes("--all"), pin: argv.includes("--pin") });
+  } else if (cmd === "sync") {
+    await cmdSync({ write: argv.includes("--write") });
   } else if (cmd === "apply") {
     await cmdApply({ asOf, write: argv.includes("--write"), topN });
   } else {

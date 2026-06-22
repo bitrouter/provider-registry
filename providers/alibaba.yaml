@@ -30,6 +30,14 @@ models:
         cache_write: 0.625
       output_tokens:
         text: 3
+  - id: qwen/qwen3.6-flash
+    provider_model_id: qwen3.6-flash
+    pricing:
+      input_tokens:
+        no_cache: 0.1875
+        cache_write: 0.234375
+      output_tokens:
+        text: 1.125
 status: active
 weight: 1
 submitted_at: 2026-05-25

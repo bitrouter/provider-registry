@@ -92,6 +92,15 @@ models:
     capabilities:
       - reasoning
       - tools
+  - id: openai/gpt-oss-120b
+    provider_model_id: openai/gpt-oss-120b
+    pricing:
+      input_tokens:
+        no_cache: 0.04
+        cache_read: 0.02
+        cache_write: 0.08
+      output_tokens:
+        text: 0.4
 status: active
 weight: 1
 submitted_at: 2026-05-12
