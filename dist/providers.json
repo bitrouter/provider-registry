@@ -279,6 +279,14 @@
     },
     {
       "api_base": "https://api.anthropic.com/v1",
+      "auth": {
+        "env": "ANTHROPIC_API_KEY",
+        "extra_headers": {
+          "anthropic-version": "2023-06-01"
+        },
+        "header": "x-api-key",
+        "kind": "header"
+      },
       "auth_scheme": "x-api-key",
       "auto_discover": false,
       "auto_sync": {
@@ -287,7 +295,10 @@
       "billing": "token",
       "byok": true,
       "community": false,
+      "display_name": "Anthropic",
+      "doc_url": "https://docs.anthropic.com/en/api/messages",
       "id": "anthropic",
+      "kind": "first_party",
       "models": [
         {
           "api_protocol": "anthropic",
@@ -1161,7 +1172,65 @@
       "weight": 1
     },
     {
+      "api_base": "https://api.githubcopilot.com",
+      "api_protocol": [
+        {
+          "claude-*": "anthropic"
+        },
+        {
+          "gpt-5.5": "responses"
+        },
+        {
+          "gpt-5.5-codex": "responses"
+        },
+        {
+          "gpt-5.1-codex": "responses"
+        },
+        {
+          "gpt-5.1-codex-mini": "responses"
+        },
+        {
+          "gpt-5.3-codex": "responses"
+        },
+        {
+          "gpt-5.2-codex": "responses"
+        },
+        {
+          "*": "openai"
+        }
+      ],
+      "auth": {
+        "handler": "github-copilot",
+        "kind": "oauth",
+        "params": {
+          "client_id": "Ov23li8tweQw6odWQebz",
+          "device_authorization_endpoint": "https://github.com/login/device/code",
+          "scope": "read:user",
+          "token_endpoint": "https://github.com/login/oauth/access_token"
+        }
+      },
+      "auth_scheme": "x-api-key",
+      "auto_discover": true,
+      "billing": "subscription",
+      "byok": true,
+      "community": false,
+      "display_name": "GitHub Copilot",
+      "doc_url": "https://docs.github.com/en/copilot/reference/api-reference/copilot-api-endpoints",
+      "id": "github-copilot",
+      "kind": "gateway",
+      "models": [],
+      "name": "github-copilot",
+      "rate_limits": [],
+      "status": "active",
+      "weight": 1
+    },
+    {
       "api_base": "https://generativelanguage.googleapis.com/v1beta",
+      "auth": {
+        "env": "GEMINI_API_KEY",
+        "header": "x-goog-api-key",
+        "kind": "header"
+      },
       "auth_scheme": "x-api-key",
       "auto_discover": false,
       "auto_sync": {
@@ -1170,7 +1239,10 @@
       "billing": "token",
       "byok": true,
       "community": false,
+      "display_name": "Generate Content",
+      "doc_url": "https://ai.google.dev/api",
       "id": "google",
+      "kind": "first_party",
       "models": [
         {
           "api_protocol": "google",
@@ -1635,6 +1707,10 @@
     },
     {
       "api_base": "https://api.openai.com/v1",
+      "auth": {
+        "env": "OPENAI_API_KEY",
+        "kind": "bearer"
+      },
       "auth_scheme": "x-api-key",
       "auto_discover": false,
       "auto_sync": {
@@ -1643,10 +1719,16 @@
       "billing": "token",
       "byok": true,
       "community": false,
+      "display_name": "OpenAI",
+      "doc_url": "https://platform.openai.com/docs/api-reference",
       "id": "openai",
+      "kind": "first_party",
       "models": [
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1668,7 +1750,10 @@
           }
         },
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1690,7 +1775,10 @@
           }
         },
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1712,7 +1800,10 @@
           }
         },
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1734,7 +1825,10 @@
           }
         },
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "tools"
@@ -1755,7 +1849,10 @@
           }
         },
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1777,7 +1874,10 @@
           }
         },
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "tools"
@@ -1798,7 +1898,10 @@
           }
         },
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1820,7 +1923,10 @@
           }
         },
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "tools"
@@ -1841,7 +1947,10 @@
           }
         },
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "tools"
@@ -1865,6 +1974,129 @@
       "name": "openai",
       "status": "active",
       "submitted_at": "2026-05-25",
+      "weight": 1
+    },
+    {
+      "api_base": "https://chatgpt.com/backend-api/codex",
+      "api_protocol": [
+        {
+          "*": "responses"
+        }
+      ],
+      "auth": {
+        "handler": "openai-codex",
+        "kind": "oauth",
+        "params": {
+          "authorize_endpoint": "https://auth.openai.com/oauth/authorize",
+          "client_id": "app_EMoamEEZ73f0CkXaXp7hrann",
+          "redirect_uri": "http://localhost:1455/auth/callback",
+          "scope": "openid profile email offline_access",
+          "token_endpoint": "https://auth.openai.com/oauth/token"
+        }
+      },
+      "auth_scheme": "x-api-key",
+      "auto_discover": true,
+      "billing": "subscription",
+      "byok": true,
+      "community": false,
+      "display_name": "OpenAI Codex",
+      "doc_url": "https://developers.openai.com/codex/auth",
+      "id": "openai-codex",
+      "kind": "first_party",
+      "models": [],
+      "name": "openai-codex",
+      "rate_limits": [],
+      "status": "active",
+      "weight": 1
+    },
+    {
+      "api_base": "https://opencode.ai/zen/go/v1",
+      "api_protocol": [
+        {
+          "opencode-go/minimax-*": "anthropic"
+        },
+        {
+          "*": "openai"
+        }
+      ],
+      "auth": {
+        "env": "OPENCODE_ZEN_API_KEY",
+        "kind": "bearer"
+      },
+      "auth_scheme": "x-api-key",
+      "auto_discover": true,
+      "billing": "subscription",
+      "byok": true,
+      "community": false,
+      "display_name": "opencode go",
+      "doc_url": "https://opencode.ai/docs/go/",
+      "id": "opencode-go",
+      "kind": "gateway",
+      "models": [],
+      "name": "opencode-go",
+      "rate_limits": [],
+      "status": "active",
+      "weight": 1
+    },
+    {
+      "api_base": "https://opencode.ai/zen/v1",
+      "api_protocol": [
+        {
+          "opencode/gpt-*": "responses"
+        },
+        {
+          "opencode/claude-*": "anthropic"
+        },
+        {
+          "opencode/gemini-*": "google"
+        },
+        {
+          "*": "openai"
+        }
+      ],
+      "auth": {
+        "env": "OPENCODE_ZEN_API_KEY",
+        "kind": "bearer"
+      },
+      "auth_scheme": "x-api-key",
+      "auto_discover": true,
+      "billing": "token",
+      "byok": true,
+      "community": false,
+      "display_name": "opencode zen",
+      "doc_url": "https://opencode.ai/docs/zen/",
+      "id": "opencode-zen",
+      "kind": "gateway",
+      "models": [],
+      "name": "opencode-zen",
+      "rate_limits": [],
+      "status": "active",
+      "weight": 1
+    },
+    {
+      "api_base": "https://openrouter.ai/api/v1",
+      "api_protocol": [
+        {
+          "*": "openai"
+        }
+      ],
+      "auth": {
+        "env": "OPENROUTER_API_KEY",
+        "kind": "bearer"
+      },
+      "auth_scheme": "x-api-key",
+      "auto_discover": true,
+      "billing": "token",
+      "byok": true,
+      "community": false,
+      "display_name": "OpenRouter",
+      "doc_url": "https://openrouter.ai/docs/api-reference/overview",
+      "id": "openrouter",
+      "kind": "gateway",
+      "models": [],
+      "name": "openrouter",
+      "rate_limits": [],
+      "status": "active",
       "weight": 1
     },
     {

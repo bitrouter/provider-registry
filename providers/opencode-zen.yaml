@@ -1,0 +1,29 @@
+# opencode-zen — pay-as-you-go gateway from the opencode.ai team. Serves
+# models from multiple vendors behind one credential, each proxied with its
+# native wire protocol.
+#
+# Official docs:
+# - https://opencode.ai/docs/zen/ (overview, account / billing)
+#   Base URL `https://opencode.ai/zen/v1/`; per-protocol endpoints appended by
+#   the consumer (openai→/chat/completions, responses→/responses,
+#   anthropic→/messages, google→/models/<id>:<verb>).
+#
+# `Authorization: Bearer <OPENCODE_ZEN_API_KEY>` (shared with opencode-go).
+# `auto_discover`: the catalog is the gateway's `/models`; per-family protocol
+# globs (longest match wins) apply to whatever is discovered.
+name: opencode-zen
+display_name: opencode zen
+kind: gateway
+auto_discover: true
+api_base: https://opencode.ai/zen/v1
+doc_url: https://opencode.ai/docs/zen/
+api_protocol:
+  - "opencode/gpt-*": responses
+  - "opencode/claude-*": anthropic
+  - "opencode/gemini-*": google
+  - "*": openai
+auth:
+  kind: bearer
+  env: OPENCODE_ZEN_API_KEY
+models: []
+status: active

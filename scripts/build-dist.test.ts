@@ -28,24 +28,33 @@ describe("dist build", () => {
     for (const m of modelData) expect(m.id).toContain("/");
   });
 
-  test("provider glob fields are resolved per-model, not shipped as patterns", async () => {
+  // A resolved protocol is a single maker name or a non-empty ordered set.
+  const PROTOS = ["openai", "anthropic", "google", "responses"];
+  const isProtocol = (p: unknown): boolean =>
+    typeof p === "string"
+      ? PROTOS.includes(p)
+      : Array.isArray(p) && p.length > 0 && p.every((x) => PROTOS.includes(x as string));
+
+  test("curated providers resolve per-model; auto_discover keep provider globs", async () => {
     const { providers } = await buildArtifacts();
     const data = JSON.parse(providers).data as Array<{
       id: string;
+      auto_discover?: boolean;
       api_protocol?: unknown;
       rate_limits?: unknown;
-      models: Array<{ id: string; api_protocol: string; rate_limits?: unknown }>;
+      models: Array<{ id: string; api_protocol: unknown }>;
     }>;
     for (const p of data) {
-      // The provider-level glob arrays must be gone (resolved onto models).
-      expect(p.api_protocol).toBeUndefined();
-      expect(p.rate_limits).toBeUndefined();
-      // Every model carries a concrete (string) protocol — no glob to resolve.
-      for (const m of p.models) {
-        expect(typeof m.api_protocol).toBe("string");
-        expect(["openai", "anthropic", "google", "responses"]).toContain(
-          m.api_protocol,
-        );
+      if (p.auto_discover) {
+        // Catalog discovered at runtime: no models, provider-level globs kept
+        // so the consumer can apply them to what it discovers.
+        expect(p.models.length).toBe(0);
+        expect(p.api_protocol).toBeDefined();
+      } else {
+        // Curated: globs resolved onto each model; no provider-level arrays.
+        expect(p.api_protocol).toBeUndefined();
+        expect(p.rate_limits).toBeUndefined();
+        for (const m of p.models) expect(isProtocol(m.api_protocol)).toBe(true);
       }
     }
   });
@@ -54,7 +63,7 @@ describe("dist build", () => {
     const { models } = await buildArtifacts();
     const data = JSON.parse(models).data as Array<{
       id: string;
-      providers: Array<{ provider: string; provider_model_id: string; api_protocol: string }>;
+      providers: Array<{ provider: string; provider_model_id: string; api_protocol: unknown }>;
     }>;
     // At least one canonical model is served by a provider, and each provider
     // entry references a provider id + carries the resolved per-pair config.
@@ -64,7 +73,7 @@ describe("dist build", () => {
       for (const p of m.providers) {
         expect(typeof p.provider).toBe("string");
         expect(typeof p.provider_model_id).toBe("string");
-        expect(typeof p.api_protocol).toBe("string");
+        expect(isProtocol(p.api_protocol)).toBe(true);
       }
     }
   });
