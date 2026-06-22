@@ -33,6 +33,32 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "anthropic",
+          "capabilities": [],
+          "provider": "claude-code",
+          "provider_model_id": "claude-fable-5"
+        },
+        {
+          "api_protocol": "openai",
+          "provider": "github-copilot",
+          "provider_model_id": "claude-fable-5"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 1,
+              "cache_write": 12.5,
+              "no_cache": 10
+            },
+            "output_tokens": {
+              "text": 50
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "claude-fable-5"
         }
       ],
       "release_date": "2026-06-09"
@@ -53,6 +79,59 @@
         "text"
       ],
       "providers": [
+        {
+          "api_protocol": "anthropic",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.1,
+              "cache_write": 1.25,
+              "no_cache": 1
+            },
+            "output_tokens": {
+              "text": 5
+            }
+          },
+          "provider": "anthropic",
+          "provider_model_id": "claude-haiku-4-5",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
+        },
+        {
+          "api_protocol": "openai",
+          "provider": "github-copilot",
+          "provider_model_id": "claude-haiku-4.5"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.1,
+              "cache_write": 1.25,
+              "no_cache": 1
+            },
+            "output_tokens": {
+              "text": 5
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "claude-haiku-4-5"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.1,
+              "cache_write": 1.25,
+              "no_cache": 1
+            },
+            "output_tokens": {
+              "text": 5
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "anthropic/claude-haiku-4.5"
+        },
         {
           "api_protocol": "openai",
           "capabilities": [
@@ -117,6 +196,51 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "anthropic",
+          "capabilities": [
+            "reasoning",
+            "structured_outputs",
+            "tools"
+          ],
+          "provider": "claude-code",
+          "provider_model_id": "claude-opus-4-5"
+        },
+        {
+          "api_protocol": "openai",
+          "provider": "github-copilot",
+          "provider_model_id": "claude-opus-4.5"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.5,
+              "cache_write": 6.25,
+              "no_cache": 5
+            },
+            "output_tokens": {
+              "text": 25
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "claude-opus-4-5"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.5,
+              "cache_write": 6.25,
+              "no_cache": 5
+            },
+            "output_tokens": {
+              "text": 25
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "anthropic/claude-opus-4.5"
         }
       ],
       "release_date": "2025-11-24"
@@ -159,6 +283,51 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "anthropic",
+          "capabilities": [
+            "reasoning",
+            "structured_outputs",
+            "tools"
+          ],
+          "provider": "claude-code",
+          "provider_model_id": "claude-opus-4-6"
+        },
+        {
+          "api_protocol": "openai",
+          "provider": "github-copilot",
+          "provider_model_id": "claude-opus-4.6"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.5,
+              "cache_write": 6.25,
+              "no_cache": 5
+            },
+            "output_tokens": {
+              "text": 25
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "claude-opus-4-6"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.5,
+              "cache_write": 6.25,
+              "no_cache": 5
+            },
+            "output_tokens": {
+              "text": 25
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "anthropic/claude-opus-4.6"
         },
         {
           "api_protocol": "openai",
@@ -225,6 +394,51 @@
           }
         },
         {
+          "api_protocol": "anthropic",
+          "capabilities": [
+            "reasoning",
+            "structured_outputs",
+            "tools"
+          ],
+          "provider": "claude-code",
+          "provider_model_id": "claude-opus-4-7"
+        },
+        {
+          "api_protocol": "openai",
+          "provider": "github-copilot",
+          "provider_model_id": "claude-opus-4.7"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.5,
+              "cache_write": 6.25,
+              "no_cache": 5
+            },
+            "output_tokens": {
+              "text": 25
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "claude-opus-4-7"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.5,
+              "cache_write": 6.25,
+              "no_cache": 5
+            },
+            "output_tokens": {
+              "text": 25
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "anthropic/claude-opus-4.7"
+        },
+        {
           "api_protocol": "openai",
           "capabilities": [
             "reasoning",
@@ -287,6 +501,51 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "anthropic",
+          "capabilities": [
+            "reasoning",
+            "structured_outputs",
+            "tools"
+          ],
+          "provider": "claude-code",
+          "provider_model_id": "claude-opus-4-8"
+        },
+        {
+          "api_protocol": "openai",
+          "provider": "github-copilot",
+          "provider_model_id": "claude-opus-4.8"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.5,
+              "cache_write": 6.25,
+              "no_cache": 5
+            },
+            "output_tokens": {
+              "text": 25
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "claude-opus-4-8"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.5,
+              "cache_write": 6.25,
+              "no_cache": 5
+            },
+            "output_tokens": {
+              "text": 25
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "anthropic/claude-opus-4.8"
         }
       ],
       "release_date": "2026-05-28"
@@ -329,6 +588,51 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "anthropic",
+          "capabilities": [
+            "reasoning",
+            "structured_outputs",
+            "tools"
+          ],
+          "provider": "claude-code",
+          "provider_model_id": "claude-sonnet-4-5"
+        },
+        {
+          "api_protocol": "openai",
+          "provider": "github-copilot",
+          "provider_model_id": "claude-sonnet-4.5"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.3,
+              "cache_write": 3.75,
+              "no_cache": 3
+            },
+            "output_tokens": {
+              "text": 15
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "claude-sonnet-4-5"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.3,
+              "cache_write": 3.75,
+              "no_cache": 3
+            },
+            "output_tokens": {
+              "text": 15
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "anthropic/claude-sonnet-4.5"
         }
       ],
       "release_date": "2025-09-29"
@@ -373,6 +677,52 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "anthropic",
+          "capabilities": [
+            "reasoning",
+            "structured_outputs",
+            "tools",
+            "image_input"
+          ],
+          "provider": "claude-code",
+          "provider_model_id": "claude-sonnet-4-6"
+        },
+        {
+          "api_protocol": "openai",
+          "provider": "github-copilot",
+          "provider_model_id": "claude-sonnet-4.6"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.3,
+              "cache_write": 3.75,
+              "no_cache": 3
+            },
+            "output_tokens": {
+              "text": 15
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "claude-sonnet-4-6"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.3,
+              "cache_write": 3.75,
+              "no_cache": 3
+            },
+            "output_tokens": {
+              "text": 15
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "anthropic/claude-sonnet-4.6"
         },
         {
           "api_protocol": "openai",
@@ -495,6 +845,19 @@
           "rate_limits": {
             "requests_per_minute": 50
           }
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "no_cache": 0.2288
+            },
+            "output_tokens": {
+              "text": 0.3432
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "deepseek/deepseek-v3.2"
         },
         {
           "api_protocol": "openai",
@@ -640,6 +1003,39 @@
         },
         {
           "api_protocol": "openai",
+          "provider": "opencode-go",
+          "provider_model_id": "deepseek-v4-flash"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.028,
+              "no_cache": 0.14
+            },
+            "output_tokens": {
+              "text": 0.28
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "deepseek-v4-flash"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.02,
+              "no_cache": 0.09
+            },
+            "output_tokens": {
+              "text": 0.18
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "deepseek/deepseek-v4-flash"
+        },
+        {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -742,6 +1138,39 @@
         },
         {
           "api_protocol": "openai",
+          "provider": "opencode-go",
+          "provider_model_id": "deepseek-v4-pro"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.145,
+              "no_cache": 1.74
+            },
+            "output_tokens": {
+              "text": 3.84
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "deepseek-v4-pro"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.003625,
+              "no_cache": 0.435
+            },
+            "output_tokens": {
+              "text": 0.87
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "deepseek/deepseek-v4-pro"
+        },
+        {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -820,6 +1249,21 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.125,
+              "cache_write": 0.375,
+              "no_cache": 1.25
+            },
+            "output_tokens": {
+              "text": 10
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "google/gemini-2.5-pro-preview"
         }
       ]
     },
@@ -841,6 +1285,11 @@
       ],
       "providers": [
         {
+          "api_protocol": "openai",
+          "provider": "github-copilot",
+          "provider_model_id": "gemini-3-flash-preview"
+        },
+        {
           "api_protocol": "google",
           "capabilities": [
             "reasoning",
@@ -860,6 +1309,21 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.05,
+              "cache_write": 0.083333,
+              "no_cache": 0.5
+            },
+            "output_tokens": {
+              "text": 3
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "google/gemini-3-flash-preview"
         }
       ],
       "release_date": "2025-12-17"
@@ -920,6 +1384,38 @@
       ],
       "providers": [
         {
+          "api_protocol": "google",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.025,
+              "no_cache": 0.25
+            },
+            "output_tokens": {
+              "text": 1.5
+            }
+          },
+          "provider": "google",
+          "provider_model_id": "gemini-3.1-flash-lite-preview",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.025,
+              "cache_write": 0.083333,
+              "no_cache": 0.25
+            },
+            "output_tokens": {
+              "text": 1.5
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "google/gemini-3.1-flash-lite-preview"
+        },
+        {
           "api_protocol": "openai",
           "capabilities": [
             "reasoning",
@@ -962,6 +1458,11 @@
       ],
       "providers": [
         {
+          "api_protocol": "openai",
+          "provider": "github-copilot",
+          "provider_model_id": "gemini-3.1-pro-preview"
+        },
+        {
           "api_protocol": "google",
           "capabilities": [
             "reasoning",
@@ -981,6 +1482,21 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.2,
+              "cache_write": 0.375,
+              "no_cache": 2
+            },
+            "output_tokens": {
+              "text": 12
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "google/gemini-3.1-pro-preview"
         },
         {
           "api_protocol": "openai",
@@ -1026,6 +1542,11 @@
       ],
       "providers": [
         {
+          "api_protocol": "openai",
+          "provider": "github-copilot",
+          "provider_model_id": "gemini-3.5-flash"
+        },
+        {
           "api_protocol": "google",
           "capabilities": [
             "reasoning",
@@ -1045,6 +1566,35 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.15,
+              "no_cache": 1.5
+            },
+            "output_tokens": {
+              "text": 9
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "gemini-3.5-flash"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.15,
+              "cache_write": 0.083333,
+              "no_cache": 1.5
+            },
+            "output_tokens": {
+              "text": 9
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "google/gemini-3.5-flash"
         }
       ],
       "release_date": "2026-05-19"
@@ -1082,6 +1632,14 @@
           "provider_model_id": "MiniMaxAI/MiniMax-M2.5",
           "rate_limits": {
             "requests_per_minute": 40
+          }
+        },
+        {
+          "api_protocol": "openai",
+          "provider": "alibaba-coding-plan",
+          "provider_model_id": "MiniMax-M2.5",
+          "rate_limits": {
+            "requests_per_minute": 60
           }
         },
         {
@@ -1172,6 +1730,39 @@
         },
         {
           "api_protocol": "openai",
+          "provider": "opencode-go",
+          "provider_model_id": "minimax-m2.5"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.06,
+              "no_cache": 0.3
+            },
+            "output_tokens": {
+              "text": 1.2
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "minimax-m2.5"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.05,
+              "no_cache": 0.15
+            },
+            "output_tokens": {
+              "text": 0.9
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "minimax/minimax-m2.5"
+        },
+        {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1254,6 +1845,39 @@
         },
         {
           "api_protocol": "openai",
+          "provider": "opencode-go",
+          "provider_model_id": "minimax-m2.7"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.06,
+              "no_cache": 0.3
+            },
+            "output_tokens": {
+              "text": 1.2
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "minimax-m2.7"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.05,
+              "no_cache": 0.25
+            },
+            "output_tokens": {
+              "text": 1
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "minimax/minimax-m2.7"
+        },
+        {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1313,6 +1937,42 @@
           }
         },
         {
+          "api_protocol": "anthropic",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.12,
+              "no_cache": 0.6
+            },
+            "output_tokens": {
+              "text": 2.4
+            }
+          },
+          "provider": "minimax",
+          "provider_model_id": "MiniMax-M3",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
+        },
+        {
+          "api_protocol": "openai",
+          "provider": "opencode-go",
+          "provider_model_id": "minimax-m3"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.06,
+              "no_cache": 0.3
+            },
+            "output_tokens": {
+              "text": 1.2
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "minimax/minimax-m3"
+        },
+        {
           "api_protocol": "openai",
           "capabilities": [
             "reasoning",
@@ -1364,6 +2024,14 @@
         "text"
       ],
       "providers": [
+        {
+          "api_protocol": "openai",
+          "provider": "alibaba-coding-plan",
+          "provider_model_id": "kimi-k2.5",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
+        },
         {
           "api_protocol": "responses",
           "capabilities": [
@@ -1448,6 +2116,38 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "openai",
+          "provider": "opencode-go",
+          "provider_model_id": "kimi-k2.5"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.08,
+              "no_cache": 0.6
+            },
+            "output_tokens": {
+              "text": 3
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "kimi-k2.5"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "no_cache": 0.375
+            },
+            "output_tokens": {
+              "text": 2.025
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "moonshotai/kimi-k2.5"
         },
         {
           "api_protocol": "openai",
@@ -1617,6 +2317,39 @@
         },
         {
           "api_protocol": "openai",
+          "provider": "opencode-go",
+          "provider_model_id": "kimi-k2.6"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.16,
+              "no_cache": 0.95
+            },
+            "output_tokens": {
+              "text": 4
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "kimi-k2.6"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.144,
+              "no_cache": 0.66
+            },
+            "output_tokens": {
+              "text": 3.41
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "moonshotai/kimi-k2.6"
+        },
+        {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1688,6 +2421,42 @@
           "rate_limits": {
             "requests_per_minute": 600
           }
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.19,
+              "no_cache": 0.95
+            },
+            "output_tokens": {
+              "text": 4
+            }
+          },
+          "provider": "moonshotai",
+          "provider_model_id": "kimi-k2.7-code",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
+        },
+        {
+          "api_protocol": "openai",
+          "provider": "opencode-go",
+          "provider_model_id": "kimi-k2.7-code"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.1296,
+              "no_cache": 0.612
+            },
+            "output_tokens": {
+              "text": 3.069
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "moonshotai/kimi-k2.7-code"
         }
       ],
       "release_date": "2026-06-12"
@@ -1732,6 +2501,34 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.107,
+              "no_cache": 1.07
+            },
+            "output_tokens": {
+              "text": 8.5
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "gpt-5.1"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.13,
+              "no_cache": 1.25
+            },
+            "output_tokens": {
+              "text": 10
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "openai/gpt-5.1"
         }
       ],
       "release_date": "2025-11-13"
@@ -1775,6 +2572,43 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "responses",
+          "capabilities": [
+            "reasoning",
+            "tools"
+          ],
+          "provider": "openai-codex",
+          "provider_model_id": "gpt-5.1-codex"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.107,
+              "no_cache": 1.07
+            },
+            "output_tokens": {
+              "text": 8.5
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "gpt-5.1-codex"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.13,
+              "no_cache": 1.25
+            },
+            "output_tokens": {
+              "text": 10
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "openai/gpt-5.1-codex"
         }
       ],
       "release_date": "2025-11-13"
@@ -1818,6 +2652,43 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "responses",
+          "capabilities": [
+            "reasoning",
+            "tools"
+          ],
+          "provider": "openai-codex",
+          "provider_model_id": "gpt-5.1-codex-mini"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.025,
+              "no_cache": 0.25
+            },
+            "output_tokens": {
+              "text": 2
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "gpt-5.1-codex-mini"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.025,
+              "no_cache": 0.25
+            },
+            "output_tokens": {
+              "text": 2
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "openai/gpt-5.1-codex-mini"
         }
       ],
       "release_date": "2025-11-13"
@@ -1838,6 +2709,11 @@
         "text"
       ],
       "providers": [
+        {
+          "api_protocol": "openai",
+          "provider": "github-copilot",
+          "provider_model_id": "gpt-5.2"
+        },
         {
           "api_protocol": [
             "openai",
@@ -1862,6 +2738,34 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.175,
+              "no_cache": 1.75
+            },
+            "output_tokens": {
+              "text": 14
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "gpt-5.2"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.175,
+              "no_cache": 1.75
+            },
+            "output_tokens": {
+              "text": 14
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "openai/gpt-5.2"
         }
       ],
       "release_date": "2025-12-11"
@@ -1882,6 +2786,11 @@
         "text"
       ],
       "providers": [
+        {
+          "api_protocol": "openai",
+          "provider": "github-copilot",
+          "provider_model_id": "gpt-5.2-codex"
+        },
         {
           "api_protocol": [
             "openai",
@@ -1905,6 +2814,43 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "responses",
+          "capabilities": [
+            "reasoning",
+            "tools"
+          ],
+          "provider": "openai-codex",
+          "provider_model_id": "gpt-5.2-codex"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.175,
+              "no_cache": 1.75
+            },
+            "output_tokens": {
+              "text": 14
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "gpt-5.2-codex"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.175,
+              "no_cache": 1.75
+            },
+            "output_tokens": {
+              "text": 14
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "openai/gpt-5.2-codex"
         }
       ],
       "release_date": "2025-12-11"
@@ -1926,6 +2872,11 @@
         "text"
       ],
       "providers": [
+        {
+          "api_protocol": "openai",
+          "provider": "github-copilot",
+          "provider_model_id": "gpt-5.3-codex"
+        },
         {
           "api_protocol": [
             "openai",
@@ -1949,6 +2900,43 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "responses",
+          "capabilities": [
+            "reasoning",
+            "tools"
+          ],
+          "provider": "openai-codex",
+          "provider_model_id": "gpt-5.3-codex"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.175,
+              "no_cache": 1.75
+            },
+            "output_tokens": {
+              "text": 14
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "gpt-5.3-codex"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.175,
+              "no_cache": 1.75
+            },
+            "output_tokens": {
+              "text": 14
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "openai/gpt-5.3-codex"
         }
       ],
       "release_date": "2026-02-05"
@@ -1991,6 +2979,11 @@
           }
         },
         {
+          "api_protocol": "openai",
+          "provider": "github-copilot",
+          "provider_model_id": "gpt-5.4"
+        },
+        {
           "api_protocol": [
             "openai",
             "responses"
@@ -2014,6 +3007,34 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.25,
+              "no_cache": 2.5
+            },
+            "output_tokens": {
+              "text": 15
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "gpt-5.4"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.25,
+              "no_cache": 2.5
+            },
+            "output_tokens": {
+              "text": 15
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "openai/gpt-5.4"
         },
         {
           "api_protocol": "openai",
@@ -2079,6 +3100,11 @@
           }
         },
         {
+          "api_protocol": "openai",
+          "provider": "github-copilot",
+          "provider_model_id": "gpt-5.4-mini"
+        },
+        {
           "api_protocol": [
             "openai",
             "responses"
@@ -2102,6 +3128,34 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.075,
+              "no_cache": 0.75
+            },
+            "output_tokens": {
+              "text": 4.5
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "gpt-5.4-mini"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.075,
+              "no_cache": 0.75
+            },
+            "output_tokens": {
+              "text": 4.5
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "openai/gpt-5.4-mini"
         },
         {
           "api_protocol": "openai",
@@ -2146,6 +3200,11 @@
       ],
       "providers": [
         {
+          "api_protocol": "openai",
+          "provider": "github-copilot",
+          "provider_model_id": "gpt-5.4-nano"
+        },
+        {
           "api_protocol": [
             "openai",
             "responses"
@@ -2169,6 +3228,34 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.02,
+              "no_cache": 0.2
+            },
+            "output_tokens": {
+              "text": 1.25
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "gpt-5.4-nano"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.02,
+              "no_cache": 0.2
+            },
+            "output_tokens": {
+              "text": 1.25
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "openai/gpt-5.4-nano"
         }
       ],
       "release_date": "2026-03-17"
@@ -2211,6 +3298,11 @@
           }
         },
         {
+          "api_protocol": "openai",
+          "provider": "github-copilot",
+          "provider_model_id": "gpt-5.5"
+        },
+        {
           "api_protocol": [
             "openai",
             "responses"
@@ -2234,6 +3326,34 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.5,
+              "no_cache": 5
+            },
+            "output_tokens": {
+              "text": 30
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "gpt-5.5"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.5,
+              "no_cache": 5
+            },
+            "output_tokens": {
+              "text": 30
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "openai/gpt-5.5"
         },
         {
           "api_protocol": "openai",
@@ -2296,6 +3416,37 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.02,
+              "cache_write": 0.08,
+              "no_cache": 0.04
+            },
+            "output_tokens": {
+              "text": 0.4
+            }
+          },
+          "provider": "ionet",
+          "provider_model_id": "openai/gpt-oss-120b",
+          "rate_limits": {
+            "requests_per_minute": 50
+          }
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "no_cache": 0.039
+            },
+            "output_tokens": {
+              "text": 0.18
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "openai/gpt-oss-120b"
         }
       ],
       "release_date": "2025-08-05"
@@ -2317,6 +3468,31 @@
       ],
       "providers": [
         {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_write": 0.234375,
+              "no_cache": 0.1875
+            },
+            "output_tokens": {
+              "text": 1.125
+            }
+          },
+          "provider": "alibaba",
+          "provider_model_id": "qwen3.6-flash",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
+        },
+        {
+          "api_protocol": "openai",
+          "provider": "alibaba-coding-plan",
+          "provider_model_id": "qwen3.6-flash",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
+        },
+        {
           "api_protocol": "responses",
           "pricing": {
             "input_tokens": {
@@ -2332,6 +3508,20 @@
           "rate_limits": {
             "requests_per_minute": 600
           }
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_write": 0.234375,
+              "no_cache": 0.1875
+            },
+            "output_tokens": {
+              "text": 1.125
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "qwen/qwen3.6-flash"
         }
       ],
       "release_date": "2026-04-02"
@@ -2401,6 +3591,40 @@
           "rate_limits": {
             "requests_per_minute": 600
           }
+        },
+        {
+          "api_protocol": "openai",
+          "provider": "opencode-go",
+          "provider_model_id": "qwen3.6-plus"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.05,
+              "cache_write": 0.625,
+              "no_cache": 0.5
+            },
+            "output_tokens": {
+              "text": 3
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "qwen3.6-plus"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_write": 0.40625,
+              "no_cache": 0.325
+            },
+            "output_tokens": {
+              "text": 1.95
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "qwen/qwen3.6-plus"
         },
         {
           "api_protocol": "openai",
@@ -2487,6 +3711,26 @@
           "rate_limits": {
             "requests_per_minute": 600
           }
+        },
+        {
+          "api_protocol": "openai",
+          "provider": "opencode-go",
+          "provider_model_id": "qwen3.7-max"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.25,
+              "cache_write": 1.5625,
+              "no_cache": 1.25
+            },
+            "output_tokens": {
+              "text": 3.75
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "qwen/qwen3.7-max"
         }
       ],
       "release_date": "2026-05-21"
@@ -2524,6 +3768,14 @@
           }
         },
         {
+          "api_protocol": "openai",
+          "provider": "alibaba-coding-plan",
+          "provider_model_id": "qwen3.7-plus",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
+        },
+        {
           "api_protocol": "responses",
           "pricing": {
             "input_tokens": {
@@ -2540,6 +3792,26 @@
           "rate_limits": {
             "requests_per_minute": 600
           }
+        },
+        {
+          "api_protocol": "openai",
+          "provider": "opencode-go",
+          "provider_model_id": "qwen3.7-plus"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.064,
+              "cache_write": 0.4,
+              "no_cache": 0.32
+            },
+            "output_tokens": {
+              "text": 1.28
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "qwen/qwen3.7-plus"
         }
       ],
       "release_date": "2026-06-01"
@@ -2578,6 +3850,20 @@
           "rate_limits": {
             "requests_per_minute": 600
           }
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.02,
+              "no_cache": 0.09
+            },
+            "output_tokens": {
+              "text": 0.3
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "stepfun/step-3.5-flash"
         },
         {
           "api_protocol": "openai",
@@ -2635,6 +3921,20 @@
           "rate_limits": {
             "requests_per_minute": 600
           }
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.04,
+              "no_cache": 0.2
+            },
+            "output_tokens": {
+              "text": 1.15
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "stepfun/step-3.7-flash"
         },
         {
           "api_protocol": "openai",
@@ -2708,6 +4008,20 @@
       "providers": [
         {
           "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.2,
+              "no_cache": 1.25
+            },
+            "output_tokens": {
+              "text": 2.5
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "x-ai/grok-4.20"
+        },
+        {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -2767,6 +4081,20 @@
         "text"
       ],
       "providers": [
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.2,
+              "no_cache": 1.25
+            },
+            "output_tokens": {
+              "text": 2.5
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "x-ai/grok-4.3"
+        },
         {
           "api_protocol": "openai",
           "capabilities": [
@@ -2913,6 +4241,11 @@
         },
         {
           "api_protocol": "openai",
+          "provider": "opencode-go",
+          "provider_model_id": "mimo-v2-omni"
+        },
+        {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -2970,6 +4303,11 @@
           "rate_limits": {
             "requests_per_minute": 600
           }
+        },
+        {
+          "api_protocol": "openai",
+          "provider": "opencode-go",
+          "provider_model_id": "mimo-v2-pro"
         },
         {
           "api_protocol": "openai",
@@ -3031,6 +4369,25 @@
           "rate_limits": {
             "requests_per_minute": 600
           }
+        },
+        {
+          "api_protocol": "openai",
+          "provider": "opencode-go",
+          "provider_model_id": "mimo-v2.5"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.0028,
+              "no_cache": 0.14
+            },
+            "output_tokens": {
+              "text": 0.28
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "xiaomi/mimo-v2.5"
         },
         {
           "api_protocol": "openai",
@@ -3117,6 +4474,25 @@
         },
         {
           "api_protocol": "openai",
+          "provider": "opencode-go",
+          "provider_model_id": "mimo-v2.5-pro"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.0036,
+              "no_cache": 0.435
+            },
+            "output_tokens": {
+              "text": 0.87
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "xiaomi/mimo-v2.5-pro"
+        },
+        {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -3175,6 +4551,14 @@
         "text"
       ],
       "providers": [
+        {
+          "api_protocol": "openai",
+          "provider": "alibaba-coding-plan",
+          "provider_model_id": "glm-5",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
+        },
         {
           "api_protocol": "responses",
           "capabilities": [
@@ -3236,6 +4620,39 @@
           "rate_limits": {
             "requests_per_minute": 50
           }
+        },
+        {
+          "api_protocol": "openai",
+          "provider": "opencode-go",
+          "provider_model_id": "glm-5"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.2,
+              "no_cache": 1
+            },
+            "output_tokens": {
+              "text": 3.2
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "glm-5"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.12,
+              "no_cache": 0.6
+            },
+            "output_tokens": {
+              "text": 1.92
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "z-ai/glm-5"
         },
         {
           "api_protocol": "openai",
@@ -3384,6 +4801,39 @@
         },
         {
           "api_protocol": "openai",
+          "provider": "opencode-go",
+          "provider_model_id": "glm-5.1"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.26,
+              "no_cache": 1.4
+            },
+            "output_tokens": {
+              "text": 4.4
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "glm-5.1"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.182,
+              "no_cache": 0.98
+            },
+            "output_tokens": {
+              "text": 3.08
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "z-ai/glm-5.1"
+        },
+        {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -3483,6 +4933,25 @@
         "text"
       ],
       "providers": [
+        {
+          "api_protocol": "openai",
+          "provider": "opencode-go",
+          "provider_model_id": "glm-5.2"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.18,
+              "no_cache": 1
+            },
+            "output_tokens": {
+              "text": 4
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "z-ai/glm-5.2"
+        },
         {
           "api_protocol": "openai",
           "capabilities": [

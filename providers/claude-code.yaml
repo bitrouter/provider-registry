@@ -25,4 +25,31 @@ auth:
   kind: oauth
   handler: anthropic
 status: active
-models: []
+# The Claude models the subscription serves — the same catalog as the `anthropic`
+# provider (same upstream), so the canonical ids match. No per-token `pricing`:
+# this is a flat-rate subscription, billed by the plan, not per request. The
+# consumer reaches these only via the explicit `claude-code:<model>` route (the
+# subscription provider is kept out of the canonical auto-cascade), so sharing
+# `anthropic/*` canonical ids never diverts pay-as-you-go traffic here.
+models:
+  - id: anthropic/claude-opus-4.8
+    provider_model_id: claude-opus-4-8
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: anthropic/claude-opus-4.7
+    provider_model_id: claude-opus-4-7
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: anthropic/claude-opus-4.6
+    provider_model_id: claude-opus-4-6
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: anthropic/claude-opus-4.5
+    provider_model_id: claude-opus-4-5
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: anthropic/claude-sonnet-4.6
+    provider_model_id: claude-sonnet-4-6
+    capabilities: [reasoning, structured_outputs, tools, image_input]
+  - id: anthropic/claude-sonnet-4.5
+    provider_model_id: claude-sonnet-4-5
+    capabilities: [reasoning, structured_outputs, tools]
+  - id: anthropic/claude-fable-5
+    provider_model_id: claude-fable-5
+    capabilities: []

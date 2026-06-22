@@ -22,6 +22,16 @@ models:
         cache_read: 0.05
       output_tokens:
         text: 3
+  - id: qwen/qwen3.7-plus
+    provider_model_id: qwen3.7-plus
+  - id: qwen/qwen3.6-flash
+    provider_model_id: qwen3.6-flash
+  - id: moonshotai/kimi-k2.5
+    provider_model_id: kimi-k2.5
+  - id: minimax/minimax-m2.5
+    provider_model_id: MiniMax-M2.5
+  - id: z-ai/glm-5
+    provider_model_id: glm-5
 status: active
 weight: 1
 submitted_at: 2026-06-05
