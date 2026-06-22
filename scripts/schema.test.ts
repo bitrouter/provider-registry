@@ -5,7 +5,13 @@
 // currently valid, not that malformed pricing is rejected.
 
 import { describe, expect, test } from "bun:test";
-import { CanonicalModel, ModelPricing, ProviderFile } from "./schema";
+import {
+  Auth,
+  CanonicalModel,
+  ModelPricing,
+  ProtocolList,
+  ProviderFile,
+} from "./schema";
 
 const base = {
   name: "p",
@@ -13,6 +19,74 @@ const base = {
   api_base: "https://p.test/v1",
   models: [] as unknown[],
 };
+
+describe("provider-definition schema (built-in migration)", () => {
+  test("ProtocolList accepts a single protocol or a non-empty ordered set", () => {
+    expect(ProtocolList.parse("openai")).toBe("openai");
+    expect(ProtocolList.parse(["openai", "responses"])).toEqual([
+      "openai",
+      "responses",
+    ]);
+    expect(() => ProtocolList.parse([])).toThrow(); // empty set rejected
+    expect(() => ProtocolList.parse("bogus")).toThrow();
+  });
+
+  test("api_protocol patterns accept protocol sets", () => {
+    const p = ProviderFile.parse({
+      ...base,
+      api_protocol: [{ "*": ["openai", "responses"] }, { "claude-*": "anthropic" }],
+    });
+    expect(p.api_protocol[0]).toEqual({ "*": ["openai", "responses"] });
+  });
+
+  test("Auth kind-gating: required fields per kind", () => {
+    expect(Auth.parse({ kind: "bearer", env: "X_API_KEY" }).kind).toBe("bearer");
+    expect(
+      Auth.parse({ kind: "header", header: "x-api-key", env: "X_API_KEY" }).header,
+    ).toBe("x-api-key");
+    expect(
+      Auth.parse({ kind: "oauth", handler: "github_copilot_device_code" }).handler,
+    ).toBe("github_copilot_device_code");
+    expect(() => Auth.parse({ kind: "bearer" })).toThrow(); // env required
+    expect(() => Auth.parse({ kind: "header", env: "X" })).toThrow(); // header required
+    expect(() => Auth.parse({ kind: "oauth" })).toThrow(); // handler required
+    expect(() => Auth.parse({ kind: "bogus", env: "X" })).toThrow();
+  });
+
+  test("provider accepts kind, auth, protocol_endpoints, display_name, doc_url", () => {
+    const p = ProviderFile.parse({
+      ...base,
+      kind: "gateway",
+      auth: { kind: "oauth", handler: "github_copilot_device_code", params: { client_id: "abc" } },
+      protocol_endpoints: { messages: "https://api.example.com/anthropic/v1" },
+      display_name: "Example",
+      doc_url: "https://example.com/docs",
+    });
+    expect(p.kind).toBe("gateway");
+    expect(p.auth?.kind).toBe("oauth");
+    expect(p.protocol_endpoints?.messages).toContain("/anthropic/v1");
+    expect(p.doc_url).toBe("https://example.com/docs");
+  });
+
+  test("protocol_endpoints + doc_url enforce HTTPS", () => {
+    expect(() =>
+      ProviderFile.parse({ ...base, doc_url: "http://example.com" }),
+    ).toThrow();
+    expect(() =>
+      ProviderFile.parse({
+        ...base,
+        protocol_endpoints: { messages: "http://insecure.example/v1" },
+      }),
+    ).toThrow();
+  });
+
+  test("auto_discover defaults false and is accepted", () => {
+    expect(ProviderFile.parse({ ...base }).auto_discover).toBe(false);
+    expect(ProviderFile.parse({ ...base, auto_discover: true }).auto_discover).toBe(
+      true,
+    );
+  });
+});
 
 test("community defaults false and verified is rejected", () => {
   expect(ProviderFile.parse({ ...base }).community).toBe(false);

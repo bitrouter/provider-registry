@@ -27,7 +27,7 @@
 
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { ApiProtocol, ProviderFile, RateLimits } from "./schema";
+import type { ProtocolList, ProviderFile, RateLimits } from "./schema";
 import { loadCanonical, loadProviders, REGISTRY_ROOT } from "./schema";
 
 // Recursively sort object keys (arrays keep their order) so serialization is
@@ -87,7 +87,7 @@ function resolvePattern<T>(
 interface ResolvedModel {
   id: string;
   provider_model_id: string;
-  api_protocol: ApiProtocol;
+  api_protocol: ProtocolList;
   pricing?: unknown;
   capabilities?: unknown;
   rate_limits?: RateLimits;
@@ -99,7 +99,7 @@ interface ResolvedModel {
 // default — matching the consumers' precedence.
 function resolveModels(provider: ProviderFile): ResolvedModel[] {
   return provider.models.map((model) => {
-    const api_protocol: ApiProtocol =
+    const api_protocol: ProtocolList =
       model.api_protocol ??
       resolvePattern(provider.api_protocol, model.id) ??
       "openai";

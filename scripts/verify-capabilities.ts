@@ -48,6 +48,7 @@ import {
   loadProviders,
   type ApiProtocol,
   type AuthScheme,
+  type ProtocolList,
   type ProviderFile,
   type ProviderModel,
 } from "./schema";
@@ -100,15 +101,21 @@ function pad(s: string, n: number): string {
   return s.length >= n ? s : s + " ".repeat(n - s.length);
 }
 
+// The preferred (head) protocol of a `ProtocolList` — a probe targets one
+// protocol, so collapse an ordered set to its first member.
+function headProtocol(p: ProtocolList): ApiProtocol {
+  return Array.isArray(p) ? p[0]! : p;
+}
+
 // Resolve the effective wire protocol for one model: an explicit per-model
 // override wins, else the provider's pattern list (exact id match, then `*`).
 function resolveProtocol(provider: ProviderFile, model: ProviderModel): ApiProtocol {
-  if (model.api_protocol) return model.api_protocol;
+  if (model.api_protocol) return headProtocol(model.api_protocol);
   let star: ApiProtocol | undefined;
   for (const entry of provider.api_protocol ?? []) {
     const [pattern, proto] = Object.entries(entry)[0]!;
-    if (pattern === model.id) return proto;
-    if (pattern === "*") star = proto;
+    if (pattern === model.id) return headProtocol(proto);
+    if (pattern === "*") star = headProtocol(proto);
   }
   return star ?? "openai";
 }

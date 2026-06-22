@@ -31,6 +31,56 @@ export type ApiProtocol = z.infer<typeof ApiProtocol>;
 export const AuthScheme = z.enum(["x-api-key", "bearer"]);
 export type AuthScheme = z.infer<typeof AuthScheme>;
 
+// An ordered set of wire protocols for one pattern or model: a bare string
+// (single protocol) or a non-empty array, most-preferred first. Lets a provider
+// advertise e.g. `[openai, responses]` so a consumer can route a native
+// Responses request without translation. Mirrors the SDK's `ProtocolList`; kept
+// in lock-step with the Rust consumers.
+export const ProtocolList = z.union([ApiProtocol, z.array(ApiProtocol).min(1)]);
+export type ProtocolList = z.infer<typeof ProtocolList>;
+
+// How a consumer places the outbound credential. `bearer` / `header` are
+// static-credential schemes (the credential is read from `env`); `oauth` /
+// `native` reference a `handler` implemented IN the consumer (device/auth-code
+// flow, SigV4, …) — only the handler NAME and public params live here, never a
+// secret. Mirrors the SDK's `AuthScheme`; kept in lock-step with the consumers.
+export const AuthKind = z.enum(["bearer", "header", "oauth", "native"]);
+export type AuthKind = z.infer<typeof AuthKind>;
+
+export const Auth = z
+  .object({
+    kind: AuthKind,
+    // Env var holding the credential (bearer/header). Public config, not a secret.
+    env: z.string().min(1).optional(),
+    // Header carrying the credential (header kind), e.g. `x-api-key`.
+    header: z.string().min(1).optional(),
+    // Constant headers sent alongside the credential (e.g. an API-version pin).
+    extra_headers: z.record(z.string(), z.string()).optional(),
+    // Named handler in the consumer's registry (oauth/native), e.g.
+    // `github_copilot_device_code`. The implementation lives in the consumer.
+    handler: z.string().min(1).optional(),
+    // Handler-specific PUBLIC params (client_id, scopes, endpoints). No secrets.
+    params: z.record(z.string(), z.unknown()).optional(),
+  })
+  .strict()
+  .superRefine((d, ctx) => {
+    if ((d.kind === "bearer" || d.kind === "header") && d.env === undefined)
+      ctx.addIssue({ code: "custom", path: ["env"], message: `${d.kind} auth requires \`env\`` });
+    if (d.kind === "header" && d.header === undefined)
+      ctx.addIssue({ code: "custom", path: ["header"], message: "header auth requires `header`" });
+    if ((d.kind === "oauth" || d.kind === "native") && d.handler === undefined)
+      ctx.addIssue({ code: "custom", path: ["handler"], message: `${d.kind} auth requires \`handler\`` });
+  });
+export type Auth = z.infer<typeof Auth>;
+
+// What kind of provider this is — drives the consumer's routing-priority class
+// and poolability. `first_party` = official upstream; `gateway` = an aggregator
+// fronting other makers' models; `cloud` = the bitrouter pool; `third_party` =
+// community reseller. A consumer pools only key-auth first/third-party
+// providers — never `gateway` / `cloud` / `oauth` / `native`.
+export const ProviderKind = z.enum(["first_party", "gateway", "cloud", "third_party"]);
+export type ProviderKind = z.infer<typeof ProviderKind>;
+
 // An API-agnostic flag for an optional inference feature a (provider, model)
 // pair supports. Capabilities are deliberately abstract: the same capability
 // maps to a different wire parameter in each inbound API (structured outputs =
@@ -304,7 +354,7 @@ export const ProviderModel = z
   .object({
     id: z.string().min(1),
     provider_model_id: z.string().min(1),
-    api_protocol: ApiProtocol.optional(),
+    api_protocol: ProtocolList.optional(),
     pricing: ModelPricing.optional(),
     rate_limits: RateLimits.optional(),
     // Inference capabilities this (provider, model) pair supports beyond plain
@@ -331,13 +381,35 @@ export const ProviderFile = z
         /^[a-z][a-z0-9-]*$/,
         "provider name must be lowercase alphanumerics + hyphen, starting with a letter",
       ),
-    api_protocol: z.array(patternEntry(ApiProtocol)).optional().default([]),
+    // Wire protocol per model-id glob. Each value is a `ProtocolList` — a bare
+    // string or an ordered set (e.g. `[openai, responses]`) — so a provider can
+    // advertise native multi-protocol support. Longest matching glob wins;
+    // `build-dist` resolves it per (provider, model).
+    api_protocol: z.array(patternEntry(ProtocolList)).optional().default([]),
     rate_limits: z.array(patternEntry(RateLimits)).optional().default([]),
+    // Per-protocol base-URL override, keyed by protocol name — for a provider
+    // that serves different protocols at different paths under one host (e.g.
+    // OpenAI-style under `/v1`, Messages under `/anthropic`). HTTPS only.
+    protocol_endpoints: z
+      .record(
+        z.string(),
+        z
+          .string()
+          .url()
+          .refine((u) => u.startsWith("https://"), {
+            message: "protocol_endpoints URLs must be HTTPS",
+          }),
+      )
+      .optional(),
     // `models` may be empty in the management workflow ("create a stub,
-    // attach models later"). The validator enforces a non-empty list for
-    // any provider whose `status` is `active`; staging/suspended/withdrawn
-    // entries are allowed to start empty.
+    // attach models later") and for `auto_discover` providers. The validator
+    // enforces a non-empty list for an `active` provider unless it is
+    // `auto_discover`; staging/suspended/withdrawn entries may start empty.
     models: z.array(ProviderModel),
+    // A transport+auth-only provider whose model catalog the consumer discovers
+    // at runtime (an aggregator/gateway that proxies an uncurated set). When
+    // true, an active provider need not declare `models`.
+    auto_discover: z.boolean().optional().default(false),
     status: ProviderStatus,
     weight: z.number().min(0).max(1).default(1.0),
     contact: z.string().email().optional(),
@@ -376,9 +448,30 @@ export const ProviderFile = z
       }),
     // Outbound credential scheme for this provider's Messages (`anthropic`)
     // requests — see `AuthScheme`. Optional; omitted means `x-api-key`
-    // (Anthropic's native default), matching the Rust consumer's serde
-    // default. Ignored for OpenAI/Google providers.
+    // (Anthropic's native default). Deprecated in favour of the full `auth`
+    // block (a consumer derives the Messages scheme from `auth` when present);
+    // retained for back-compat with providers not yet migrated.
     auth_scheme: AuthScheme.optional().default("x-api-key"),
+    // Full outbound auth declaration — see `Auth`. When present it is the
+    // authoritative credential scheme (bearer/header/oauth/native); only public
+    // config lives here (env-var / header names, handler names + public params),
+    // never a secret. Optional so unmigrated providers keep working off
+    // `auth_scheme` + the host-inferred default.
+    auth: Auth.optional(),
+    // What kind of provider this is — see `ProviderKind`. Drives the consumer's
+    // routing-priority class and poolability. Optional; when omitted a consumer
+    // derives it from `community` (`third_party` if community, else
+    // `first_party`).
+    kind: ProviderKind.optional(),
+    // Human-readable display name (UI only). Optional.
+    display_name: z.string().min(1).optional(),
+    // Link to the provider's official API documentation (auth + endpoint
+    // reference). HTTPS. Optional.
+    doc_url: z
+      .string()
+      .url()
+      .refine((u) => u.startsWith("https://"), { message: "doc_url must be HTTPS" })
+      .optional(),
     // Optional upstream feed for catalog auto-sync — see `AutoSync`. Omit for
     // manual / source-of-truth providers (the role `verified` played in gating
     // a provider out of the curation pipeline).
@@ -480,12 +573,13 @@ export function crossFileIssues(reg: LoadedRegistry): RegistryIssue[] {
   const canonicalIds = new Set(reg.canonical.map((m) => m.id));
 
   // Active providers must declare at least one model — only staging /
-  // suspended / withdrawn entries may sit empty.
+  // suspended / withdrawn entries, or `auto_discover` providers (whose catalog
+  // is discovered at runtime), may sit empty.
   for (const { path, data } of reg.providers) {
-    if (data.status === "active" && data.models.length === 0) {
+    if (data.status === "active" && data.models.length === 0 && !data.auto_discover) {
       issues.push({
         file: path,
-        message: `provider '${data.name}' is active but declares no models`,
+        message: `provider '${data.name}' is active but declares no models (set auto_discover: true for a runtime-discovered catalog)`,
       });
     }
   }

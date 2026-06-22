@@ -3,6 +3,7 @@
     {
       "api_base": "https://all.ai0ms.com/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "billing": "token",
       "byok": false,
       "community": true,
@@ -80,6 +81,7 @@
     {
       "api_base": "https://api.akashml.com/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "billing": "token",
       "byok": true,
       "community": true,
@@ -156,6 +158,7 @@
     {
       "api_base": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -225,6 +228,7 @@
     {
       "api_base": "https://coding-intl.dashscope.aliyuncs.com/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -276,6 +280,7 @@
     {
       "api_base": "https://api.anthropic.com/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -450,6 +455,7 @@
     {
       "api_base": "https://provider-api.bitrouter.ai/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "billing": "token",
       "byok": false,
       "community": false,
@@ -894,6 +900,7 @@
     {
       "api_base": "https://api.cerebras.ai/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -932,6 +939,7 @@
     {
       "api_base": "https://llm.chutes.ai/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -1095,6 +1103,7 @@
     {
       "api_base": "https://api.deepseek.com",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -1154,6 +1163,7 @@
     {
       "api_base": "https://generativelanguage.googleapis.com/v1beta",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -1277,6 +1287,7 @@
     {
       "api_base": "https://api.intelligence.io.solutions/api/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev",
         "key": "io-net"
@@ -1461,6 +1472,7 @@
     {
       "api_base": "https://api.minimax.io/anthropic/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -1522,6 +1534,7 @@
     {
       "api_base": "https://api.moonshot.ai/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -1583,6 +1596,7 @@
     {
       "api_base": "https://api.kimi.com/coding/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev",
         "key": "kimi-for-coding"
@@ -1622,6 +1636,7 @@
     {
       "api_base": "https://api.openai.com/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -1855,6 +1870,7 @@
     {
       "api_base": "https://api.redpill.ai/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "billing": "token",
       "byok": true,
       "community": true,
@@ -1904,6 +1920,7 @@
     {
       "api_base": "https://api.stepfun.ai/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev",
         "key": "stepfun-ai"
@@ -1963,6 +1980,7 @@
     {
       "api_base": "https://tokenhub-intl.tencentcloudmaas.com/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "billing": "token",
       "byok": true,
       "community": false,
@@ -2193,6 +2211,7 @@
     {
       "api_base": "https://inference.tinfoil.sh/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "billing": "token",
       "byok": true,
       "community": true,
@@ -2270,6 +2289,7 @@
     {
       "api_base": "https://inference-api.worldrouter.ai/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "billing": "token",
       "byok": true,
       "community": true,
@@ -2613,6 +2633,7 @@
     {
       "api_base": "https://api.x.ai/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -2671,6 +2692,7 @@
     {
       "api_base": "https://api.xiaomimimo.com/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -2793,6 +2815,7 @@
     {
       "api_base": "https://api.z.ai/api/paas/v4",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -2873,6 +2896,7 @@
     {
       "api_base": "https://api.z.ai/api/coding/paas/v4",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
