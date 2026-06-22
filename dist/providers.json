@@ -1112,6 +1112,31 @@
       "weight": 1
     },
     {
+      "access": "local_oauth",
+      "api_base": "https://api.anthropic.com/v1",
+      "api_protocol": [
+        {
+          "*": "anthropic"
+        }
+      ],
+      "auth": {
+        "handler": "anthropic",
+        "kind": "oauth"
+      },
+      "auth_scheme": "x-api-key",
+      "billing": "subscription",
+      "byok": false,
+      "community": false,
+      "display_name": "Claude Code (subscription)",
+      "id": "claude-code",
+      "kind": "first_party",
+      "models": [],
+      "name": "claude-code",
+      "rate_limits": [],
+      "status": "active",
+      "weight": 1
+    },
+    {
       "access": "api_key",
       "api_base": "https://api.deepseek.com",
       "auth_scheme": "x-api-key",
