@@ -234,4 +234,6 @@ status: active
 weight: 1
 submitted_at: 2026-06-11
 auth_scheme: x-api-key
-byok: false
+# Platform-pooled provider — no public registration, so never BYOK / poolable
+# by a caller's key (replaces the old `byok: false`).
+access: private

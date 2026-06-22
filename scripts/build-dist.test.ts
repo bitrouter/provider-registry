@@ -35,20 +35,23 @@ describe("dist build", () => {
       ? PROTOS.includes(p)
       : Array.isArray(p) && p.length > 0 && p.every((x) => PROTOS.includes(x as string));
 
-  test("curated providers resolve per-model; auto_discover keep provider globs", async () => {
+  test("curated providers resolve per-model; runtime-discovered keep provider globs", async () => {
     const { providers } = await buildArtifacts();
     const data = JSON.parse(providers).data as Array<{
       id: string;
-      auto_discover?: boolean;
+      access?: string;
+      byok?: boolean;
       api_protocol?: unknown;
       rate_limits?: unknown;
       models: Array<{ id: string; api_protocol: unknown }>;
     }>;
     for (const p of data) {
-      if (p.auto_discover) {
-        // Catalog discovered at runtime: no models, provider-level globs kept
-        // so the consumer can apply them to what it discovers.
-        expect(p.models.length).toBe(0);
+      // Derived back-compat alias: byok iff access === "api_key".
+      expect(p.byok).toBe(p.access === "api_key");
+      if (p.models.length === 0) {
+        // Catalog discovered at runtime (provider declares an auto_sync feed):
+        // provider-level globs are kept so the consumer can apply them to what
+        // it discovers.
         expect(p.api_protocol).toBeDefined();
       } else {
         // Curated: globs resolved onto each model; no provider-level arrays.

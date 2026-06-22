@@ -80,11 +80,11 @@ describe("provider-definition schema (built-in migration)", () => {
     ).toThrow();
   });
 
-  test("auto_discover defaults false and is accepted", () => {
-    expect(ProviderFile.parse({ ...base }).auto_discover).toBe(false);
-    expect(ProviderFile.parse({ ...base, auto_discover: true }).auto_discover).toBe(
-      true,
-    );
+  test("auto_sync is optional and accepts a feed", () => {
+    expect(ProviderFile.parse({ ...base }).auto_sync).toBeUndefined();
+    expect(
+      ProviderFile.parse({ ...base, auto_sync: { feed: "v1_models" } }).auto_sync,
+    ).toEqual({ feed: "v1_models" });
   });
 });
 
@@ -102,10 +102,14 @@ test("api_base is required and must be HTTPS", () => {
   expect(() => ProviderFile.parse({ ...base, api_base: "http://p.test/v1" })).toThrow(); // non-HTTPS
 });
 
-test("byok defaults true and can be disabled; byok_only is rejected", () => {
-  expect(ProviderFile.parse({ ...base }).byok).toBe(true);
-  expect(ProviderFile.parse({ ...base, byok: false }).byok).toBe(false);
-  expect(() => ProviderFile.parse({ ...base, byok_only: true })).toThrow(); // strict()
+test("access defaults api_key and accepts the obtainment kinds; byok is gone", () => {
+  expect(ProviderFile.parse({ ...base }).access).toBe("api_key");
+  for (const access of ["api_key", "local_oauth", "local_pkce", "private"] as const) {
+    expect(ProviderFile.parse({ ...base, access }).access).toBe(access);
+  }
+  expect(() => ProviderFile.parse({ ...base, access: "nope" })).toThrow(); // enum
+  // `byok` was replaced by `access`; strict() must now reject the old field.
+  expect(() => ProviderFile.parse({ ...base, byok: false })).toThrow();
 });
 
 test("billing defaults token and accepts subscription; unknown values rejected", () => {

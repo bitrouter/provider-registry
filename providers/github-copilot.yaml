@@ -14,12 +14,14 @@
 # handler exchanges it for a short-lived Copilot Bearer. Only the public OAuth
 # params live here; the exchange + integration headers are the consumer's
 # handler. Copilot multiplexes families behind one host, so protocol is
-# per-model-glob; `auto_discover` since the catalog is the gateway's `/models`.
+# per-model-glob. The catalog is the gateway's `/models`, pulled at runtime via
+# `auto_sync: v1_models`. `access: local_oauth` — credentials are minted by the
+# local device flow, so there is no portable key to BYOK or pool.
 name: github-copilot
 display_name: GitHub Copilot
 kind: gateway
 billing: subscription
-auto_discover: true
+access: local_oauth
 api_base: https://api.githubcopilot.com
 doc_url: https://docs.github.com/en/copilot/reference/api-reference/copilot-api-endpoints
 api_protocol:
@@ -44,3 +46,5 @@ auth:
     token_endpoint: https://github.com/login/oauth/access_token
 models: []
 status: active
+auto_sync:
+  feed: v1_models

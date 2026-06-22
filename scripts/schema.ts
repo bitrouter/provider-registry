@@ -81,6 +81,28 @@ export type Auth = z.infer<typeof Auth>;
 export const ProviderKind = z.enum(["first_party", "gateway", "cloud", "third_party"]);
 export type ProviderKind = z.infer<typeof ProviderKind>;
 
+// How a caller obtains access to a provider — the registration / credential
+// *obtainment* model (orthogonal to `auth.kind`, which is wire placement).
+// Replaces the coarse `byok` boolean and lets consumers act on the distinction:
+//
+//   - `api_key`     public self-registration → a portable API key. The cloud
+//                   console BYOK page lists ONLY these; the platform can pool
+//                   them with its own key; the OSS auto-enables on the env key.
+//   - `local_oauth` public, but credentials are minted by a browser/device
+//                   OAuth flow run locally (e.g. GitHub Copilot device flow).
+//                   No portable key → the cloud cannot BYOK or pool it; the OSS
+//                   obtains it via `bitrouter login <provider>`.
+//   - `local_pkce`  public, but credentials come from a local OAuth+PKCE flow
+//                   (e.g. OpenAI Codex against a ChatGPT subscription). Same
+//                   consumer consequences as `local_oauth`.
+//   - `private`     no public registration — platform-pooled / invite-only
+//                   (the bitrouter pool, an anonymous aggregator). Never BYOK.
+//
+// `byok` is now a derived alias: `byok === (access === "api_key")`. The dist
+// still emits it for back-compat with consumers that have not migrated.
+export const Access = z.enum(["api_key", "local_oauth", "local_pkce", "private"]);
+export type Access = z.infer<typeof Access>;
+
 // An API-agnostic flag for an optional inference feature a (provider, model)
 // pair supports. Capabilities are deliberately abstract: the same capability
 // maps to a different wire parameter in each inbound API (structured outputs =
@@ -402,14 +424,11 @@ export const ProviderFile = z
       )
       .optional(),
     // `models` may be empty in the management workflow ("create a stub,
-    // attach models later") and for `auto_discover` providers. The validator
-    // enforces a non-empty list for an `active` provider unless it is
-    // `auto_discover`; staging/suspended/withdrawn entries may start empty.
+    // attach models later") and for runtime-discovered providers. The validator
+    // enforces a non-empty list for an `active` provider unless it declares an
+    // `auto_sync` feed (the catalog comes from that channel — see `auto_sync`
+    // below); staging/suspended/withdrawn entries may start empty.
     models: z.array(ProviderModel),
-    // A transport+auth-only provider whose model catalog the consumer discovers
-    // at runtime (an aggregator/gateway that proxies an uncurated set). When
-    // true, an active provider need not declare `models`.
-    auto_discover: z.boolean().optional().default(false),
     status: ProviderStatus,
     weight: z.number().min(0).max(1).default(1.0),
     contact: z.string().email().optional(),
@@ -422,14 +441,13 @@ export const ProviderFile = z
     // router's /v1/providers. Replaces the former `verified` flag — providers
     // are no longer anonymized, so the real name is always public.
     community: z.boolean().optional().default(false),
-    // Whether callers may bring their own key (BYOK) for this provider.
-    // Defaults `true` — BYOK is available for every provider that is open to
-    // public self-registration. Set `false` only when a caller cannot obtain
-    // their own key (e.g. our own pooled `bitrouter` provider, or an invite-only
-    // aggregator). The router routes via its platform key when it holds one,
-    // builds a BYOK placeholder (dispatched against `api_base`) when `byok` and
-    // it holds none, and applies the BYOK overlay only when `byok`.
-    byok: z.boolean().optional().default(true),
+    // How a caller obtains access to this provider — see `Access`. Defaults
+    // `api_key` (public self-registration → a portable key, the BYOK case).
+    // Set `local_oauth` / `local_pkce` for providers whose credentials are
+    // minted by a local interactive flow (no portable key), and `private` for
+    // platform-pooled / invite-only providers with no public registration.
+    // Supersedes the old `byok` boolean (now derived: `byok` iff `api_key`).
+    access: Access.optional().default("api_key"),
     // How a caller pays this provider — see `Billing`. Defaults `token`
     // (pay-as-you-go). Set `subscription` for flat-rate plans (e.g. a
     // first-party coding plan). Optional + defaulted, so a consumer that does
@@ -472,9 +490,15 @@ export const ProviderFile = z
       .url()
       .refine((u) => u.startsWith("https://"), { message: "doc_url must be HTTPS" })
       .optional(),
-    // Optional upstream feed for catalog auto-sync — see `AutoSync`. Omit for
-    // manual / source-of-truth providers (the role `verified` played in gating
-    // a provider out of the curation pipeline).
+    // Optional upstream feed for the provider's model catalog — see `AutoSync`.
+    // Serves a dual role: the registry's own curation bot reads it to refresh
+    // the canonical entries, AND a consumer reads the SAME channel at runtime to
+    // pull the provider's FULL catalog (beyond the curated canonical subset) —
+    // `v1_models` → GET `{url ?? api_base}/models`, `models_dev` → models.dev
+    // keyed by `key`. A provider with `auto_sync` but no curated `models` is a
+    // pure runtime-discovered catalog (the former `auto_discover` role); the
+    // consumer keeps the canonical list at highest route priority. Omit for
+    // manual / source-of-truth providers.
     auto_sync: AutoSync.optional(),
   })
   .strict()
@@ -573,13 +597,17 @@ export function crossFileIssues(reg: LoadedRegistry): RegistryIssue[] {
   const canonicalIds = new Set(reg.canonical.map((m) => m.id));
 
   // Active providers must declare at least one model — only staging /
-  // suspended / withdrawn entries, or `auto_discover` providers (whose catalog
-  // is discovered at runtime), may sit empty.
+  // suspended / withdrawn entries, or providers with an `auto_sync` feed (whose
+  // catalog is pulled from that channel at runtime), may sit empty.
   for (const { path, data } of reg.providers) {
-    if (data.status === "active" && data.models.length === 0 && !data.auto_discover) {
+    if (
+      data.status === "active" &&
+      data.models.length === 0 &&
+      data.auto_sync === undefined
+    ) {
       issues.push({
         file: path,
-        message: `provider '${data.name}' is active but declares no models (set auto_discover: true for a runtime-discovered catalog)`,
+        message: `provider '${data.name}' is active but declares no models (add an auto_sync feed for a runtime-discovered catalog)`,
       });
     }
   }
