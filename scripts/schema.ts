@@ -598,12 +598,19 @@ export function crossFileIssues(reg: LoadedRegistry): RegistryIssue[] {
 
   // Active providers must declare at least one model — only staging /
   // suspended / withdrawn entries, or providers with an `auto_sync` feed (whose
-  // catalog is pulled from that channel at runtime), may sit empty.
+  // catalog is pulled from that channel at runtime), may sit empty. A
+  // `local_oauth` / `local_pkce` provider is also exempt: it carries no public
+  // catalog and is reached only by an explicit `provider:model` route after a
+  // local login (e.g. the Claude Code subscription forwards the model id
+  // straight upstream), so it has no models of its own to declare.
+  const explicitRouteAccess = (access: string) =>
+    access === "local_oauth" || access === "local_pkce";
   for (const { path, data } of reg.providers) {
     if (
       data.status === "active" &&
       data.models.length === 0 &&
-      data.auto_sync === undefined
+      data.auto_sync === undefined &&
+      !explicitRouteAccess(data.access)
     ) {
       issues.push({
         file: path,

@@ -1,0 +1,28 @@
+# Claude Code subscription — a caller's own Claude Pro/Max plan, used through
+# the Claude Code OAuth session minted locally (read from `~/.claude`). This is
+# the FIRST `local_oauth` provider in the catalog: there is no portable API key,
+# so it is not BYOK-able and not poolable — the consumer obtains the credential
+# via a local login (`bitrouter providers login claude-code`) and authenticates
+# each request with a request-time OAuth applier.
+#
+# It carries no models of its own: the consumer reaches it only by an explicit
+# `claude-code:<model>` route for genuine Claude Code traffic (detected by the
+# Claude Code system prompt) and forwards the model id straight to Anthropic.
+# Non-Claude-Code traffic uses the pay-as-you-go `anthropic` provider instead.
+#
+# Reference: Claude Code's published OAuth client, reused by the OpenClaw /
+# opencode auth registries.
+# - https://docs.anthropic.com/en/api/messages
+name: claude-code
+display_name: Claude Code (subscription)
+kind: first_party
+access: local_oauth
+billing: subscription
+api_base: https://api.anthropic.com/v1
+api_protocol:
+  - "*": anthropic
+auth:
+  kind: oauth
+  handler: anthropic
+status: active
+models: []
