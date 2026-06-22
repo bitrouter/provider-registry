@@ -2,11 +2,6 @@
   "data": [
     {
       "api_base": "https://all.ai0ms.com/v1",
-      "api_protocol": [
-        {
-          "*": "openai"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "billing": "token",
       "byok": false,
@@ -14,6 +9,7 @@
       "id": "ai0ms",
       "models": [
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -28,9 +24,13 @@
               "text": 15
             }
           },
-          "provider_model_id": "gpt-5.4"
+          "provider_model_id": "gpt-5.4",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -45,9 +45,13 @@
               "text": 4.5
             }
           },
-          "provider_model_id": "gpt-5.4-mini"
+          "provider_model_id": "gpt-5.4-mini",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -62,28 +66,19 @@
               "text": 30
             }
           },
-          "provider_model_id": "gpt-5.5"
-        }
-      ],
-      "name": "ai0ms",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "gpt-5.5",
+          "rate_limits": {
             "requests_per_minute": 60
           }
         }
       ],
+      "name": "ai0ms",
       "status": "active",
       "submitted_at": "2026-05-25",
       "weight": 1
     },
     {
       "api_base": "https://api.akashml.com/v1",
-      "api_protocol": [
-        {
-          "*": "openai"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "billing": "token",
       "byok": true,
@@ -91,6 +86,7 @@
       "id": "akashml",
       "models": [
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -105,9 +101,13 @@
               "text": 0.28
             }
           },
-          "provider_model_id": "deepseek-ai/DeepSeek-V4-Flash"
+          "provider_model_id": "deepseek-ai/DeepSeek-V4-Flash",
+          "rate_limits": {
+            "requests_per_minute": 40
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -122,9 +122,13 @@
               "text": 1.15
             }
           },
-          "provider_model_id": "MiniMaxAI/MiniMax-M2.5"
+          "provider_model_id": "MiniMaxAI/MiniMax-M2.5",
+          "rate_limits": {
+            "requests_per_minute": 40
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -138,28 +142,19 @@
               "text": 4
             }
           },
-          "provider_model_id": "moonshotai/Kimi-K2.6"
-        }
-      ],
-      "name": "akashml",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "moonshotai/Kimi-K2.6",
+          "rate_limits": {
             "requests_per_minute": 40
           }
         }
       ],
+      "name": "akashml",
       "status": "active",
       "submitted_at": "2026-05-12",
       "weight": 1
     },
     {
       "api_base": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
-      "api_protocol": [
-        {
-          "*": "openai"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "auto_sync": {
         "feed": "models_dev"
@@ -170,6 +165,7 @@
       "id": "alibaba",
       "models": [
         {
+          "api_protocol": "openai",
           "id": "qwen/qwen3.7-max",
           "pricing": {
             "input_tokens": {
@@ -180,9 +176,13 @@
               "text": 7.5
             }
           },
-          "provider_model_id": "qwen3.7-max"
+          "provider_model_id": "qwen3.7-max",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "id": "qwen/qwen3.6-plus",
           "pricing": {
             "input_tokens": {
@@ -193,9 +193,13 @@
               "text": 3
             }
           },
-          "provider_model_id": "qwen3.6-plus"
+          "provider_model_id": "qwen3.6-plus",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "id": "qwen/qwen3.7-plus",
           "pricing": {
             "input_tokens": {
@@ -207,28 +211,19 @@
               "text": 3
             }
           },
-          "provider_model_id": "qwen3.7-plus"
-        }
-      ],
-      "name": "alibaba",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "qwen3.7-plus",
+          "rate_limits": {
             "requests_per_minute": 60
           }
         }
       ],
+      "name": "alibaba",
       "status": "active",
       "submitted_at": "2026-05-25",
       "weight": 1
     },
     {
       "api_base": "https://coding-intl.dashscope.aliyuncs.com/v1",
-      "api_protocol": [
-        {
-          "*": "openai"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "auto_sync": {
         "feed": "models_dev"
@@ -239,6 +234,7 @@
       "id": "alibaba-coding-plan",
       "models": [
         {
+          "api_protocol": "openai",
           "id": "qwen/qwen3.7-max",
           "pricing": {
             "input_tokens": {
@@ -249,9 +245,13 @@
               "text": 7.5
             }
           },
-          "provider_model_id": "qwen3.7-max"
+          "provider_model_id": "qwen3.7-max",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "id": "qwen/qwen3.6-plus",
           "pricing": {
             "input_tokens": {
@@ -262,28 +262,19 @@
               "text": 3
             }
           },
-          "provider_model_id": "qwen3.6-plus"
-        }
-      ],
-      "name": "alibaba-coding-plan",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "qwen3.6-plus",
+          "rate_limits": {
             "requests_per_minute": 60
           }
         }
       ],
+      "name": "alibaba-coding-plan",
       "status": "active",
       "submitted_at": "2026-06-05",
       "weight": 1
     },
     {
       "api_base": "https://api.anthropic.com/v1",
-      "api_protocol": [
-        {
-          "*": "anthropic"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "auto_sync": {
         "feed": "models_dev"
@@ -294,6 +285,7 @@
       "id": "anthropic",
       "models": [
         {
+          "api_protocol": "anthropic",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -310,9 +302,13 @@
               "text": 25
             }
           },
-          "provider_model_id": "claude-opus-4-8"
+          "provider_model_id": "claude-opus-4-8",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "anthropic",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -329,9 +325,13 @@
               "text": 25
             }
           },
-          "provider_model_id": "claude-opus-4-7"
+          "provider_model_id": "claude-opus-4-7",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "anthropic",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -348,9 +348,13 @@
               "text": 25
             }
           },
-          "provider_model_id": "claude-opus-4-6"
+          "provider_model_id": "claude-opus-4-6",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "anthropic",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -368,9 +372,13 @@
               "text": 15
             }
           },
-          "provider_model_id": "claude-sonnet-4-6"
+          "provider_model_id": "claude-sonnet-4-6",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "anthropic",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -387,9 +395,13 @@
               "text": 25
             }
           },
-          "provider_model_id": "claude-opus-4-5"
+          "provider_model_id": "claude-opus-4-5",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "anthropic",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -406,9 +418,13 @@
               "text": 15
             }
           },
-          "provider_model_id": "claude-sonnet-4-5"
+          "provider_model_id": "claude-sonnet-4-5",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "anthropic",
           "id": "anthropic/claude-fable-5",
           "pricing": {
             "input_tokens": {
@@ -420,28 +436,19 @@
               "text": 50
             }
           },
-          "provider_model_id": "claude-fable-5"
-        }
-      ],
-      "name": "anthropic",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "claude-fable-5",
+          "rate_limits": {
             "requests_per_minute": 60
           }
         }
       ],
+      "name": "anthropic",
       "status": "active",
       "submitted_at": "2026-05-25",
       "weight": 1
     },
     {
       "api_base": "https://provider-api.bitrouter.ai/v1",
-      "api_protocol": [
-        {
-          "*": "responses"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "billing": "token",
       "byok": false,
@@ -449,6 +456,7 @@
       "id": "bitrouter",
       "models": [
         {
+          "api_protocol": "responses",
           "capabilities": [
             "reasoning",
             "tools"
@@ -463,9 +471,13 @@
               "text": 0.315
             }
           },
-          "provider_model_id": "deepseek-v3.2"
+          "provider_model_id": "deepseek-v3.2",
+          "rate_limits": {
+            "requests_per_minute": 600
+          }
         },
         {
+          "api_protocol": "responses",
           "capabilities": [
             "reasoning",
             "tools"
@@ -480,9 +492,13 @@
               "text": 2.61
             }
           },
-          "provider_model_id": "deepseek-v4-pro"
+          "provider_model_id": "deepseek-v4-pro",
+          "rate_limits": {
+            "requests_per_minute": 600
+          }
         },
         {
+          "api_protocol": "responses",
           "capabilities": [
             "reasoning",
             "tools"
@@ -497,9 +513,13 @@
               "text": 0.21
             }
           },
-          "provider_model_id": "deepseek-v4-flash"
+          "provider_model_id": "deepseek-v4-flash",
+          "rate_limits": {
+            "requests_per_minute": 600
+          }
         },
         {
+          "api_protocol": "responses",
           "capabilities": [
             "reasoning",
             "tools"
@@ -515,9 +535,13 @@
               "text": 0.9
             }
           },
-          "provider_model_id": "MiniMax-M2.5"
+          "provider_model_id": "MiniMax-M2.5",
+          "rate_limits": {
+            "requests_per_minute": 600
+          }
         },
         {
+          "api_protocol": "responses",
           "capabilities": [
             "reasoning",
             "tools"
@@ -533,9 +557,13 @@
               "text": 0.9
             }
           },
-          "provider_model_id": "MiniMax-M2.7"
+          "provider_model_id": "MiniMax-M2.7",
+          "rate_limits": {
+            "requests_per_minute": 600
+          }
         },
         {
+          "api_protocol": "responses",
           "capabilities": [
             "reasoning",
             "tools"
@@ -550,9 +578,13 @@
               "text": 1.8
             }
           },
-          "provider_model_id": "MiniMax-M3"
+          "provider_model_id": "MiniMax-M3",
+          "rate_limits": {
+            "requests_per_minute": 600
+          }
         },
         {
+          "api_protocol": "responses",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -568,9 +600,13 @@
               "text": 2.25
             }
           },
-          "provider_model_id": "kimi-k2.5"
+          "provider_model_id": "kimi-k2.5",
+          "rate_limits": {
+            "requests_per_minute": 600
+          }
         },
         {
+          "api_protocol": "responses",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -586,9 +622,13 @@
               "text": 3
             }
           },
-          "provider_model_id": "kimi-k2.6"
+          "provider_model_id": "kimi-k2.6",
+          "rate_limits": {
+            "requests_per_minute": 600
+          }
         },
         {
+          "api_protocol": "responses",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -604,9 +644,13 @@
               "text": 3
             }
           },
-          "provider_model_id": "kimi-k2.7-code"
+          "provider_model_id": "kimi-k2.7-code",
+          "rate_limits": {
+            "requests_per_minute": 600
+          }
         },
         {
+          "api_protocol": "responses",
           "id": "qwen/qwen3.6-plus",
           "pricing": {
             "input_tokens": {
@@ -617,9 +661,13 @@
               "text": 2.25
             }
           },
-          "provider_model_id": "qwen3.6-plus"
+          "provider_model_id": "qwen3.6-plus",
+          "rate_limits": {
+            "requests_per_minute": 600
+          }
         },
         {
+          "api_protocol": "responses",
           "id": "qwen/qwen3.7-max",
           "pricing": {
             "input_tokens": {
@@ -630,9 +678,13 @@
               "text": 5.625
             }
           },
-          "provider_model_id": "qwen3.7-max"
+          "provider_model_id": "qwen3.7-max",
+          "rate_limits": {
+            "requests_per_minute": 600
+          }
         },
         {
+          "api_protocol": "responses",
           "id": "qwen/qwen3.7-plus",
           "pricing": {
             "input_tokens": {
@@ -644,9 +696,13 @@
               "text": 2.25
             }
           },
-          "provider_model_id": "qwen3.7-plus"
+          "provider_model_id": "qwen3.7-plus",
+          "rate_limits": {
+            "requests_per_minute": 600
+          }
         },
         {
+          "api_protocol": "responses",
           "capabilities": [
             "reasoning",
             "tools"
@@ -661,9 +717,13 @@
               "text": 0.216
             }
           },
-          "provider_model_id": "step-3.5-flash"
+          "provider_model_id": "step-3.5-flash",
+          "rate_limits": {
+            "requests_per_minute": 600
+          }
         },
         {
+          "api_protocol": "responses",
           "capabilities": [
             "structured_outputs"
           ],
@@ -677,9 +737,13 @@
               "text": 0.8625
             }
           },
-          "provider_model_id": "step-3.7-flash"
+          "provider_model_id": "step-3.7-flash",
+          "rate_limits": {
+            "requests_per_minute": 600
+          }
         },
         {
+          "api_protocol": "responses",
           "capabilities": [
             "reasoning",
             "tools"
@@ -694,9 +758,13 @@
               "text": 1.5
             }
           },
-          "provider_model_id": "mimo-v2-omni"
+          "provider_model_id": "mimo-v2-omni",
+          "rate_limits": {
+            "requests_per_minute": 600
+          }
         },
         {
+          "api_protocol": "responses",
           "capabilities": [
             "reasoning",
             "tools"
@@ -711,9 +779,13 @@
               "text": 2.25
             }
           },
-          "provider_model_id": "mimo-v2-pro"
+          "provider_model_id": "mimo-v2-pro",
+          "rate_limits": {
+            "requests_per_minute": 600
+          }
         },
         {
+          "api_protocol": "responses",
           "capabilities": [
             "reasoning",
             "tools"
@@ -728,9 +800,13 @@
               "text": 1.5
             }
           },
-          "provider_model_id": "mimo-v2.5"
+          "provider_model_id": "mimo-v2.5",
+          "rate_limits": {
+            "requests_per_minute": 600
+          }
         },
         {
+          "api_protocol": "responses",
           "capabilities": [
             "reasoning",
             "tools"
@@ -745,9 +821,13 @@
               "text": 2.25
             }
           },
-          "provider_model_id": "mimo-v2.5-pro"
+          "provider_model_id": "mimo-v2.5-pro",
+          "rate_limits": {
+            "requests_per_minute": 600
+          }
         },
         {
+          "api_protocol": "responses",
           "capabilities": [
             "reasoning",
             "tools"
@@ -762,9 +842,13 @@
               "text": 2.4
             }
           },
-          "provider_model_id": "glm-5"
+          "provider_model_id": "glm-5",
+          "rate_limits": {
+            "requests_per_minute": 600
+          }
         },
         {
+          "api_protocol": "responses",
           "capabilities": [
             "reasoning",
             "tools"
@@ -779,9 +863,13 @@
               "text": 3.3
             }
           },
-          "provider_model_id": "glm-5.1"
+          "provider_model_id": "glm-5.1",
+          "rate_limits": {
+            "requests_per_minute": 600
+          }
         },
         {
+          "api_protocol": "responses",
           "id": "qwen/qwen3.6-flash",
           "pricing": {
             "input_tokens": {
@@ -792,28 +880,19 @@
               "text": 1.125
             }
           },
-          "provider_model_id": "qwen3.6-flash"
-        }
-      ],
-      "name": "bitrouter",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "qwen3.6-flash",
+          "rate_limits": {
             "requests_per_minute": 600
           }
         }
       ],
+      "name": "bitrouter",
       "status": "active",
       "submitted_at": "2026-06-11",
       "weight": 1
     },
     {
       "api_base": "https://api.cerebras.ai/v1",
-      "api_protocol": [
-        {
-          "*": "openai"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "auto_sync": {
         "feed": "models_dev"
@@ -824,6 +903,7 @@
       "id": "cerebras",
       "models": [
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -838,28 +918,19 @@
               "text": 0.69
             }
           },
-          "provider_model_id": "gpt-oss-120b"
-        }
-      ],
-      "name": "cerebras",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "gpt-oss-120b",
+          "rate_limits": {
             "requests_per_minute": 60
           }
         }
       ],
+      "name": "cerebras",
       "status": "active",
       "submitted_at": "2026-06-16",
       "weight": 1
     },
     {
       "api_base": "https://llm.chutes.ai/v1",
-      "api_protocol": [
-        {
-          "*": "openai"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "auto_sync": {
         "feed": "models_dev"
@@ -870,6 +941,7 @@
       "id": "chutes",
       "models": [
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -884,9 +956,13 @@
               "text": 2
             }
           },
-          "provider_model_id": "moonshotai/Kimi-K2.5-TEE"
+          "provider_model_id": "moonshotai/Kimi-K2.5-TEE",
+          "rate_limits": {
+            "requests_per_minute": 30
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -901,9 +977,13 @@
               "text": 4
             }
           },
-          "provider_model_id": "moonshotai/Kimi-K2.6-TEE"
+          "provider_model_id": "moonshotai/Kimi-K2.6-TEE",
+          "rate_limits": {
+            "requests_per_minute": 30
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -918,9 +998,13 @@
               "text": 3.5
             }
           },
-          "provider_model_id": "zai-org/GLM-5.1-TEE"
+          "provider_model_id": "zai-org/GLM-5.1-TEE",
+          "rate_limits": {
+            "requests_per_minute": 30
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -935,9 +1019,13 @@
               "text": 2.55
             }
           },
-          "provider_model_id": "zai-org/GLM-5-TEE"
+          "provider_model_id": "zai-org/GLM-5-TEE",
+          "rate_limits": {
+            "requests_per_minute": 30
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -952,9 +1040,13 @@
               "text": 0.42
             }
           },
-          "provider_model_id": "deepseek-ai/DeepSeek-V3.2-TEE"
+          "provider_model_id": "deepseek-ai/DeepSeek-V3.2-TEE",
+          "rate_limits": {
+            "requests_per_minute": 30
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -969,9 +1061,13 @@
               "text": 1.2
             }
           },
-          "provider_model_id": "MiniMaxAI/MiniMax-M2.5-TEE"
+          "provider_model_id": "MiniMaxAI/MiniMax-M2.5-TEE",
+          "rate_limits": {
+            "requests_per_minute": 30
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -986,27 +1082,18 @@
               "text": 0.29
             }
           },
-          "provider_model_id": "XiaomiMiMo/MiMo-V2-Flash-TEE"
-        }
-      ],
-      "name": "chutes",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "XiaomiMiMo/MiMo-V2-Flash-TEE",
+          "rate_limits": {
             "requests_per_minute": 30
           }
         }
       ],
+      "name": "chutes",
       "status": "active",
       "weight": 1
     },
     {
       "api_base": "https://api.deepseek.com",
-      "api_protocol": [
-        {
-          "*": "openai"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "auto_sync": {
         "feed": "models_dev"
@@ -1017,6 +1104,7 @@
       "id": "deepseek",
       "models": [
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1031,9 +1119,13 @@
               "text": 3.48
             }
           },
-          "provider_model_id": "deepseek-v4-pro"
+          "provider_model_id": "deepseek-v4-pro",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1048,28 +1140,19 @@
               "text": 0.28
             }
           },
-          "provider_model_id": "deepseek-v4-flash"
-        }
-      ],
-      "name": "deepseek",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "deepseek-v4-flash",
+          "rate_limits": {
             "requests_per_minute": 60
           }
         }
       ],
+      "name": "deepseek",
       "status": "active",
       "submitted_at": "2026-05-25",
       "weight": 1
     },
     {
       "api_base": "https://generativelanguage.googleapis.com/v1beta",
-      "api_protocol": [
-        {
-          "*": "google"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "auto_sync": {
         "feed": "models_dev"
@@ -1080,6 +1163,7 @@
       "id": "google",
       "models": [
         {
+          "api_protocol": "google",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1094,9 +1178,13 @@
               "text": 12
             }
           },
-          "provider_model_id": "gemini-3.1-pro-preview"
+          "provider_model_id": "gemini-3.1-pro-preview",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "google",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1111,9 +1199,13 @@
               "text": 9
             }
           },
-          "provider_model_id": "gemini-3.5-flash"
+          "provider_model_id": "gemini-3.5-flash",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "google",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1128,9 +1220,13 @@
               "text": 12
             }
           },
-          "provider_model_id": "gemini-3-pro-preview"
+          "provider_model_id": "gemini-3-pro-preview",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "google",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1145,9 +1241,13 @@
               "text": 3
             }
           },
-          "provider_model_id": "gemini-3-flash-preview"
+          "provider_model_id": "gemini-3-flash-preview",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "google",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1163,28 +1263,19 @@
               "text": 10
             }
           },
-          "provider_model_id": "gemini-2.5-pro"
-        }
-      ],
-      "name": "google",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "gemini-2.5-pro",
+          "rate_limits": {
             "requests_per_minute": 60
           }
         }
       ],
+      "name": "google",
       "status": "active",
       "submitted_at": "2026-05-25",
       "weight": 1
     },
     {
       "api_base": "https://api.intelligence.io.solutions/api/v1",
-      "api_protocol": [
-        {
-          "*": "openai"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "auto_sync": {
         "feed": "models_dev",
@@ -1196,6 +1287,7 @@
       "id": "ionet",
       "models": [
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1210,9 +1302,13 @@
               "text": 0.38
             }
           },
-          "provider_model_id": "deepseek-ai/DeepSeek-V3.2"
+          "provider_model_id": "deepseek-ai/DeepSeek-V3.2",
+          "rate_limits": {
+            "requests_per_minute": 50
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1227,9 +1323,13 @@
               "text": 5.5
             }
           },
-          "provider_model_id": "deepseek-ai/DeepSeek-V4-Pro"
+          "provider_model_id": "deepseek-ai/DeepSeek-V4-Pro",
+          "rate_limits": {
+            "requests_per_minute": 50
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1244,9 +1344,13 @@
               "text": 2.28
             }
           },
-          "provider_model_id": "deepseek-ai/DeepSeek-V4-Flash"
+          "provider_model_id": "deepseek-ai/DeepSeek-V4-Flash",
+          "rate_limits": {
+            "requests_per_minute": 50
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1260,9 +1364,13 @@
               "text": 2
             }
           },
-          "provider_model_id": "moonshotai/Kimi-K2.5"
+          "provider_model_id": "moonshotai/Kimi-K2.5",
+          "rate_limits": {
+            "requests_per_minute": 50
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1277,9 +1385,13 @@
               "text": 3.5
             }
           },
-          "provider_model_id": "moonshotai/Kimi-K2.6"
+          "provider_model_id": "moonshotai/Kimi-K2.6",
+          "rate_limits": {
+            "requests_per_minute": 50
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1293,9 +1405,13 @@
               "text": 3
             }
           },
-          "provider_model_id": "zai-org/GLM-5"
+          "provider_model_id": "zai-org/GLM-5",
+          "rate_limits": {
+            "requests_per_minute": 50
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1310,9 +1426,13 @@
               "text": 4.4
             }
           },
-          "provider_model_id": "zai-org/GLM-5.1"
+          "provider_model_id": "zai-org/GLM-5.1",
+          "rate_limits": {
+            "requests_per_minute": 50
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1327,28 +1447,19 @@
               "text": 1.2
             }
           },
-          "provider_model_id": "MiniMaxAI/MiniMax-M2.5"
-        }
-      ],
-      "name": "ionet",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "MiniMaxAI/MiniMax-M2.5",
+          "rate_limits": {
             "requests_per_minute": 50
           }
         }
       ],
+      "name": "ionet",
       "status": "active",
       "submitted_at": "2026-05-12",
       "weight": 1
     },
     {
       "api_base": "https://api.minimax.io/anthropic/v1",
-      "api_protocol": [
-        {
-          "*": "anthropic"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "auto_sync": {
         "feed": "models_dev"
@@ -1359,6 +1470,7 @@
       "id": "minimax",
       "models": [
         {
+          "api_protocol": "anthropic",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1374,9 +1486,13 @@
               "text": 1.2
             }
           },
-          "provider_model_id": "MiniMax-M2.7"
+          "provider_model_id": "MiniMax-M2.7",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "anthropic",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1392,28 +1508,19 @@
               "text": 1.2
             }
           },
-          "provider_model_id": "MiniMax-M2.5"
-        }
-      ],
-      "name": "minimax",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "MiniMax-M2.5",
+          "rate_limits": {
             "requests_per_minute": 60
           }
         }
       ],
+      "name": "minimax",
       "status": "active",
       "submitted_at": "2026-05-25",
       "weight": 1
     },
     {
       "api_base": "https://api.moonshot.ai/v1",
-      "api_protocol": [
-        {
-          "*": "openai"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "auto_sync": {
         "feed": "models_dev"
@@ -1424,6 +1531,7 @@
       "id": "moonshotai",
       "models": [
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1439,9 +1547,13 @@
               "text": 4
             }
           },
-          "provider_model_id": "kimi-k2.6"
+          "provider_model_id": "kimi-k2.6",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1457,28 +1569,19 @@
               "text": 3
             }
           },
-          "provider_model_id": "kimi-k2.5"
-        }
-      ],
-      "name": "moonshotai",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "kimi-k2.5",
+          "rate_limits": {
             "requests_per_minute": 60
           }
         }
       ],
+      "name": "moonshotai",
       "status": "active",
       "submitted_at": "2026-05-25",
       "weight": 1
     },
     {
       "api_base": "https://api.kimi.com/coding/v1",
-      "api_protocol": [
-        {
-          "*": "openai"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "auto_sync": {
         "feed": "models_dev",
@@ -1490,6 +1593,7 @@
       "id": "moonshotai-coding-plan",
       "models": [
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1504,28 +1608,19 @@
               "text": 4
             }
           },
-          "provider_model_id": "kimi-for-coding"
-        }
-      ],
-      "name": "moonshotai-coding-plan",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "kimi-for-coding",
+          "rate_limits": {
             "requests_per_minute": 60
           }
         }
       ],
+      "name": "moonshotai-coding-plan",
       "status": "active",
       "submitted_at": "2026-06-05",
       "weight": 1
     },
     {
       "api_base": "https://api.openai.com/v1",
-      "api_protocol": [
-        {
-          "*": "openai"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "auto_sync": {
         "feed": "models_dev"
@@ -1536,6 +1631,7 @@
       "id": "openai",
       "models": [
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1551,9 +1647,13 @@
               "text": 30
             }
           },
-          "provider_model_id": "gpt-5.5"
+          "provider_model_id": "gpt-5.5",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1569,9 +1669,13 @@
               "text": 15
             }
           },
-          "provider_model_id": "gpt-5.4"
+          "provider_model_id": "gpt-5.4",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1587,9 +1691,13 @@
               "text": 4.5
             }
           },
-          "provider_model_id": "gpt-5.4-mini"
+          "provider_model_id": "gpt-5.4-mini",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1605,9 +1713,13 @@
               "text": 1.25
             }
           },
-          "provider_model_id": "gpt-5.4-nano"
+          "provider_model_id": "gpt-5.4-nano",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1622,9 +1734,13 @@
               "text": 14
             }
           },
-          "provider_model_id": "gpt-5.3-codex"
+          "provider_model_id": "gpt-5.3-codex",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1640,9 +1756,13 @@
               "text": 14
             }
           },
-          "provider_model_id": "gpt-5.2"
+          "provider_model_id": "gpt-5.2",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1657,9 +1777,13 @@
               "text": 14
             }
           },
-          "provider_model_id": "gpt-5.2-codex"
+          "provider_model_id": "gpt-5.2-codex",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1675,9 +1799,13 @@
               "text": 10
             }
           },
-          "provider_model_id": "gpt-5.1"
+          "provider_model_id": "gpt-5.1",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1692,9 +1820,13 @@
               "text": 10
             }
           },
-          "provider_model_id": "gpt-5.1-codex"
+          "provider_model_id": "gpt-5.1-codex",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1709,28 +1841,19 @@
               "text": 2
             }
           },
-          "provider_model_id": "gpt-5.1-codex-mini"
-        }
-      ],
-      "name": "openai",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "gpt-5.1-codex-mini",
+          "rate_limits": {
             "requests_per_minute": 60
           }
         }
       ],
+      "name": "openai",
       "status": "active",
       "submitted_at": "2026-05-25",
       "weight": 1
     },
     {
       "api_base": "https://api.redpill.ai/v1",
-      "api_protocol": [
-        {
-          "*": "openai"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "billing": "token",
       "byok": true,
@@ -1738,6 +1861,7 @@
       "id": "redpill",
       "models": [
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1749,9 +1873,13 @@
               "no_cache": 0.27
             }
           },
-          "provider_model_id": "deepseek/deepseek-v3.2"
+          "provider_model_id": "deepseek/deepseek-v3.2",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1763,27 +1891,18 @@
               "no_cache": 3
             }
           },
-          "provider_model_id": "anthropic/claude-sonnet-4-6"
-        }
-      ],
-      "name": "redpill",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "anthropic/claude-sonnet-4-6",
+          "rate_limits": {
             "requests_per_minute": 60
           }
         }
       ],
+      "name": "redpill",
       "status": "active",
       "weight": 1
     },
     {
       "api_base": "https://api.stepfun.ai/v1",
-      "api_protocol": [
-        {
-          "*": "openai"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "auto_sync": {
         "feed": "models_dev",
@@ -1795,6 +1914,7 @@
       "id": "stepfun",
       "models": [
         {
+          "api_protocol": "openai",
           "capabilities": [
             "structured_outputs"
           ],
@@ -1808,9 +1928,13 @@
               "text": 1.15
             }
           },
-          "provider_model_id": "step-3.7-flash"
+          "provider_model_id": "step-3.7-flash",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1825,28 +1949,19 @@
               "text": 0.288
             }
           },
-          "provider_model_id": "step-3.5-flash"
-        }
-      ],
-      "name": "stepfun",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "step-3.5-flash",
+          "rate_limits": {
             "requests_per_minute": 60
           }
         }
       ],
+      "name": "stepfun",
       "status": "active",
       "submitted_at": "2026-06-01",
       "weight": 1
     },
     {
       "api_base": "https://tokenhub-intl.tencentcloudmaas.com/v1",
-      "api_protocol": [
-        {
-          "*": "openai"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "billing": "token",
       "byok": true,
@@ -1854,6 +1969,7 @@
       "id": "tencent",
       "models": [
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1869,9 +1985,13 @@
               "text": 1.71
             }
           },
-          "provider_model_id": "deepseek-v3.2"
+          "provider_model_id": "deepseek-v3.2",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1886,9 +2006,13 @@
               "text": 0.28
             }
           },
-          "provider_model_id": "deepseek-v4-flash"
+          "provider_model_id": "deepseek-v4-flash",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1903,9 +2027,13 @@
               "text": 3.48
             }
           },
-          "provider_model_id": "deepseek-v4-pro"
+          "provider_model_id": "deepseek-v4-pro",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1921,9 +2049,13 @@
               "text": 3.2
             }
           },
-          "provider_model_id": "glm-5"
+          "provider_model_id": "glm-5",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1938,9 +2070,13 @@
               "text": 4.4
             }
           },
-          "provider_model_id": "glm-5.1"
+          "provider_model_id": "glm-5.1",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1956,17 +2092,25 @@
               "text": 3
             }
           },
-          "provider_model_id": "kimi-k2.5"
+          "provider_model_id": "kimi-k2.5",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
           ],
           "id": "moonshotai/kimi-k2.6",
-          "provider_model_id": "kimi-k2.6"
+          "provider_model_id": "kimi-k2.6",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1981,9 +2125,13 @@
               "text": 1.2
             }
           },
-          "provider_model_id": "minimax-m2.5"
+          "provider_model_id": "minimax-m2.5",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -1998,9 +2146,13 @@
               "text": 1.2
             }
           },
-          "provider_model_id": "minimax-m2.7"
+          "provider_model_id": "minimax-m2.7",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -2027,28 +2179,19 @@
               "text": 2.4
             }
           },
-          "provider_model_id": "minimax-m3"
-        }
-      ],
-      "name": "tencent",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "minimax-m3",
+          "rate_limits": {
             "requests_per_minute": 60
           }
         }
       ],
+      "name": "tencent",
       "status": "active",
       "submitted_at": "2026-05-23",
       "weight": 1
     },
     {
       "api_base": "https://inference.tinfoil.sh/v1",
-      "api_protocol": [
-        {
-          "*": "openai"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "billing": "token",
       "byok": true,
@@ -2056,6 +2199,7 @@
       "id": "tinfoil",
       "models": [
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -2070,9 +2214,13 @@
               "text": 5.25
             }
           },
-          "provider_model_id": "deepseek-v4-pro"
+          "provider_model_id": "deepseek-v4-pro",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -2087,9 +2235,13 @@
               "text": 5.25
             }
           },
-          "provider_model_id": "glm-5-1"
+          "provider_model_id": "glm-5-1",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -2104,28 +2256,19 @@
               "text": 5.25
             }
           },
-          "provider_model_id": "kimi-k2-6"
-        }
-      ],
-      "name": "tinfoil",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "kimi-k2-6",
+          "rate_limits": {
             "requests_per_minute": 60
           }
         }
       ],
+      "name": "tinfoil",
       "status": "active",
       "submitted_at": "2026-05-12",
       "weight": 1
     },
     {
       "api_base": "https://inference-api.worldrouter.ai/v1",
-      "api_protocol": [
-        {
-          "*": "openai"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "billing": "token",
       "byok": true,
@@ -2133,6 +2276,7 @@
       "id": "worldrouter",
       "models": [
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -2148,9 +2292,13 @@
               "text": 15
             }
           },
-          "provider_model_id": "claude-sonnet-4-6"
+          "provider_model_id": "claude-sonnet-4-6",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -2166,9 +2314,13 @@
               "text": 25
             }
           },
-          "provider_model_id": "claude-opus-4-6"
+          "provider_model_id": "claude-opus-4-6",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -2185,9 +2337,13 @@
               "text": 25
             }
           },
-          "provider_model_id": "claude-opus-4-7"
+          "provider_model_id": "claude-opus-4-7",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -2204,9 +2360,13 @@
               "text": 5
             }
           },
-          "provider_model_id": "claude-haiku-4-5"
+          "provider_model_id": "claude-haiku-4-5",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -2223,9 +2383,13 @@
               "text": 31.5
             }
           },
-          "provider_model_id": "gpt-5.5"
+          "provider_model_id": "gpt-5.5",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -2242,9 +2406,13 @@
               "text": 15.75
             }
           },
-          "provider_model_id": "gpt-5.4"
+          "provider_model_id": "gpt-5.4",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -2261,9 +2429,13 @@
               "text": 4.5
             }
           },
-          "provider_model_id": "gpt-5.4-mini"
+          "provider_model_id": "gpt-5.4-mini",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -2280,9 +2452,13 @@
               "text": 12.6
             }
           },
-          "provider_model_id": "gemini-3.1-pro-preview"
+          "provider_model_id": "gemini-3.1-pro-preview",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -2299,9 +2475,13 @@
               "text": 1.5
             }
           },
-          "provider_model_id": "gemini-3.1-flash-lite-preview"
+          "provider_model_id": "gemini-3.1-flash-lite-preview",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "id": "x-ai/grok-4.1-fast",
           "pricing": {
             "input_tokens": {
@@ -2313,9 +2493,13 @@
               "text": 0.5
             }
           },
-          "provider_model_id": "grok-4.1-fast"
+          "provider_model_id": "grok-4.1-fast",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -2332,9 +2516,13 @@
               "text": 12
             }
           },
-          "provider_model_id": "grok-4.20"
+          "provider_model_id": "grok-4.20",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "id": "qwen/qwen3.6-plus",
           "pricing": {
             "input_tokens": {
@@ -2346,9 +2534,13 @@
               "text": 4.6214
             }
           },
-          "provider_model_id": "qwen3.6-plus"
+          "provider_model_id": "qwen3.6-plus",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -2364,9 +2556,13 @@
               "text": 4
             }
           },
-          "provider_model_id": "mimo-v2.5"
+          "provider_model_id": "mimo-v2.5",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -2382,9 +2578,13 @@
               "text": 6
             }
           },
-          "provider_model_id": "mimo-v2.5-pro"
+          "provider_model_id": "mimo-v2.5-pro",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -2399,28 +2599,19 @@
               "text": 0.29
             }
           },
-          "provider_model_id": "mimo-v2-flash"
-        }
-      ],
-      "name": "worldrouter",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "mimo-v2-flash",
+          "rate_limits": {
             "requests_per_minute": 60
           }
         }
       ],
+      "name": "worldrouter",
       "status": "active",
       "submitted_at": "2026-05-12",
       "weight": 1
     },
     {
       "api_base": "https://api.x.ai/v1",
-      "api_protocol": [
-        {
-          "*": "openai"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "auto_sync": {
         "feed": "models_dev"
@@ -2431,6 +2622,7 @@
       "id": "xai",
       "models": [
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -2445,9 +2637,13 @@
               "text": 2.5
             }
           },
-          "provider_model_id": "grok-4.3"
+          "provider_model_id": "grok-4.3",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "tools"
           ],
@@ -2461,28 +2657,19 @@
               "text": 2.5
             }
           },
-          "provider_model_id": "grok-4.20-0309-non-reasoning"
-        }
-      ],
-      "name": "xai",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "grok-4.20-0309-non-reasoning",
+          "rate_limits": {
             "requests_per_minute": 60
           }
         }
       ],
+      "name": "xai",
       "status": "active",
       "submitted_at": "2026-05-25",
       "weight": 1
     },
     {
       "api_base": "https://api.xiaomimimo.com/v1",
-      "api_protocol": [
-        {
-          "*": "openai"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "auto_sync": {
         "feed": "models_dev"
@@ -2493,6 +2680,7 @@
       "id": "xiaomi",
       "models": [
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -2507,9 +2695,13 @@
               "text": 3
             }
           },
-          "provider_model_id": "mimo-v2.5-pro"
+          "provider_model_id": "mimo-v2.5-pro",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -2524,9 +2716,13 @@
               "text": 2
             }
           },
-          "provider_model_id": "mimo-v2.5"
+          "provider_model_id": "mimo-v2.5",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -2541,9 +2737,13 @@
               "text": 3
             }
           },
-          "provider_model_id": "mimo-v2-pro"
+          "provider_model_id": "mimo-v2-pro",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -2558,9 +2758,13 @@
               "text": 2
             }
           },
-          "provider_model_id": "mimo-v2-omni"
+          "provider_model_id": "mimo-v2-omni",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -2575,28 +2779,19 @@
               "text": 0.3
             }
           },
-          "provider_model_id": "mimo-v2-flash"
-        }
-      ],
-      "name": "xiaomi",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "mimo-v2-flash",
+          "rate_limits": {
             "requests_per_minute": 60
           }
         }
       ],
+      "name": "xiaomi",
       "status": "active",
       "submitted_at": "2026-05-25",
       "weight": 1
     },
     {
       "api_base": "https://api.z.ai/api/paas/v4",
-      "api_protocol": [
-        {
-          "*": "openai"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "auto_sync": {
         "feed": "models_dev"
@@ -2607,6 +2802,7 @@
       "id": "zai",
       "models": [
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -2621,9 +2817,13 @@
               "text": 4.4
             }
           },
-          "provider_model_id": "glm-5.1"
+          "provider_model_id": "glm-5.1",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -2638,9 +2838,13 @@
               "text": 4.4
             }
           },
-          "provider_model_id": "glm-5.2"
+          "provider_model_id": "glm-5.2",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -2655,28 +2859,19 @@
               "text": 3.2
             }
           },
-          "provider_model_id": "glm-5"
-        }
-      ],
-      "name": "zai",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "glm-5",
+          "rate_limits": {
             "requests_per_minute": 60
           }
         }
       ],
+      "name": "zai",
       "status": "active",
       "submitted_at": "2026-05-25",
       "weight": 1
     },
     {
       "api_base": "https://api.z.ai/api/coding/paas/v4",
-      "api_protocol": [
-        {
-          "*": "openai"
-        }
-      ],
       "auth_scheme": "x-api-key",
       "auto_sync": {
         "feed": "models_dev"
@@ -2687,6 +2882,7 @@
       "id": "zai-coding-plan",
       "models": [
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -2701,9 +2897,13 @@
               "text": 4.4
             }
           },
-          "provider_model_id": "glm-5.1"
+          "provider_model_id": "glm-5.1",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -2718,9 +2918,13 @@
               "text": 4.4
             }
           },
-          "provider_model_id": "glm-5.2"
+          "provider_model_id": "glm-5.2",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
         },
         {
+          "api_protocol": "openai",
           "capabilities": [
             "reasoning",
             "tools"
@@ -2735,17 +2939,13 @@
               "text": 3.2
             }
           },
-          "provider_model_id": "glm-5"
-        }
-      ],
-      "name": "zai-coding-plan",
-      "rate_limits": [
-        {
-          "*": {
+          "provider_model_id": "glm-5",
+          "rate_limits": {
             "requests_per_minute": 60
           }
         }
       ],
+      "name": "zai-coding-plan",
       "status": "active",
       "submitted_at": "2026-06-05",
       "weight": 1

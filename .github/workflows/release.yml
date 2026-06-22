@@ -1,5 +1,5 @@
 # Release automation for the distribution artifacts under `dist/`
-# (`providers.json` + `canonical.json`), following the release-plz pattern in a
+# (`providers.json` + `models.json`), following the release-plz pattern in a
 # SINGLE workflow.
 #
 # On every push to `main` it rebuilds the aggregation and then does exactly one
@@ -72,10 +72,10 @@ jobs:
         run: |
           set -euo pipefail
           ZERO=0000000000000000000000000000000000000000
-          if ! git diff --quiet -- dist/providers.json dist/canonical.json; then
+          if ! git diff --quiet -- dist/providers.json dist/models.json; then
             # rebuild differs from committed dist → unreleased provider changes
             echo "state=changed" >> "$GITHUB_OUTPUT"
-          elif [ "$BEFORE" != "$ZERO" ] && ! git diff --quiet "$BEFORE" "$AFTER" -- dist/providers.json dist/canonical.json; then
+          elif [ "$BEFORE" != "$ZERO" ] && ! git diff --quiet "$BEFORE" "$AFTER" -- dist/providers.json dist/models.json; then
             # dist already current AND this push wrote dist → release PR merged
             echo "state=released" >> "$GITHUB_OUTPUT"
           else
@@ -94,7 +94,7 @@ jobs:
           commit-message: "chore(release): update dist/ artifacts"
           body: |
             Automated release PR — regenerates `dist/providers.json` and
-            `dist/canonical.json` from the current `providers/` + `canonical.yaml`.
+            `dist/models.json` from the current `providers/` + `canonical.yaml`.
 
             The branch is force-updated to the latest generation on every push to
             `main`, so this single PR always reflects the newest snapshot. Merging

@@ -14,8 +14,8 @@ canonical.yaml              # the shared model vocabulary
 providers/
   <name>.yaml               # one file per provider (filename == name)
 dist/                       # generated distribution artifacts (`bun run build`)
-  providers.json            # { data: [ <provider>, ... ] }
-  canonical.json            # { data: [ <canonical model>, ... ] }
+  providers.json            # provider view: { data: [ <provider w/ resolved models> ] }
+  models.json               # model view:    { data: [ <canonical model + providers> ] }
 curation/                   # ranking policy + models.dev→canonical crosswalk
 scripts/
   schema.ts                 # shared Zod schemas + IO helpers
@@ -77,12 +77,19 @@ bun run validate
 ## Distribution (`dist/`)
 
 `bun run build` compiles the registry into two deterministic JSON artifacts —
-the public, validated snapshot consumers read instead of walking the YAML tree:
+the public, validated snapshot consumers read instead of walking the YAML tree.
+Both are **fully resolved**: the source authors `api_protocol` / `rate_limits`
+as glob → value pattern lists, but the dist expands them to the concrete value
+per (provider, model), so a consumer reads a value and never runs a glob engine.
 
-- `dist/providers.json` — `{ data: [ <provider>, … ] }`, every provider's
-  resolved config (defaults applied), sorted by id.
-- `dist/canonical.json` — `{ data: [ <canonical model>, … ] }`, the canonical
-  model vocabulary, sorted by id.
+- `dist/providers.json` — **provider view**: `{ data: [ <provider>, … ] }`,
+  sorted by id. Each provider carries its top-level config (`api_base`, `byok`,
+  `community`, `billing`, `auth_scheme`, …) and a `models[]` list where every
+  entry has the resolved `api_protocol` (a single string) + `rate_limits`.
+- `dist/models.json` — **model view**: `{ data: [ <canonical model>, … ] }`,
+  sorted by id — the canonical model vocabulary with, per model, a `providers[]`
+  list naming every provider that serves it and that pair's resolved config.
+  Consumers needing the authoritative model set read `data[].id`.
 
 Both are byte-deterministic (sorted keys, no timestamps), so an unchanged
 registry regenerates identical bytes. The `release` workflow keeps them current
