@@ -33,6 +33,12 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "anthropic",
+          "capabilities": [],
+          "provider": "claude-code",
+          "provider_model_id": "claude-fable-5"
         }
       ],
       "release_date": "2026-06-09"
@@ -117,6 +123,16 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "anthropic",
+          "capabilities": [
+            "reasoning",
+            "structured_outputs",
+            "tools"
+          ],
+          "provider": "claude-code",
+          "provider_model_id": "claude-opus-4-5"
         }
       ],
       "release_date": "2025-11-24"
@@ -159,6 +175,16 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "anthropic",
+          "capabilities": [
+            "reasoning",
+            "structured_outputs",
+            "tools"
+          ],
+          "provider": "claude-code",
+          "provider_model_id": "claude-opus-4-6"
         },
         {
           "api_protocol": "openai",
@@ -225,6 +251,16 @@
           }
         },
         {
+          "api_protocol": "anthropic",
+          "capabilities": [
+            "reasoning",
+            "structured_outputs",
+            "tools"
+          ],
+          "provider": "claude-code",
+          "provider_model_id": "claude-opus-4-7"
+        },
+        {
           "api_protocol": "openai",
           "capabilities": [
             "reasoning",
@@ -287,6 +323,16 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "anthropic",
+          "capabilities": [
+            "reasoning",
+            "structured_outputs",
+            "tools"
+          ],
+          "provider": "claude-code",
+          "provider_model_id": "claude-opus-4-8"
         }
       ],
       "release_date": "2026-05-28"
@@ -329,6 +375,16 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "anthropic",
+          "capabilities": [
+            "reasoning",
+            "structured_outputs",
+            "tools"
+          ],
+          "provider": "claude-code",
+          "provider_model_id": "claude-sonnet-4-5"
         }
       ],
       "release_date": "2025-09-29"
@@ -373,6 +429,17 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "anthropic",
+          "capabilities": [
+            "reasoning",
+            "structured_outputs",
+            "tools",
+            "image_input"
+          ],
+          "provider": "claude-code",
+          "provider_model_id": "claude-sonnet-4-6"
         },
         {
           "api_protocol": "openai",
@@ -1775,6 +1842,15 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "responses",
+          "capabilities": [
+            "reasoning",
+            "tools"
+          ],
+          "provider": "openai-codex",
+          "provider_model_id": "gpt-5.1-codex"
         }
       ],
       "release_date": "2025-11-13"
@@ -1818,6 +1894,15 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "responses",
+          "capabilities": [
+            "reasoning",
+            "tools"
+          ],
+          "provider": "openai-codex",
+          "provider_model_id": "gpt-5.1-codex-mini"
         }
       ],
       "release_date": "2025-11-13"
@@ -1905,6 +1990,15 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "responses",
+          "capabilities": [
+            "reasoning",
+            "tools"
+          ],
+          "provider": "openai-codex",
+          "provider_model_id": "gpt-5.2-codex"
         }
       ],
       "release_date": "2025-12-11"
@@ -1949,6 +2043,15 @@
           "rate_limits": {
             "requests_per_minute": 60
           }
+        },
+        {
+          "api_protocol": "responses",
+          "capabilities": [
+            "reasoning",
+            "tools"
+          ],
+          "provider": "openai-codex",
+          "provider_model_id": "gpt-5.3-codex"
         }
       ],
       "release_date": "2026-02-05"

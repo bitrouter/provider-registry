@@ -25,4 +25,4 @@ auth:
 models: []
 status: active
 auto_sync:
-  feed: v1_models
+  feed: models_dev
