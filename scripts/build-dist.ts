@@ -27,7 +27,7 @@
 
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { ApiProtocol, ProviderFile, RateLimits } from "./schema";
+import type { ProtocolList, ProviderFile, RateLimits } from "./schema";
 import { loadCanonical, loadProviders, REGISTRY_ROOT } from "./schema";
 
 // Recursively sort object keys (arrays keep their order) so serialization is
@@ -87,7 +87,7 @@ function resolvePattern<T>(
 interface ResolvedModel {
   id: string;
   provider_model_id: string;
-  api_protocol: ApiProtocol;
+  api_protocol: ProtocolList;
   pricing?: unknown;
   capabilities?: unknown;
   rate_limits?: RateLimits;
@@ -99,7 +99,7 @@ interface ResolvedModel {
 // default — matching the consumers' precedence.
 function resolveModels(provider: ProviderFile): ResolvedModel[] {
   return provider.models.map((model) => {
-    const api_protocol: ApiProtocol =
+    const api_protocol: ProtocolList =
       model.api_protocol ??
       resolvePattern(provider.api_protocol, model.id) ??
       "openai";
@@ -136,10 +136,17 @@ export async function buildArtifacts(): Promise<{
 
   // ── Provider view ──
   // `id` is the provider name (schema requires it to equal the filename stem).
-  // Drop the provider-level glob arrays — they are now resolved onto each model.
+  // For a curated provider, resolve the glob `api_protocol` / `rate_limits`
+  // onto each model and drop the provider-level arrays. For an `auto_discover`
+  // provider there are no models to resolve onto (its catalog is discovered at
+  // runtime), so KEEP the provider-level glob arrays — the consumer applies
+  // them to the models it discovers.
   const providerData = providers
     .map(({ data }) => {
-      const { api_protocol: _ap, rate_limits: _rl, models: _m, ...rest } = data;
+      const { api_protocol, rate_limits, models: _m, ...rest } = data;
+      if (data.auto_discover) {
+        return { id: data.name, ...rest, api_protocol, rate_limits, models: [] };
+      }
       return { id: data.name, ...rest, models: resolveModels(data) };
     })
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));

@@ -1,4 +1,6 @@
 name: google
+display_name: Generate Content
+kind: first_party
 api_protocol:
   - "*": google
 rate_limits:
@@ -65,6 +67,10 @@ status: active
 weight: 1
 submitted_at: 2026-05-25
 api_base: https://generativelanguage.googleapis.com/v1beta
-auth_scheme: x-api-key
+doc_url: https://ai.google.dev/api
+auth:
+  kind: header
+  header: x-goog-api-key
+  env: GEMINI_API_KEY
 auto_sync:
   feed: models_dev

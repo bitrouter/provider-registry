@@ -1709,7 +1709,10 @@
       ],
       "providers": [
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1750,7 +1753,10 @@
       ],
       "providers": [
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "tools"
@@ -1790,7 +1796,10 @@
       ],
       "providers": [
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "tools"
@@ -1830,7 +1839,10 @@
       ],
       "providers": [
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1871,7 +1883,10 @@
       ],
       "providers": [
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "tools"
@@ -1912,7 +1927,10 @@
       ],
       "providers": [
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "tools"
@@ -1973,7 +1991,10 @@
           }
         },
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -2058,7 +2079,10 @@
           }
         },
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -2122,7 +2146,10 @@
       ],
       "providers": [
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -2184,7 +2211,10 @@
           }
         },
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "structured_outputs",

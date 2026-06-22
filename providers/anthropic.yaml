@@ -1,4 +1,6 @@
 name: anthropic
+display_name: Anthropic
+kind: first_party
 api_protocol:
   - "*": anthropic
 rate_limits:
@@ -97,6 +99,12 @@ status: active
 weight: 1
 submitted_at: 2026-05-25
 api_base: https://api.anthropic.com/v1
-auth_scheme: x-api-key
+doc_url: https://docs.anthropic.com/en/api/messages
+auth:
+  kind: header
+  header: x-api-key
+  env: ANTHROPIC_API_KEY
+  extra_headers:
+    anthropic-version: "2023-06-01"
 auto_sync:
   feed: models_dev

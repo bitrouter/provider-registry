@@ -1,0 +1,38 @@
+# OpenAI Codex — ChatGPT Plus/Pro subscription route, OAuth-only.
+#
+# NOT the same as `openai`: Codex lives at a different host
+# (`chatgpt.com/backend-api/codex`) reachable only with credentials minted by
+# the user's ChatGPT subscription via the `login openai-codex` PKCE flow
+# against `auth.openai.com`. The resulting Bearer JWT additionally needs a
+# `chatgpt-account-id` header (from the JWT), an `OpenAI-Beta` opt-in, and an
+# `originator` tag — all wired by the consumer's `openai-codex` handler.
+#
+# Reference implementations (public OAuth client + endpoints, header shape):
+# - https://developers.openai.com/codex/auth
+# - https://github.com/sst/opencode/blob/dev/packages/opencode/src/plugin/codex.ts
+#
+# Codex speaks the Responses API exclusively. `auto_discover` since the catalog
+# is the backend's, not curated here.
+name: openai-codex
+display_name: OpenAI Codex
+kind: first_party
+billing: subscription
+auto_discover: true
+api_base: https://chatgpt.com/backend-api/codex
+doc_url: https://developers.openai.com/codex/auth
+api_protocol:
+  - "*": responses
+auth:
+  kind: oauth
+  handler: openai-codex
+  params:
+    # OAuth client id of the official Codex CLI (confirmed in opencode's
+    # plugin/codex.ts). Reused while bitrouter has no registered OpenAI app.
+    client_id: app_EMoamEEZ73f0CkXaXp7hrann
+    scope: openid profile email offline_access
+    authorize_endpoint: https://auth.openai.com/oauth/authorize
+    token_endpoint: https://auth.openai.com/oauth/token
+    # Loopback redirect on a pinned port, registered against the OAuth client.
+    redirect_uri: http://localhost:1455/auth/callback
+models: []
+status: active

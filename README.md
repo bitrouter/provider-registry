@@ -32,14 +32,19 @@ scripts/
 |---|---|---|
 | `name` | ✓ | Must equal the filename stem (lowercase, hyphenated). |
 | `api_base` | ✓ | The provider's **public** upstream base URL (HTTPS). v2 declares every endpoint openly; the router routes against it (a BYOK caller may override it per-request). |
-| `api_protocol` | ✓ | Wire protocol per model-id glob, e.g. `- "*": openai` (`openai` \| `anthropic` \| `google` \| `responses`). |
+| `api_protocol` | ✓ | Wire protocol per model-id glob. Value is a single maker name or an ordered **set**, e.g. `- "*": openai` or `- "*": [openai, responses]` (`openai` \| `anthropic` \| `google` \| `responses`). Longest glob wins; `build-dist` resolves it per (provider, model). |
 | `status` | ✓ | `active` \| `staging` \| `suspended` \| `withdrawn` — only `active` is routable. |
-| `models` | ✓ | `{ id (canonical), provider_model_id, pricing?, capabilities?, api_protocol?, rate_limits?, deprecation_date? }`. |
-| `community` | — | `true` marks an unaffiliated community reseller; omit for first-party / official upstreams (default). Always public. |
+| `models` | ✓ | `{ id (canonical), provider_model_id, pricing?, capabilities?, api_protocol?, rate_limits?, deprecation_date? }`. May be empty for an `auto_discover` provider. |
+| `kind` | — | `first_party` \| `gateway` \| `cloud` \| `third_party`. Drives the consumer's routing-priority class + poolability. Omitted ⇒ derived from `community`. |
+| `auth` | — | Full outbound auth declaration: `{ kind: bearer\|header\|oauth\|native, env?, header?, extra_headers?, handler?, params? }`. **Public config only** — env/header/handler names + public OAuth params; never a secret. Supersedes `auth_scheme`. |
+| `auto_discover` | — | `true` for a transport+auth-only provider (a gateway proxying an uncurated set) whose catalog the consumer discovers at runtime; relaxes the active-needs-models rule. |
+| `protocol_endpoints` | — | Per-protocol base-URL override `{ <protocol>: <https url> }` for a provider serving protocols at different paths under one host. |
+| `display_name`, `doc_url` | — | Human-readable name; link to the provider's official API docs (HTTPS). |
+| `community` | — | `true` marks an unaffiliated community reseller; omit for first-party / official upstreams (default). Always public. A derived alias of `kind: third_party`. |
 | `byok` | — | Whether callers may bring their own key. **Default `true`** — BYOK is available for every publicly-registerable provider. Set `false` only where a caller cannot obtain a key (a pooled or invite-only provider). |
-| `billing` | — | `token` (default, pay-as-you-go) \| `subscription` (flat-rate plan, e.g. a first-party coding plan). Descriptive only; consumers rank provider preference with it alongside `community`. |
+| `billing` | — | `token` (default, pay-as-you-go) \| `subscription` (flat-rate plan, e.g. a first-party coding plan). Descriptive only; consumers rank provider preference with it alongside `kind`. |
 | `auto_sync` | — | Upstream catalog feed for the sync bot: `{ feed: models_dev \| v1_models, key?, url?, writes? }`. Omit for manual / source-of-truth providers — *we* are the source; the feed only says where the bot reads. |
-| `auth_scheme` | — | `x-api-key` (default) \| `bearer` — the Messages transport only (ignored by OpenAI/Google). |
+| `auth_scheme` | — | *(Deprecated — use `auth`.)* `x-api-key` (default) \| `bearer` — the Messages transport only. |
 | `weight`, `rate_limits` | — | Routing weight + declared RPM/TPM. |
 
 A model's `capabilities` is the **verified per-channel** subset of

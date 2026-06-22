@@ -1,0 +1,26 @@
+# opencode-go — flat-rate subscription tier from the opencode.ai team. Sister
+# gateway to opencode-zen with a different base URL and catalog; both
+# authenticate with the same `OPENCODE_ZEN_API_KEY` (one opencode account).
+#
+# Official docs:
+# - https://opencode.ai/docs/go/ (catalog, subscription tiers)
+#   Base URL `https://opencode.ai/zen/go/v1/`; per-protocol endpoints appended
+#   by the consumer (openai→/chat/completions default, anthropic→/messages for
+#   MiniMax).
+#
+# `auto_discover`: catalog is the gateway's `/models`; protocol globs apply.
+name: opencode-go
+display_name: opencode go
+kind: gateway
+billing: subscription
+auto_discover: true
+api_base: https://opencode.ai/zen/go/v1
+doc_url: https://opencode.ai/docs/go/
+api_protocol:
+  - "opencode-go/minimax-*": anthropic
+  - "*": openai
+auth:
+  kind: bearer
+  env: OPENCODE_ZEN_API_KEY
+models: []
+status: active

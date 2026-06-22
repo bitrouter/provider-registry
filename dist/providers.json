@@ -3,6 +3,7 @@
     {
       "api_base": "https://all.ai0ms.com/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "billing": "token",
       "byok": false,
       "community": true,
@@ -80,6 +81,7 @@
     {
       "api_base": "https://api.akashml.com/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "billing": "token",
       "byok": true,
       "community": true,
@@ -156,6 +158,7 @@
     {
       "api_base": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -225,6 +228,7 @@
     {
       "api_base": "https://coding-intl.dashscope.aliyuncs.com/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -275,14 +279,26 @@
     },
     {
       "api_base": "https://api.anthropic.com/v1",
+      "auth": {
+        "env": "ANTHROPIC_API_KEY",
+        "extra_headers": {
+          "anthropic-version": "2023-06-01"
+        },
+        "header": "x-api-key",
+        "kind": "header"
+      },
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
       "billing": "token",
       "byok": true,
       "community": false,
+      "display_name": "Anthropic",
+      "doc_url": "https://docs.anthropic.com/en/api/messages",
       "id": "anthropic",
+      "kind": "first_party",
       "models": [
         {
           "api_protocol": "anthropic",
@@ -450,6 +466,7 @@
     {
       "api_base": "https://provider-api.bitrouter.ai/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "billing": "token",
       "byok": false,
       "community": false,
@@ -894,6 +911,7 @@
     {
       "api_base": "https://api.cerebras.ai/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -932,6 +950,7 @@
     {
       "api_base": "https://llm.chutes.ai/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -1095,6 +1114,7 @@
     {
       "api_base": "https://api.deepseek.com",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -1152,15 +1172,77 @@
       "weight": 1
     },
     {
-      "api_base": "https://generativelanguage.googleapis.com/v1beta",
+      "api_base": "https://api.githubcopilot.com",
+      "api_protocol": [
+        {
+          "claude-*": "anthropic"
+        },
+        {
+          "gpt-5.5": "responses"
+        },
+        {
+          "gpt-5.5-codex": "responses"
+        },
+        {
+          "gpt-5.1-codex": "responses"
+        },
+        {
+          "gpt-5.1-codex-mini": "responses"
+        },
+        {
+          "gpt-5.3-codex": "responses"
+        },
+        {
+          "gpt-5.2-codex": "responses"
+        },
+        {
+          "*": "openai"
+        }
+      ],
+      "auth": {
+        "handler": "github-copilot",
+        "kind": "oauth",
+        "params": {
+          "client_id": "Ov23li8tweQw6odWQebz",
+          "device_authorization_endpoint": "https://github.com/login/device/code",
+          "scope": "read:user",
+          "token_endpoint": "https://github.com/login/oauth/access_token"
+        }
+      },
       "auth_scheme": "x-api-key",
+      "auto_discover": true,
+      "billing": "subscription",
+      "byok": true,
+      "community": false,
+      "display_name": "GitHub Copilot",
+      "doc_url": "https://docs.github.com/en/copilot/reference/api-reference/copilot-api-endpoints",
+      "id": "github-copilot",
+      "kind": "gateway",
+      "models": [],
+      "name": "github-copilot",
+      "rate_limits": [],
+      "status": "active",
+      "weight": 1
+    },
+    {
+      "api_base": "https://generativelanguage.googleapis.com/v1beta",
+      "auth": {
+        "env": "GEMINI_API_KEY",
+        "header": "x-goog-api-key",
+        "kind": "header"
+      },
+      "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
       "billing": "token",
       "byok": true,
       "community": false,
+      "display_name": "Generate Content",
+      "doc_url": "https://ai.google.dev/api",
       "id": "google",
+      "kind": "first_party",
       "models": [
         {
           "api_protocol": "google",
@@ -1277,6 +1359,7 @@
     {
       "api_base": "https://api.intelligence.io.solutions/api/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev",
         "key": "io-net"
@@ -1461,6 +1544,7 @@
     {
       "api_base": "https://api.minimax.io/anthropic/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -1522,6 +1606,7 @@
     {
       "api_base": "https://api.moonshot.ai/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -1583,6 +1668,7 @@
     {
       "api_base": "https://api.kimi.com/coding/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev",
         "key": "kimi-for-coding"
@@ -1621,17 +1707,28 @@
     },
     {
       "api_base": "https://api.openai.com/v1",
+      "auth": {
+        "env": "OPENAI_API_KEY",
+        "kind": "bearer"
+      },
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
       "billing": "token",
       "byok": true,
       "community": false,
+      "display_name": "OpenAI",
+      "doc_url": "https://platform.openai.com/docs/api-reference",
       "id": "openai",
+      "kind": "first_party",
       "models": [
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1653,7 +1750,10 @@
           }
         },
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1675,7 +1775,10 @@
           }
         },
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1697,7 +1800,10 @@
           }
         },
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1719,7 +1825,10 @@
           }
         },
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "tools"
@@ -1740,7 +1849,10 @@
           }
         },
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1762,7 +1874,10 @@
           }
         },
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "tools"
@@ -1783,7 +1898,10 @@
           }
         },
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "structured_outputs",
@@ -1805,7 +1923,10 @@
           }
         },
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "tools"
@@ -1826,7 +1947,10 @@
           }
         },
         {
-          "api_protocol": "openai",
+          "api_protocol": [
+            "openai",
+            "responses"
+          ],
           "capabilities": [
             "reasoning",
             "tools"
@@ -1853,8 +1977,132 @@
       "weight": 1
     },
     {
+      "api_base": "https://chatgpt.com/backend-api/codex",
+      "api_protocol": [
+        {
+          "*": "responses"
+        }
+      ],
+      "auth": {
+        "handler": "openai-codex",
+        "kind": "oauth",
+        "params": {
+          "authorize_endpoint": "https://auth.openai.com/oauth/authorize",
+          "client_id": "app_EMoamEEZ73f0CkXaXp7hrann",
+          "redirect_uri": "http://localhost:1455/auth/callback",
+          "scope": "openid profile email offline_access",
+          "token_endpoint": "https://auth.openai.com/oauth/token"
+        }
+      },
+      "auth_scheme": "x-api-key",
+      "auto_discover": true,
+      "billing": "subscription",
+      "byok": true,
+      "community": false,
+      "display_name": "OpenAI Codex",
+      "doc_url": "https://developers.openai.com/codex/auth",
+      "id": "openai-codex",
+      "kind": "first_party",
+      "models": [],
+      "name": "openai-codex",
+      "rate_limits": [],
+      "status": "active",
+      "weight": 1
+    },
+    {
+      "api_base": "https://opencode.ai/zen/go/v1",
+      "api_protocol": [
+        {
+          "opencode-go/minimax-*": "anthropic"
+        },
+        {
+          "*": "openai"
+        }
+      ],
+      "auth": {
+        "env": "OPENCODE_ZEN_API_KEY",
+        "kind": "bearer"
+      },
+      "auth_scheme": "x-api-key",
+      "auto_discover": true,
+      "billing": "subscription",
+      "byok": true,
+      "community": false,
+      "display_name": "opencode go",
+      "doc_url": "https://opencode.ai/docs/go/",
+      "id": "opencode-go",
+      "kind": "gateway",
+      "models": [],
+      "name": "opencode-go",
+      "rate_limits": [],
+      "status": "active",
+      "weight": 1
+    },
+    {
+      "api_base": "https://opencode.ai/zen/v1",
+      "api_protocol": [
+        {
+          "opencode/gpt-*": "responses"
+        },
+        {
+          "opencode/claude-*": "anthropic"
+        },
+        {
+          "opencode/gemini-*": "google"
+        },
+        {
+          "*": "openai"
+        }
+      ],
+      "auth": {
+        "env": "OPENCODE_ZEN_API_KEY",
+        "kind": "bearer"
+      },
+      "auth_scheme": "x-api-key",
+      "auto_discover": true,
+      "billing": "token",
+      "byok": true,
+      "community": false,
+      "display_name": "opencode zen",
+      "doc_url": "https://opencode.ai/docs/zen/",
+      "id": "opencode-zen",
+      "kind": "gateway",
+      "models": [],
+      "name": "opencode-zen",
+      "rate_limits": [],
+      "status": "active",
+      "weight": 1
+    },
+    {
+      "api_base": "https://openrouter.ai/api/v1",
+      "api_protocol": [
+        {
+          "*": "openai"
+        }
+      ],
+      "auth": {
+        "env": "OPENROUTER_API_KEY",
+        "kind": "bearer"
+      },
+      "auth_scheme": "x-api-key",
+      "auto_discover": true,
+      "billing": "token",
+      "byok": true,
+      "community": false,
+      "display_name": "OpenRouter",
+      "doc_url": "https://openrouter.ai/docs/api-reference/overview",
+      "id": "openrouter",
+      "kind": "gateway",
+      "models": [],
+      "name": "openrouter",
+      "rate_limits": [],
+      "status": "active",
+      "weight": 1
+    },
+    {
       "api_base": "https://api.redpill.ai/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "billing": "token",
       "byok": true,
       "community": true,
@@ -1904,6 +2152,7 @@
     {
       "api_base": "https://api.stepfun.ai/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev",
         "key": "stepfun-ai"
@@ -1963,6 +2212,7 @@
     {
       "api_base": "https://tokenhub-intl.tencentcloudmaas.com/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "billing": "token",
       "byok": true,
       "community": false,
@@ -2193,6 +2443,7 @@
     {
       "api_base": "https://inference.tinfoil.sh/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "billing": "token",
       "byok": true,
       "community": true,
@@ -2270,6 +2521,7 @@
     {
       "api_base": "https://inference-api.worldrouter.ai/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "billing": "token",
       "byok": true,
       "community": true,
@@ -2613,6 +2865,7 @@
     {
       "api_base": "https://api.x.ai/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -2671,6 +2924,7 @@
     {
       "api_base": "https://api.xiaomimimo.com/v1",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -2793,6 +3047,7 @@
     {
       "api_base": "https://api.z.ai/api/paas/v4",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },
@@ -2873,6 +3128,7 @@
     {
       "api_base": "https://api.z.ai/api/coding/paas/v4",
       "auth_scheme": "x-api-key",
+      "auto_discover": false,
       "auto_sync": {
         "feed": "models_dev"
       },

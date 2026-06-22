@@ -1,0 +1,46 @@
+# GitHub Copilot — OAuth Device Flow + per-model protocol map.
+#
+# Official references:
+# - GitHub OAuth Device Flow:
+#   https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#device-flow
+# - Copilot API surface (chat / messages endpoints at api.githubcopilot.com):
+#   https://docs.github.com/en/copilot/reference/api-reference/copilot-api-endpoints
+# - VS Code Copilot Chat (MIT) — reference impl of the GitHub→Copilot token
+#   exchange + per-model protocol routing:
+#   https://github.com/microsoft/vscode-copilot-chat
+#
+# Two-step auth: `login github-copilot` runs the device flow (stores a GitHub
+# user-to-server token ghu_…); per request the consumer's `github-copilot`
+# handler exchanges it for a short-lived Copilot Bearer. Only the public OAuth
+# params live here; the exchange + integration headers are the consumer's
+# handler. Copilot multiplexes families behind one host, so protocol is
+# per-model-glob; `auto_discover` since the catalog is the gateway's `/models`.
+name: github-copilot
+display_name: GitHub Copilot
+kind: gateway
+billing: subscription
+auto_discover: true
+api_base: https://api.githubcopilot.com
+doc_url: https://docs.github.com/en/copilot/reference/api-reference/copilot-api-endpoints
+api_protocol:
+  - "claude-*": anthropic
+  - "gpt-5.5": responses
+  - "gpt-5.5-codex": responses
+  - "gpt-5.1-codex": responses
+  - "gpt-5.1-codex-mini": responses
+  - "gpt-5.3-codex": responses
+  - "gpt-5.2-codex": responses
+  - "*": openai
+auth:
+  kind: oauth
+  handler: github-copilot
+  params:
+    # Opencode's public client_id, reused while bitrouter has no registered
+    # GitHub OAuth App. Source: opencode auth registry. A caller may override
+    # via their own config.
+    client_id: Ov23li8tweQw6odWQebz
+    scope: read:user
+    device_authorization_endpoint: https://github.com/login/device/code
+    token_endpoint: https://github.com/login/oauth/access_token
+models: []
+status: active
