@@ -7,8 +7,8 @@
 //     id). Consumers that need the authoritative model set + descriptive
 //     metadata (e.g. "this gateway serves every canonical model") read this.
 //
-// Consumers (the cloud, pinned to a `reg-<timestamp>` tag; the OSS gateway,
-// fetching the raw files) read these instead of walking the YAML tree.
+// Consumers (pinned to a `reg-<timestamp>` tag, or fetching the raw files on
+// `main`) read these instead of walking the YAML tree.
 //
 // Two invariants make it safe to drive an automated release PR off the output:
 //   1. Both files are loaded through `loadProviders()` / `loadCanonical()`, so

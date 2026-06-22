@@ -18,7 +18,7 @@
 //
 // Every mutation re-validates the resulting YAML through the shared Zod
 // schema before writing, so the on-disk files are always loadable by
-// `bitrouter-cloud`.
+// the router.
 
 import { existsSync } from "node:fs";
 import { unlink } from "node:fs/promises";

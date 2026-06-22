@@ -2,8 +2,8 @@
 //
 // All scripts in this repo (validate, manage, the GitHub Actions check)
 // MUST parse YAML through the helpers exported here so the on-disk schema
-// stays consistent. Anything the Rust `bitrouter-cloud` consumer rejects
-// is something the validator here must catch first.
+// stays consistent. Anything the Rust consumer rejects is something the
+// validator here must catch first.
 
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
@@ -309,7 +309,7 @@ export const ProviderModel = z
     rate_limits: RateLimits.optional(),
     // Inference capabilities this (provider, model) pair supports beyond plain
     // completion — see `Capability`. Omitted/empty means none declared: the
-    // cloud router will not route a request that needs a capability to a
+    // router will not route a request that needs a capability to a
     // provider that doesn't list it, and `/v1/models` surfaces the union across
     // all providers of a canonical model.
     capabilities: z.array(Capability).optional(),
@@ -347,14 +347,14 @@ export const ProviderFile = z
       .optional(),
     // Marks an unaffiliated community reseller (vs a first-party / official
     // upstream, which is the unmarked default). Surfaced publicly on the
-    // cloud's /v1/providers. Replaces the former `verified` flag — providers
+    // router's /v1/providers. Replaces the former `verified` flag — providers
     // are no longer anonymized, so the real name is always public.
     community: z.boolean().optional().default(false),
     // Whether callers may bring their own key (BYOK) for this provider.
     // Defaults `true` — BYOK is available for every provider that is open to
     // public self-registration. Set `false` only when a caller cannot obtain
     // their own key (e.g. our own pooled `bitrouter` provider, or an invite-only
-    // aggregator). The cloud routes via its platform key when it holds one,
+    // aggregator). The router routes via its platform key when it holds one,
     // builds a BYOK placeholder (dispatched against `api_base`) when `byok` and
     // it holds none, and applies the BYOK overlay only when `byok`.
     byok: z.boolean().optional().default(true),
@@ -365,7 +365,7 @@ export const ProviderFile = z
     billing: Billing.optional().default("token"),
     // The provider's public upstream base URL — REQUIRED for every provider
     // (v2 transparency: endpoints are public, not held server-side). HTTPS only
-    // — matches the cloud's `validate_upstream_base` guard so a yaml that passes
+    // — matches the router's `validate_upstream_base` guard so a yaml that passes
     // the validator can never be rejected at routing time. A `byok_only` caller
     // may still override it per-request via their own BYOK `api_base`.
     api_base: z

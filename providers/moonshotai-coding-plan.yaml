@@ -10,7 +10,7 @@ rate_limits:
 # coding model; it is mapped here to the flagship canonical id so the
 # model is routable. Pricing mirrors the standard flagship for reference
 # only — Kimi Code is a flat-rate subscription and BYOK traffic is billed
-# by Moonshot, not metered per token by bitrouter-cloud.
+# by Moonshot, not metered per token by the router.
 models:
   - id: moonshotai/kimi-k2.6
     provider_model_id: kimi-for-coding
