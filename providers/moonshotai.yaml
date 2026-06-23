@@ -29,6 +29,7 @@ models:
       - reasoning
       - structured_outputs
       - tools
+    deprecation_date: 2026-08-22
   - id: moonshotai/kimi-k2.7-code
     provider_model_id: kimi-k2.7-code
     pricing:

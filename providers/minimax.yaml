@@ -29,6 +29,7 @@ models:
     capabilities:
       - reasoning
       - tools
+    deprecation_date: 2026-08-22
   - id: minimax/minimax-m3
     provider_model_id: MiniMax-M3
     pricing:

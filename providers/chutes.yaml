@@ -17,6 +17,7 @@ models:
     capabilities:
       - reasoning
       - tools
+    deprecation_date: 2026-08-22
   - id: moonshotai/kimi-k2.6
     provider_model_id: moonshotai/Kimi-K2.6-TEE
     pricing:
@@ -50,6 +51,7 @@ models:
     capabilities:
       - reasoning
       - tools
+    deprecation_date: 2026-08-22
   - id: deepseek/deepseek-v3.2
     provider_model_id: deepseek-ai/DeepSeek-V3.2-TEE
     pricing:
@@ -61,6 +63,7 @@ models:
     capabilities:
       - reasoning
       - tools
+    deprecation_date: 2026-08-22
   - id: minimax/minimax-m2.5
     provider_model_id: MiniMaxAI/MiniMax-M2.5-TEE
     pricing:
@@ -72,6 +75,7 @@ models:
     capabilities:
       - reasoning
       - tools
+    deprecation_date: 2026-08-22
   - id: xiaomi/mimo-v2-flash
     provider_model_id: XiaomiMiMo/MiMo-V2-Flash-TEE
     pricing:
@@ -83,6 +87,7 @@ models:
     capabilities:
       - reasoning
       - tools
+    deprecation_date: 2026-08-22
 status: active
 weight: 1
 auth_scheme: x-api-key

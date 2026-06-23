@@ -27,6 +27,7 @@ models:
     provider_model_id: deepseek-v4-flash
   - id: minimax/minimax-m2.5
     provider_model_id: minimax-m2.5
+    deprecation_date: 2026-08-22
   - id: qwen/qwen3.7-plus
     provider_model_id: qwen3.7-plus
   - id: qwen/qwen3.7-max
@@ -45,18 +46,23 @@ models:
     provider_model_id: minimax-m2.7
   - id: moonshotai/kimi-k2.5
     provider_model_id: kimi-k2.5
+    deprecation_date: 2026-08-22
   - id: xiaomi/mimo-v2.5
     provider_model_id: mimo-v2.5
+    deprecation_date: 2026-08-22
   - id: xiaomi/mimo-v2-omni
     provider_model_id: mimo-v2-omni
+    deprecation_date: 2026-08-22
   - id: moonshotai/kimi-k2.6
     provider_model_id: kimi-k2.6
   - id: xiaomi/mimo-v2-pro
     provider_model_id: mimo-v2-pro
+    deprecation_date: 2026-08-22
   - id: xiaomi/mimo-v2.5-pro
     provider_model_id: mimo-v2.5-pro
   - id: z-ai/glm-5
     provider_model_id: glm-5
+    deprecation_date: 2026-08-22
   - id: qwen/qwen3.6-plus
     provider_model_id: qwen3.6-plus
 status: active

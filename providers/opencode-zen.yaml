@@ -42,6 +42,7 @@ models:
         cache_read: 0.06
       output_tokens:
         text: 1.2
+    deprecation_date: 2026-08-22
   - id: anthropic/claude-opus-4.5
     provider_model_id: claude-opus-4-5
     pricing:
@@ -109,6 +110,7 @@ models:
         cache_read: 0.107
       output_tokens:
         text: 8.5
+    deprecation_date: 2026-08-22
   - id: anthropic/claude-opus-4.8
     provider_model_id: claude-opus-4-8
     pricing:
@@ -126,6 +128,7 @@ models:
         cache_read: 0.175
       output_tokens:
         text: 14
+    deprecation_date: 2026-08-22
   - id: openai/gpt-5.3-codex
     provider_model_id: gpt-5.3-codex
     pricing:
@@ -134,6 +137,7 @@ models:
         cache_read: 0.175
       output_tokens:
         text: 14
+    deprecation_date: 2026-08-22
   - id: minimax/minimax-m2.7
     provider_model_id: minimax-m2.7
     pricing:
@@ -158,6 +162,7 @@ models:
         cache_read: 0.08
       output_tokens:
         text: 3
+    deprecation_date: 2026-08-22
   - id: anthropic/claude-fable-5
     provider_model_id: claude-fable-5
     pricing:
@@ -226,6 +231,7 @@ models:
         cache_read: 0.2
       output_tokens:
         text: 3.2
+    deprecation_date: 2026-08-22
   - id: openai/gpt-5.2-codex
     provider_model_id: gpt-5.2-codex
     pricing:
@@ -234,6 +240,7 @@ models:
         cache_read: 0.175
       output_tokens:
         text: 14
+    deprecation_date: 2026-08-22
   - id: qwen/qwen3.6-plus
     provider_model_id: qwen3.6-plus
     pricing:
@@ -251,6 +258,7 @@ models:
         cache_read: 0.107
       output_tokens:
         text: 8.5
+    deprecation_date: 2026-08-22
   - id: openai/gpt-5.5
     provider_model_id: gpt-5.5
     pricing:

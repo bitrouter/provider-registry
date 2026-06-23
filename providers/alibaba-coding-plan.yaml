@@ -26,12 +26,16 @@ models:
     provider_model_id: qwen3.7-plus
   - id: qwen/qwen3.6-flash
     provider_model_id: qwen3.6-flash
+    deprecation_date: 2026-08-22
   - id: moonshotai/kimi-k2.5
     provider_model_id: kimi-k2.5
+    deprecation_date: 2026-08-22
   - id: minimax/minimax-m2.5
     provider_model_id: MiniMax-M2.5
+    deprecation_date: 2026-08-22
   - id: z-ai/glm-5
     provider_model_id: glm-5
+    deprecation_date: 2026-08-22
 status: active
 weight: 1
 submitted_at: 2026-06-05
