@@ -3776,6 +3776,27 @@
           "api_protocol": "openai",
           "capabilities": [
             "reasoning",
+            "tools"
+          ],
+          "id": "z-ai/glm-5.2",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.26,
+              "no_cache": 1.4
+            },
+            "output_tokens": {
+              "text": 4.4
+            }
+          },
+          "provider_model_id": "glm-5.2",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
+        },
+        {
+          "api_protocol": "openai",
+          "capabilities": [
+            "reasoning",
             "structured_outputs",
             "tools"
           ],
