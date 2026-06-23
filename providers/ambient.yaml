@@ -1,0 +1,34 @@
+# Ambient — OpenAI-compatible inference API. Bearer auth on `Authorization`.
+#
+# Official auth + endpoint docs:
+# - https://docs.ambient.xyz/ (developer docs)
+# - https://api.ambient.xyz/docs (OpenAPI reference)
+# - base URL `https://api.ambient.xyz/v1`; Chat Completions wire format
+#   (`POST /v1/chat/completions`); model list at `GET /v1/models`.
+#
+# Catalog source: models.dev (provider key `ambient`). The curation bot writes
+# back canonical `models` + `pricing` from that feed; consumers pull the full
+# live catalog from the same channel at runtime. Ambient also serves its own
+# `GET /v1/models` — see the `v1_models` alternative noted in the PR.
+name: ambient
+display_name: Ambient
+api_base: https://api.ambient.xyz/v1
+doc_url: https://docs.ambient.xyz/
+api_protocol:
+  - "*": openai
+rate_limits:
+  - "*":
+      requests_per_minute: 60
+auth:
+  kind: bearer
+  env: AMBIENT_API_KEY
+# Runtime-discovered catalog. The daily curation job attaches the canonical
+# models Ambient serves (per models.dev) with resale pricing and writes them
+# here; consumers pull the full live catalog from the same feed at runtime.
+# Left empty so nothing is hand-maintained — the bot is the source of truth.
+models: []
+status: active
+weight: 1
+submitted_at: 2026-06-23
+auto_sync:
+  feed: models_dev
