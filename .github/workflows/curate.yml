@@ -1,23 +1,22 @@
-# Automated, scheduled curation for providers with auto_sync (public-repo safe).
+# Automated, scheduled catalog sync for providers with auto_sync (public-repo safe).
 #
-# Two independent phases run daily (and on-demand), reflecting that the two need
-# different inputs:
+# The daily job runs ONE phase — a keyless model-catalog update:
 #
-#   1. Catalog sync  — KEYLESS. For each auto_sync=models_dev provider, attach
-#      the canonical models it already serves (per models.dev), with that
-#      provider's resale pricing. Needs no API key, so it runs on its own and
-#      always — even when the AA secret is absent or the ranking API is down.
-#   2. Onboarding    — needs the Artificial Analysis ranking API. Adds NEW
-#      canonical models (AA-top-N that a provider serves: canonical entry +
-#      crosswalk cache + attachment) and stages deprecations for auto_sync
-#      models that fell out of AA top-N.
+#   Catalog sync — KEYLESS. For each auto_sync=models_dev provider, attach the
+#   canonical models it already serves (per models.dev), with that provider's
+#   resale pricing. Needs no API key.
 #
-# Both write to the source YAML; a single bot PR collects the result for a
-# maintainer to review. Providers without auto_sync are never touched here.
+# Automatic new-model onboarding and deprecation (the Artificial Analysis
+# `curate apply` / `curate resolve` phase) is intentionally NOT run here. Those
+# decisions are made by a maintainer on demand — run `bun run curate apply` /
+# `resolve` / `suggest` locally (they require AA_API_KEY) to onboard or deprecate
+# models. The daily job only refreshes catalogs; it never adds canonical models
+# or stages deprecations.
 #
-# Required secrets (just two — no per-provider keys):
-#   AA_API_KEY                         Artificial Analysis ranking API (phase 2
-#                                      only; phase 1 runs without it)
+# The result is collected into a single bot PR for a maintainer to review.
+# Providers without auto_sync are never touched here.
+#
+# Required secrets (one — no AA or per-provider keys):
 #   RELEASE_BOT_APP_ID / _PRIVATE_KEY  the GitHub App that opens the PR (so CI
 #                                      runs on the bot PR, same as release-plz)
 name: curate
@@ -63,27 +62,14 @@ jobs:
           bun run validate
           bunx tsc --noEmit
 
-      # Phase 1 — keyless. No AA_API_KEY in scope on purpose: catalog sync must
-      # not depend on the ranking API, so it ships even when phase 2 can't run.
+      # Keyless model-catalog update. For each auto_sync=models_dev provider,
+      # attach the canonical models it already serves (per models.dev) with that
+      # provider's resale pricing. No AA_API_KEY: this never onboards a new
+      # canonical model or stages a deprecation — it only updates catalogs.
       - name: Catalog sync (keyless)
         run: |
           set -euo pipefail
           bun run curate sync --write 2>&1 | tee /tmp/sync.txt
-          bun run validate # post-write gate
-
-      # Phase 2 — needs AA. Allowed to soft-fail so a flaky/absent ranking API
-      # never blocks the phase-1 catalog sync from reaching the bot PR.
-      - name: Onboard new models (Artificial Analysis)
-        id: onboard
-        continue-on-error: true
-        env:
-          AA_API_KEY: ${{ secrets.AA_API_KEY }}
-        run: |
-          set -euo pipefail
-          DATE=$(date -u +%F)
-          echo "date=$DATE" >> "$GITHUB_OUTPUT"
-          bun run curate apply --write --as-of="$DATE" 2>&1 | tee /tmp/apply.txt
-          bun run curate resolve --as-of="$DATE" 2>&1 | tee /tmp/resolve.txt
           bun run validate # post-write gate
 
       - name: Build PR body
@@ -94,23 +80,13 @@ jobs:
           echo "date=$DATE" >> "$GITHUB_OUTPUT"
           {
             echo "body<<__CURATE_EOF__"
-            echo "Automated curation — as-of **$DATE** — auto_sync providers only."
-            echo "Phase 1 (keyless) attaches the canonical models each auto_sync=models_dev provider serves, per models.dev. Phase 2 (Artificial Analysis) onboards AA-top-N models and stages deprecations. Review the diff and merge."
+            echo "Automated catalog sync — as-of **$DATE** — auto_sync providers only."
+            echo "Keyless model-catalog update: attaches the canonical models each auto_sync=models_dev provider serves, per models.dev. New-model onboarding and deprecation (Artificial Analysis) are NOT run automatically — a maintainer runs \`curate apply\` / \`resolve\` on demand. Review the diff and merge."
             echo
-            echo "### Phase 1 — catalog sync (keyless)"
+            echo "### Catalog sync (keyless)"
             echo '```'
             cat /tmp/sync.txt 2>/dev/null || echo "(did not run)"
             echo '```'
-            echo "### Phase 2 — onboarding (Artificial Analysis)"
-            echo '```'
-            cat /tmp/apply.txt 2>/dev/null || echo "(did not run — AA unavailable)"
-            echo '```'
-            echo "<details><summary>Full resolve digest</summary>"
-            echo
-            echo '```'
-            cat /tmp/resolve.txt 2>/dev/null || echo "(did not run)"
-            echo '```'
-            echo "</details>"
             echo "__CURATE_EOF__"
           } >> "$GITHUB_OUTPUT"
 
