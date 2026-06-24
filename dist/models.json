@@ -4942,6 +4942,20 @@
           "api_protocol": "openai",
           "pricing": {
             "input_tokens": {
+              "cache_read": 0.26,
+              "no_cache": 1.4
+            },
+            "output_tokens": {
+              "text": 4.4
+            }
+          },
+          "provider": "opencode-zen",
+          "provider_model_id": "glm-5.2"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
               "cache_read": 0.18,
               "no_cache": 1
             },
