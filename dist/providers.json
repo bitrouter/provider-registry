@@ -2875,6 +2875,20 @@
             }
           },
           "provider_model_id": "gpt-5.5"
+        },
+        {
+          "api_protocol": "openai",
+          "id": "z-ai/glm-5.2",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.26,
+              "no_cache": 1.4
+            },
+            "output_tokens": {
+              "text": 4.4
+            }
+          },
+          "provider_model_id": "glm-5.2"
         }
       ],
       "name": "opencode-zen",
