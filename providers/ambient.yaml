@@ -22,11 +22,25 @@ rate_limits:
 auth:
   kind: bearer
   env: AMBIENT_API_KEY
-# Runtime-discovered catalog. The daily curation job attaches the canonical
-# models Ambient serves (per models.dev) with resale pricing and writes them
-# here; consumers pull the full live catalog from the same feed at runtime.
-# Left empty so nothing is hand-maintained — the bot is the source of truth.
-models: []
+# Seed the one model verified production-ready on Ambient's live API:
+# `moonshotai/kimi-k2.7-code` (~1.7s TTFT, ~65 tok/s, standard OpenAI-compatible
+# streaming via `delta.content`). Pricing is from Ambient's live `GET /v1/models`
+# (USD per 1M tokens) — authoritative for billing and currently higher than the
+# models.dev feed. The daily `curate sync` is additive + idempotent: it leaves
+# this hand-set entry untouched and only attaches the other canonical models
+# Ambient serves from the same feed at runtime.
+models:
+  - id: moonshotai/kimi-k2.7-code
+    provider_model_id: moonshotai/kimi-k2.7-code
+    pricing:
+      input_tokens:
+        no_cache: 0.84
+      output_tokens:
+        text: 3.99
+    capabilities:
+      - reasoning
+      - tools
+      - structured_outputs
 status: active
 weight: 1
 submitted_at: 2026-06-23

@@ -2401,6 +2401,27 @@
       ],
       "providers": [
         {
+          "api_protocol": "openai",
+          "capabilities": [
+            "reasoning",
+            "tools",
+            "structured_outputs"
+          ],
+          "pricing": {
+            "input_tokens": {
+              "no_cache": 0.84
+            },
+            "output_tokens": {
+              "text": 3.99
+            }
+          },
+          "provider": "ambient",
+          "provider_model_id": "moonshotai/kimi-k2.7-code",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
+        },
+        {
           "api_protocol": "responses",
           "capabilities": [
             "reasoning",
