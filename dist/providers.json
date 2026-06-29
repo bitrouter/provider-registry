@@ -336,6 +336,51 @@
     },
     {
       "access": "api_key",
+      "api_base": "https://api.ambient.xyz/v1",
+      "auth": {
+        "env": "AMBIENT_API_KEY",
+        "kind": "bearer"
+      },
+      "auth_scheme": "x-api-key",
+      "auto_sync": {
+        "feed": "models_dev"
+      },
+      "billing": "token",
+      "byok": true,
+      "community": false,
+      "display_name": "Ambient",
+      "doc_url": "https://docs.ambient.xyz/",
+      "id": "ambient",
+      "models": [
+        {
+          "api_protocol": "openai",
+          "capabilities": [
+            "reasoning",
+            "tools",
+            "structured_outputs"
+          ],
+          "id": "moonshotai/kimi-k2.7-code",
+          "pricing": {
+            "input_tokens": {
+              "no_cache": 0.84
+            },
+            "output_tokens": {
+              "text": 3.99
+            }
+          },
+          "provider_model_id": "moonshotai/kimi-k2.7-code",
+          "rate_limits": {
+            "requests_per_minute": 60
+          }
+        }
+      ],
+      "name": "ambient",
+      "status": "active",
+      "submitted_at": "2026-06-23",
+      "weight": 1
+    },
+    {
+      "access": "api_key",
       "api_base": "https://api.anthropic.com/v1",
       "auth": {
         "env": "ANTHROPIC_API_KEY",
