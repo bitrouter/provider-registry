@@ -59,6 +59,21 @@
           },
           "provider": "opencode-zen",
           "provider_model_id": "claude-fable-5"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 1,
+              "cache_write": 12.5,
+              "no_cache": 10
+            },
+            "output_tokens": {
+              "text": 50
+            }
+          },
+          "provider": "openrouter",
+          "provider_model_id": "anthropic/claude-fable-5"
         }
       ],
       "release_date": "2026-06-09"
@@ -1969,6 +1984,20 @@
               "text": 1.2
             }
           },
+          "provider": "opencode-zen",
+          "provider_model_id": "minimax-m3"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.06,
+              "no_cache": 0.3
+            },
+            "output_tokens": {
+              "text": 1.2
+            }
+          },
           "provider": "openrouter",
           "provider_model_id": "minimax/minimax-m3"
         },
@@ -2206,6 +2235,24 @@
           "provider_model_id": "moonshotai/Kimi-K2.6",
           "rate_limits": {
             "requests_per_minute": 40
+          }
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.2,
+              "cache_write": 0,
+              "no_cache": 0.95
+            },
+            "output_tokens": {
+              "text": 4
+            }
+          },
+          "provider": "ambient",
+          "provider_model_id": "moonshotai/kimi-k2.6",
+          "rate_limits": {
+            "requests_per_minute": 60
           }
         },
         {
@@ -2463,6 +2510,20 @@
         {
           "api_protocol": "openai",
           "provider": "opencode-go",
+          "provider_model_id": "kimi-k2.7-code"
+        },
+        {
+          "api_protocol": "openai",
+          "pricing": {
+            "input_tokens": {
+              "cache_read": 0.19,
+              "no_cache": 0.95
+            },
+            "output_tokens": {
+              "text": 4
+            }
+          },
+          "provider": "opencode-zen",
           "provider_model_id": "kimi-k2.7-code"
         },
         {
